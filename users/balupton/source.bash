@@ -1,25 +1,28 @@
 #!/usr/bin/env bash
 # this file is only loaded for bash, which is what most of the commands are coded in
 
-# make sure when we use bash, we use globstar if it is supported
-if [[ "$BASH_VERSION" = "4."* || "$BASH_VERSION" = "5."* ]]; then
-	source "$BDIR/sources/globstar.bash"
-fi
+# DOROTHY ECOSYSTEM
+# https://github.com/bevry/dorothy/blob/master/sources/defaults.bash
 
-# load anything cross-shell useful from source.sh
-source "$BDIR/users/balupton/source.sh"
+# inherit the cross-platform shell configuration
+source "$DOROTHY/user/source.sh"
 
-export TERMINAL_EDITORS=(
-	vim # --noplugin -c "set nowrap"'
-	micro
-	nano
+# dns
+export DNS_NOFAP="yes"
+export DNS_SERVICE="system"
+export DNS_PROVIDER="env"
+export DNS_IPV4SERVERS=(
+	"192.168.5.20"
+)
+export DNS_IPV6SERVERS=(
+	"fd4a:1de5:c962:1:dea6:32ff:fec1:a6fc"
 )
 
-export GUI_EDITORS=(
-	"code -w"
-	"atom -w"
-	"subl -w"
-	gedit
+export USER_SHELLS=(
+	fish
+	bash
+	zsh
+	sh
 )
 
 export APK_INSTALL=(
@@ -64,6 +67,7 @@ export APT_ADD=(
 export SNAP_INSTALL=(
 	code
 	deno
+	go --classic
 )
 
 # https://github.com/Microsoft/vscode-go/wiki/Go-tools-that-the-Go-extension-depends-on
@@ -105,9 +109,8 @@ export GO_INSTALL=(
 	github.com/cloudflare/utahfs/cmd/utahfs-client
 )
 
-export BREW_ARCH="x86_64"
-
-export BREW_INSTALL=(
+export HOMEBREW_ARCH="x86_64"
+export HOMEBREW_INSTALL=(
 	# azure-cli
 	# balena-cli
 	# blackbox
@@ -149,13 +152,11 @@ export BREW_INSTALL=(
 	watchman
 	wget
 )
-
-export BREW_INSTALL_SLOW=(
+export HOMEBREW_INSTALL_SLOW=(
 	gpg
 	shellcheck
 )
-
-export BREW_INSTALL_CASK=(
+export HOMEBREW_INSTALL_CASK=(
 	# 1password-cli
 	# acorn
 	# adguard
@@ -275,119 +276,4 @@ export NODE_INSTALL=(
 	# cryptocurrency
 	# cartera
 	# coinmon
-)
-
-## BAD THEMES ##
-# Adophis
-# After Dark
-# Ardent
-# Ayu
-# Ayu Adaptive
-# Cobalt2
-# Eva
-# Eye Care
-# Eye Relax Theme
-# Eye Relax Theme
-# Fons
-# IKKI
-# Kimbie Dark
-# Make Apps
-# Night Owl Light
-# Noctis
-# Palenight
-# Ra Eyeful
-# Rainbow
-# Red
-# Relax Eyes
-# Relax Eyes
-# Relax your eyes
-# Salad
-# Solarized
-# Tomorrow Night
-# Zenburn
-
-## BEST LIGHT THEMES ##
-# An Old Hope Light
-# Eyesore
-# GitHub Light
-# Ra Light
-# Ra Spring
-
-## BEST DARK THEMES ##
-# Github Dark
-# Monokai Night
-# Night Owl
-# PEGO Eye
-# Save Eyes HC
-# Save My Eyes
-# Zeal
-export VSCODE_INSTALL=(
-	# akamud.vscode-theme-onedark
-	# akamud.vscode-theme-onelight
-	# ccy.ayu-adaptive
-	# DavidAnson.vscode-markdownlint
-	# donjayamanne.jupyter
-	# fatihacet.gitlab-workflow
-	# flowtype.flow-for-vscode
-	# jsaulou.theme-by-language
-	# julialang.language-julia
-	# mindginative.terraform-snippets
-	# ms-vscode.vscode-typescript-next
-	# shinnn.stylelint
-	# teabyii.ayu
-	# Uber.baseweb
-	alexlab.save-eyes-hc
-	bierner.lit-html
-	dbaeumer.vscode-eslint
-	dbaeumer.vscode-eslint
-	denoland.vscode-deno
-	dotjoshjohnson.xml
-	dustinsanders.an-old-hope-theme-vscode
-	eamodio.gitlens
-	editorconfig.editorconfig
-	esbenp.prettier-vscode
-	fabiospampinato.vscode-monokai-night
-	fauna.faunadb
-	github.github-vscode-theme
-	github.vscode-pull-request-github
-	golang.go
-	hashicorp.terraform
-	idleberg.applescript
-	joonaskivikunnas.eyesore
-	kqadem.zeal-theme
-	mechatroner.rainbow-csv
-	ms-azuretools.vscode-docker
-	ms-python.python
-	ms-vsliveshare.vsliveshare-pack
-	pego.pego-eye
-	pkief.material-icon-theme
-	plievone.vscode-template-literal-editor
-	rahmanyerli.ra-light
-	rahmanyerli.ra-spring
-	richie5um2.vscode-sort-json
-	sdras.night-owl
-	silvenon.mdx
-	skyapps.fish-vscode
-	timonwong.shellcheck
-	wayou.vscode-todo-highlight
-	zaphodando.save-my-eyes
-)
-
-export ATOM_INSTALL=(
-	city-lights-ui
-	editorconfig
-	file-type-icons
-	highlight-selected
-	indentation-indicator
-	jackhammer-syntax
-	language-stylus
-	linter
-	linter-coffeelint
-	linter-csslint
-	linter-eslint
-	linter-flow
-	linter-jsonlint
-	linter-shellcheck
-	react
-	visual-bell
 )

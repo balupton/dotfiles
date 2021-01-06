@@ -1,5 +1,5 @@
 #!/usr/bin/env bash
-source "$BDIR/sources/strict.bash"
+source "$DOROTHY/sources/strict.bash"
 
 # 1. create an app with read+write access permissions
 # 2. run this once https://github.com/twitter/twurl#getting-started

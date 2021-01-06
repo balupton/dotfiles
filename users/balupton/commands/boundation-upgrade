@@ -1,7 +1,7 @@
 #!/usr/bin/env bash
-source "$BDIR/sources/essentials.sh"
-source "$BDIR/sources/extras.sh"
-source "$BDIR/sources/strict.bash"
+source "$DOROTHY/sources/essentials.sh"
+source "$DOROTHY/sources/extras.sh"
+source "$DOROTHY/sources/strict.bash"
 
 # prepare
 name="$(basename "$(pwd)")"
