@@ -1,8 +1,8 @@
 #!/usr/bin/env bash
-# this file is only loaded for bash, which is what most of the commands are coded in
 
-# DOROTHY ECOSYSTEM
-# https://github.com/bevry/dorothy/blob/master/sources/defaults.bash
+# dorothy configuration options:
+# https://github.com/bevry/dorothy#configuration
+# https://github.com/bevry/dorothy/blob/master/sources/defaults.sh
 
 # inherit the cross-platform shell configuration
 source "$DOROTHY/user/source.sh"
