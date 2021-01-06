@@ -1,3 +1,0 @@
-#!/usr/bin/env bash
-
-bash -x "$(get-command "$1")" "${@:2}"

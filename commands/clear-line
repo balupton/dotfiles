@@ -1,3 +1,0 @@
-#!/usr/bin/env bash
-
-echo -e $'\u001b[1A\u001b[0J\u001b[2K'

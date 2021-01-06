@@ -1,8 +1,0 @@
-#!/usr/bin/env bash
-source "$BDIR/sources/strict.bash"
-
-if "$BDIR/commands/is-dir" "$1"; then
-	echo "$1"
-else
-	exit 1
-fi

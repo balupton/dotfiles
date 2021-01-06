@@ -1,3 +1,0 @@
-#!/usr/bin/env bash
-
-is-string "${SSH_CONNECTION-}" || is-string "${SSH_CLIENT-}" || is-string "${SSH_TTY-}"

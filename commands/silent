@@ -1,5 +1,0 @@
-#!/usr/bin/env bash
-
-"$@" &> /dev/null
-
-# fish: "$@" > /dev/null ^ /dev/null
