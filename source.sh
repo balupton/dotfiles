@@ -1,4 +1,5 @@
 #!/usr/bin/env sh
+# this file must be compatible with fish, zsh, bash
 
 # dorothy configuration options:
 # https://github.com/bevry/dorothy#configuration
@@ -12,7 +13,5 @@ export GIT_DEFAULT_BRANCH="main"
 export SHELLCHECK_OPTS="-e SC2096 -e SC1090 -e SC1091 -e SC1071"
 alias go-open="open -a /Applications/GoLand.app ."
 
-# load my env file if it exists (it may be missing if it hasn't been copied over, as clones do not keep it)
-if test -f "$DOROTHY/user/env.sh"; then
-	. "$DOROTHY/user/env.sh"
-fi
+# source my env file
+. "$DOROTHY/user/env.sh"
