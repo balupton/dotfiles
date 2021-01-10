@@ -8,15 +8,17 @@
 source "$DOROTHY/user/source.sh"
 
 # dns
-export DNS_NOFAP="yes"
-export DNS_SERVICE="system"
-export DNS_PROVIDER="env"
-export DNS_IPV4SERVERS=(
-	"192.168.5.20"
-)
-export DNS_IPV6SERVERS=(
-	"fd4a:1de5:c962:1:dea6:32ff:fec1:a6fc"
-)
+if "$DOROTHY/commands/is-mac"; then
+	export DNS_NOFAP="yes"
+	export DNS_SERVICE="system"
+	export DNS_PROVIDER="env"
+	export DNS_IPV4SERVERS=(
+		"192.168.5.20"
+	)
+	export DNS_IPV6SERVERS=(
+		"fd4a:1de5:c962:1:dea6:32ff:fec1:a6fc"
+	)
+fi
 
 export USER_SHELLS=(
 	fish
@@ -51,16 +53,17 @@ export APT_REMOVE=(
 )
 
 export APT_ADD=(
+	# ruby-dev
+	# software-properties-common
 	build-essential
 	curl
 	fish
 	git
 	libssl-dev
+	make
 	openssl
 	python
 	ruby
-	ruby-dev
-	software-properties-common
 	vim
 )
 
@@ -222,7 +225,7 @@ export HOMEBREW_INSTALL_CASK=(
 )
 
 # gems
-# export RUBY_VERSION="2.7"
+export RUBY_VERSION="2.7"
 export RUBY_INSTALL=(
 	compass
 	ffi
