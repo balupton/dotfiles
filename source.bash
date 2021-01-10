@@ -222,7 +222,7 @@ export HOMEBREW_INSTALL_CASK=(
 )
 
 # gems
-# export RUBY_VERSION="ruby@2.3"
+# export RUBY_VERSION="2.7"
 export RUBY_INSTALL=(
 	compass
 	ffi
