@@ -218,7 +218,7 @@ export HOMEBREW_INSTALL_CASK=(
 	# windscribe
 	# workflowy
 	# xld
-	calibre
+	# calibre
 )
 
 # gems
