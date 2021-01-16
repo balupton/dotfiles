@@ -55,6 +55,8 @@ export APT_REMOVE=(
 export APT_ADD=(
 	# ruby-dev
 	# software-properties-common
+	# youtube-dl is not updated regurly enough to keep up to date with youtube's counter-measures, use the pip install instead
+	atomicparsley # a youtube-dl dependency
 	build-essential
 	curl
 	fish
@@ -214,6 +216,9 @@ export PYTHON_INSTALL=(
 	httpie
 	PyPDF2
 )
+if is-ubuntu; then
+	PYTHON_INSTALL+=('youtube_dl')
+fi
 
 export NODE_INSTALL=(
 	# bevry
