@@ -7,6 +7,11 @@
 # inherit the cross-platform shell configuration
 source "$DOROTHY/user/source.sh"
 
+# note on youtube-dl
+# brew maintains it actively, and also will assist with dependencies
+# however, ubuntu is slow to maintain, so install via pip instead
+# http://ytdl-org.github.io/youtube-dl/download.html
+
 # dns
 if "$DOROTHY/commands/is-mac"; then
 	export DNS_NOFAP="yes"
@@ -55,7 +60,6 @@ export APT_REMOVE=(
 export APT_ADD=(
 	# ruby-dev
 	# software-properties-common
-	# youtube-dl is not updated regurly enough to keep up to date with youtube's counter-measures, use the pip install instead
 	atomicparsley # a youtube-dl dependency
 	build-essential
 	curl
