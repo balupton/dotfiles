@@ -1,0 +1,22 @@
+#!/usr/bin/env bash
+source "$DOROTHY/sources/essentials.sh"
+source "$DOROTHY/sources/strict.bash"
+
+if test -z "${1-}"; then
+	stderr echo 'USAGE: fix-permissions <...dir>'
+	exit 1
+fi
+if test -z "${user-}"; then
+	stderr echo 'USAGE: env user=<user> fix-permissions <...dir>'
+	exit 1
+fi
+if test -z "${group-}"; then
+	stderr echo 'USAGE: env group=<group> fix-permissions <...dir>'
+	exit 1
+fi
+
+for dir in "$@"; do
+	sudo chown -Rv $user:$group "$dir"
+	sudo chmod -Rv g+rwx "$dir"
+	sudo chmod -Rv u+rwx "$dir"
+done
