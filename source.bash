@@ -220,7 +220,7 @@ export PYTHON_INSTALL=(
 	httpie
 	PyPDF2
 )
-if is-ubuntu; then
+if "$DOROTHY/commands/is-ubuntu"; then
 	PYTHON_INSTALL+=('youtube_dl')
 fi
 
