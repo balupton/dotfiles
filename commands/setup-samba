@@ -1,0 +1,47 @@
+#!/usr/bin/env bash
+source "$DOROTHY/sources/strict.bash"
+
+# check
+if ! is-ubuntu; then
+	stderr echo 'only for ubuntu'
+	exit 1
+fi
+
+# install
+sudo apt-get install samba samba-common-bin
+
+# ensure correct permissions
+sudo chown root:root /etc/samba/credentials
+sudo chmod 700 /etc/samba/credentials
+sudo chmod 600 /etc/samba/credentials/share
+
+# prepare
+if test -z "${user-}"; then
+	stderr echo 'USAGE: env user=<user> setup-samba'
+	exit 1
+fi
+if test -z "${group-}"; then
+	stderr echo 'USAGE: env group=<group> setup-samba'
+	exit 1
+fi
+
+# create
+sudo useradd "$user"
+sudo groupadd "$group"
+
+# set a password for the user
+sudo smbpasswd -a "$user"
+
+# make it so the user is only a share user, rather than a login user
+sudo usermod -L "$user"
+
+# add users to group
+sudo gpasswd -a "$user" "$group"
+sudo gpasswd -a ubuntu "$group"
+sudo gpasswd -a root "$group"
+
+# restart samba
+sudo systemctl restart smbd
+
+# verify configuration
+testparm

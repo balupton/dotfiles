@@ -1,0 +1,27 @@
+#!/usr/bin/env bash
+source "$DOROTHY/sources/strict.bash"
+
+# check
+if ! is-ubuntu; then
+	stderr echo 'only for ubuntu'
+	exit 1
+fi
+
+# https://support.plex.tv/articles/235974187#enable-repository-updating-for-supported-linux-server-distributions/
+# https://www.plex.tv/media-server-downloads##plex-media-server
+
+# prepare
+if test -z "${group-}"; then
+	stderr echo 'USAGE: env group=<group> setup-plex'
+	exit 1
+fi
+
+# install
+sudo apt install apt-transport-https ca-certificates curl
+curl https://downloads.plex.tv/plex-keys/PlexSign.key | sudo apt-key add -
+echo deb https://downloads.plex.tv/repo/deb public main | sudo tee /etc/apt/sources.list.d/plexmediaserver.list
+sudo apt update
+sudo apt install plexmediaserver
+
+# permissions
+sudo gpasswd -a plex "$group"

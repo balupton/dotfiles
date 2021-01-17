@@ -1,0 +1,31 @@
+#!/usr/bin/env bash
+source "$DOROTHY/sources/strict.bash"
+
+# check
+if ! is-ubuntu; then
+	stderr echo 'only for ubuntu'
+	exit 1
+fi
+
+# https://help.resilio.com/hc/en-us/articles/206178924
+# https://help.resilio.com/hc/en-us/articles/204762449-Guide-to-Linux
+
+if test -z "${group-}"; then
+	stderr echo 'USAGE: env group=<group> setup-resilio'
+	exit 1
+fi
+
+echo "deb http://linux-packages.resilio.com/resilio-sync/deb resilio-sync non-free" | sudo tee /etc/apt/sources.list.d/resilio-sync.list
+curl -LO http://linux-packages.resilio.com/resilio-sync/key.asc && sudo apt-key add ./key.asc
+sudo apt-get update
+sudo apt-get install resilio-sync
+sudo systemctl enable resilio-sync
+
+sudo gpasswd -a rslsync "$group"
+
+sudo vim /lib/systemd/system/resilio-sync.service
+sudo vim /etc/resilio-sync/config.json
+
+sudo systemctl daemon-reload
+sudo systemctl restart resilio-sync
+sudo systemctl status resilio-sync
