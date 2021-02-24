@@ -15,8 +15,19 @@ if test -z "${group-}"; then
 	exit 1
 fi
 
+function act {
+	sudo -H -u "$user" "$@" || sudo "$@" || echo "failed to run: $@"
+	echo
+}
+
 for dir in "$@"; do
-	sudo chown -Rv $user:$group "$dir"
-	sudo chmod -Rv g+rwx "$dir"
-	sudo chmod -Rv u+rwx "$dir"
+	echo
+	ls -la "$dir"
+	echo
+	act chown -Rv "$user:$group" "$dir"
+	act chmod -Rv g+rwx "$dir"
+	act chmod -Rv u+rwx "$dir"
+	echo
+	ls -la "$dir"
+	echo
 done

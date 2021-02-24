@@ -1,0 +1,31 @@
+#!/usr/bin/env bash
+source "$DOROTHY/sources/strict.bash"
+
+function unmount_location {
+	local mount_target="$1"
+	echo "unmounting: $mount_target"
+	sudo umount -l "$mount_target" || echo
+}
+
+function unmount_locations {
+	local previous_item=''
+	for item in "$@"; do
+		if test -z "$previous_item"; then
+			previous_item="$item"
+		else
+			# only unmount targets
+			unmount_location "$item"
+			previous_item=''
+		fi
+	done
+}
+
+if test "$#" -ne 0; then
+	unmount_locations "$@"
+elif test -f "$DOROTHY/user/env/mount-locations.bash"; then
+	source "$DOROTHY/user/env/mount-locations.bash"
+	unmount_locations "${MOUNT_VAULTS[@]}"
+	unmount_locations "${MOUNT_DRIVES[@]}"
+else
+	stderr echo 'USAGE: mount-drives "/source" "/target" ..."'
+fi

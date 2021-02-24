@@ -1,0 +1,52 @@
+#!/usr/bin/env bash
+source "$DOROTHY/sources/strict.bash"
+
+gc="$(which gocryptfs)"
+echo "gocrypt: $gc"
+
+function mount_vault {
+	local mount_source="$1"
+	local mount_target="$2"
+	echo 'Enter the cipher password for'
+	echo "$mount_source => $mount_target"
+	sudo umount -l "$mount_target" || echo 'already unmounted'
+	mkdir -p "$mount_target"
+	fix-permissions "$mount_target"
+	if is-mac; then
+		gocryptfs "$mount_source" "$mount_target"
+	elif is-ubuntu; then
+		sudo -H -u "$user" "$gc" -noprealloc -allow_other -force_owner "$(uid "$user"):$(gid "$group")" "$mount_source" "$mount_target"
+	else
+		stderr echo 'unsupported operating system'
+		exit 1
+	fi
+	# verify permissions
+	r="$mount_target/random-$(rand)"
+	touch "$r"
+	ls -la "$r"
+	rm "$r"
+	# fix permissions
+	fix-permissions "$mount_target"
+	sudo systemctl restart smbd
+}
+
+function mount_vaults {
+	local previous_item=''
+	for item in "$@"; do
+		if test -z "$previous_item"; then
+			previous_item="$item"
+		else
+			mount_vault "$previous_item" "$item"
+			previous_item=''
+		fi
+	done
+}
+
+if test "$#" -ne 0; then
+	mount_vaults "$@"
+elif test -f "$DOROTHY/user/env/mount-locations.bash"; then
+	source "$DOROTHY/user/env/mount-locations.bash"
+	mount_vaults "${MOUNT_VAULTS[@]}"
+else
+	stderr echo 'USAGE: mount-vaults "/source" "/target" ..."'
+fi
