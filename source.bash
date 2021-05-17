@@ -16,13 +16,14 @@ source "$DOROTHY/user/source.sh"
 if "$DOROTHY/commands/is-mac"; then
 	export DNS_NOFAP="yes"
 	export DNS_SERVICE="system"
-	export DNS_PROVIDER="env"
-	export DNS_IPV4SERVERS=(
-		"192.168.5.20"
-	)
-	export DNS_IPV6SERVERS=(
-		"fd4a:1de5:c962:1:dea6:32ff:fec1:a6fc"
-	)
+	export DNS_PROVIDER="cf-family"
+	# export DNS_PROVIDER="env"
+	# export DNS_IPV4SERVERS=(
+	# 	"192.168.5.20"
+	# )
+	# export DNS_IPV6SERVERS=(
+	# 	"fd4a:1de5:c962:1:dea6:32ff:fec1:a6fc"
+	# )
 fi
 
 export USER_SHELLS=(
