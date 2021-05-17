@@ -1,4 +1,8 @@
 #!/usr/bin/env bash
 source "$DOROTHY/sources/strict.bash"
 
+# edit
 sudo vim /etc/samba/smb.conf
+
+# restart samba
+sudo systemctl restart smbd
