@@ -123,8 +123,6 @@ export HOMEBREW_INSTALL=(
 	openssh
 	pkg-config
 	podman
-	python
-	ruby
 	screen
 	terminal-notifier
 	tmux
