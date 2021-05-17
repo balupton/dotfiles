@@ -16,7 +16,7 @@ if test -z "${group-}"; then
 fi
 
 function act {
-	sudo -H -u "$user" "$@" || sudo "$@" || echo "failed to run: $@"
+	sudo -H -u "$user" "$@" || sudo "$@" || echo "failed to run: $*"
 	echo
 }
 
