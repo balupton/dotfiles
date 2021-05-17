@@ -1,3 +1,4 @@
 **/env/
 **/env.*
 **/secrets/
+commands/mount-vaults
