@@ -3,12 +3,15 @@ source "$DOROTHY/sources/strict.bash"
 
 tag="$(github-latest-release 'rfjakob/gocryptfs')"
 
-dir="$(mktemp -d)"
-git clone --depth 1 --branch "$tag" 'https://github.com/rfjakob/gocryptfs.git' "$dir"
-pushd "$dir"
+dir="$HOME/gocryptfs-$tag"
+ok rm -Rf "$dir"
+
+git clone --quiet --depth 1 --branch "$tag" 'https://github.com/rfjakob/gocryptfs.git' "$dir" > /dev/null
+pushd "$dir" > /dev/null
+chmod +x ./build.bash
 ./build.bash
-popd
+popd > /dev/null
 
 rm -Rf "$dir"
 
-gocryptfs --version
+# gocryptfs --version
