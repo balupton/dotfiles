@@ -1,14 +1,18 @@
 #!/usr/bin/env bash
 source "$DOROTHY/sources/strict.bash"
 
-conf="$DOROTHY/user/env/seedbox.bash"
-if test -f "$config"; then
-	source "$config"
+action="${1:-'start'}"
+
+# config
+varfile="$DOROTHY/user/env/seedbox.bash"
+if test -f "$varfile"; then
+	source "$varfile"
 else
-	stderr echo "config file missing: $config"
+	stderr echo "config file missing: $varfile"
 	exit 1
 fi
 
+# config check
 if test -z "${seedboxport-}"; then
 	seedboxport='9091'
 fi
@@ -28,25 +32,36 @@ if test -z "${vpnpass-}"; then
 	exist 1
 fi
 
-sudo docker run --cap-add=NET_ADMIN -d \
-	-v "$datapath":/data \
-	-e OPENVPN_PROVIDER="$vpnprovider" \
-	-e OPENVPN_USERNAME="$vpnuser" \
-	-e OPENVPN_PASSWORD="$vpnpass" \
-	-e OPENVPN_OPTS='--inactive 3600 --ping 10 --ping-exit 60' \
-	-e NORDVPN_CATEGORY=legacy_p2p \
-	-e LOCAL_NETWORK=192.168.0.0/16 \
-	--restart=always \
-	--log-driver json-file \
-	--log-opt max-size=10m \
-	-p "$seedboxport":"$seedboxport" \
-	haugene/transmission-openvpn
+# action
+if test "$action" = 'start'; then
+	sudo docker run --cap-add=NET_ADMIN -d \
+		-v "$datapath":/data \
+		-e OPENVPN_PROVIDER="$vpnprovider" \
+		-e OPENVPN_USERNAME="$vpnuser" \
+		-e OPENVPN_PASSWORD="$vpnpass" \
+		-e OPENVPN_OPTS='--inactive 3600 --ping 10 --ping-exit 60' \
+		-e NORDVPN_CATEGORY=legacy_p2p \
+		-e LOCAL_NETWORK=192.168.0.0/16 \
+		--restart=always \
+		--log-driver json-file \
+		--log-opt max-size=10m \
+		-p "$seedboxport":"$seedboxport" \
+		haugene/transmission-openvpn
+fi
+
+# fetch container identifier
+id="$(sudo docker ps --latest --format '{{ .ID }}')"
+
+# if the action is stop, then stop it
+if test "$action" = 'stop'; then
+	sudo docker stop --time 60 "$id"
+
+	echo "seedbox stopped successfully"
+	exit 0
+fi
 
 # sudo docker container ls
 # sudo docker ps
-
-# fetch the container ID
-id="$(sudo docker ps --latest --format '{{ .ID }}')"
 
 # output the IP address on the container IP
 localip="$(ip-local)"
