@@ -34,6 +34,7 @@ export USER_SHELLS=(
 )
 
 export APK_INSTALL=(
+	# gocryptfs: use `setup-gocryptfs` instead, as this version lags behind
 	aria2
 	bash
 	fish
@@ -90,6 +91,7 @@ if "$DOROTHY/commands/is-mac"; then
 else
 	export GO_INSTALL=(
 		changkun.de/x/rmtrash
+		# github.com/rfjakob/gocryptfs: use `setup-gocryptfs` instead, as this version lags behind
 	)
 fi
 

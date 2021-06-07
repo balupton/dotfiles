@@ -1,0 +1,14 @@
+#!/usr/bin/env bash
+source "$DOROTHY/sources/strict.bash"
+
+tag="$(github-latest-release 'rfjakob/gocryptfs')"
+
+dir="$(mktemp -d)"
+git clone --depth 1 --branch "$tag" 'https://github.com/rfjakob/gocryptfs.git' "$dir"
+pushd "$dir"
+./build.bash
+popd
+
+rm -Rf "$dir"
+
+gocryptfs --version
