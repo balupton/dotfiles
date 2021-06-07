@@ -99,6 +99,7 @@ export HOMEBREW_INSTALL=(
 	# balena-cli
 	# blackbox
 	# heroku
+	# kryptco/tap/kr
 	# yarn
 	aria2
 	bash
@@ -117,8 +118,8 @@ export HOMEBREW_INSTALL=(
 	hashicorp/tap/terraform
 	hashicorp/tap/vault
 	hub
+	ImageMagick
 	jq
-	kryptco/tap/kr
 	mas
 	micro
 	openssh
