@@ -67,6 +67,7 @@ export APT_ADD=(
 	curl
 	fish
 	git
+	jq
 	libssl-dev
 	make
 	openssl
