@@ -6,5 +6,5 @@ setup-gocryptfs
 mount-all
 
 if test -f "$DOROTHY/user/env/seedbox.bash"; then
-	seedbox-runner
+	seedbox-runner start
 fi

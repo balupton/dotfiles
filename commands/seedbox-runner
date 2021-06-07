@@ -2,6 +2,7 @@
 source "$DOROTHY/sources/strict.bash"
 
 action="${1:-'start'}"
+image='haugene/transmission-openvpn'
 
 # config
 varfile="$DOROTHY/user/env/seedbox.bash"
@@ -32,8 +33,17 @@ if test -z "${vpnpass-}"; then
 	exist 1
 fi
 
-# action
-if test "$action" = 'start'; then
+# actions
+function seedbox_ip {
+	sudo docker exec -it "$id" curl -fsSL 'http://ipecho.net/plain'
+}
+function seedbox_id {
+	# fetch container identifier
+	# sudo docker container ls
+	# sudo docker ps
+	sudo docker ps --filter ancestor="$image" --format '{{ .ID }}'
+}
+function seedbox_create {
 	sudo docker run --cap-add=NET_ADMIN -d \
 		-v "$datapath":/data \
 		-e OPENVPN_PROVIDER="$vpnprovider" \
@@ -46,37 +56,54 @@ if test "$action" = 'start'; then
 		--log-driver json-file \
 		--log-opt max-size=10m \
 		-p "$seedboxport":"$seedboxport" \
-		haugene/transmission-openvpn
-fi
+		"$image"
 
-# fetch container identifier
-id="$(sudo docker ps --latest --format '{{ .ID }}')"
+	id="$(seedbox_id)"
+	# ensure that it does not automatically start with the system
+	sudo docker update --restart=no "$id"
+}
+function seedbox_stop {
+	id="$(seedbox_id)"
+	sudo docker stop --time 60 "$id"
+	echo "seedbox stopped successfully"
+}
+function seedbox_status {
+	id="$(seedbox_id)"
+	localip="$(ip-local)"
+	hostip="$(ip-remote)"
+	seedboxip="$(seedbox_ip)"
+	details=(
+		"host ip      =  $hostip"
+		"seedbox ip   =  $seedboxip"
+		"seedbox url  =  http://$localip:$seedboxport"
+	)
+	if test "$hostip" != "$seedboxip"; then
+		echo 'seedbox booted successfully'
+		echo-args "${details[@]}"
+	else
+		echo 'seedbox did not connect to the vpn it seems'
+		echo-args "${details[@]}"
+		exit 1
+	fi
+}
+function seedbox_start {
+	id="$(seedbox_id)"
+	sudo docker start "$id"
+	seedbox_status
+}
 
 # if the action is stop, then stop it
 if test "$action" = 'stop'; then
-	sudo docker stop --time 60 "$id"
-
-	echo "seedbox stopped successfully"
-	exit 0
-fi
-
-# sudo docker container ls
-# sudo docker ps
-
-# output the IP address on the container IP
-localip="$(ip-local)"
-hostip="$(curl 'http://ipecho.net/plain')"
-containerip="$(sudo docker exec -it "$id" curl 'http://ipecho.net/plain')"
-function details {
-	echo "host ip      =  $hostip"
-	echo "seedbox ip   =  $containerip"
-	echo "seedbox url  =  http://$localip:$seedboxport"
-}
-if test "$hostip" != "$containerip"; then
-	echo 'seedbox booted successfully'
-	details
+	seedbox_stop
+elif test "$action" = 'start'; then
+	seedbox_start
+elif test "$action" = 'status'; then
+	seedbox_status
+elif test "$action" = 'id'; then
+	seedbox_id
+elif test "$action" = 'create'; then
+	seedbox_create
 else
-	echo 'seedbox did not connect to the vpn it seems'
-	details
+	stderr echo 'USAGE: seeedbox-runner <start|stop|status|id|create>'
 	exit 1
 fi
