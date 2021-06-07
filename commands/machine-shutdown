@@ -1,0 +1,10 @@
+#!/usr/bin/env bash
+source "$DOROTHY/sources/strict.bash"
+
+unmount-all
+
+if test -f "$DOROTHY/user/env/seedbox.bash"; then
+	seedbox-runner stop
+fi
+
+sudo shutdown --reboot

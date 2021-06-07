@@ -1,0 +1,10 @@
+#!/usr/bin/env bash
+source "$DOROTHY/sources/strict.bash"
+
+setup-gocryptfs
+
+mount-all
+
+if test -f "$DOROTHY/user/env/seedbox.bash"; then
+	seedbox-runner
+fi
