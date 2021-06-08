@@ -18,8 +18,6 @@ if test -z "${categories-}"; then
 	stderr echo 'categories configuration missing'
 	exit 1
 fi
-catnames="$(array-odds "${categories[@]}")"
-catpaths="$(array-evens "${categories[@]}")"
 
 # which
 echo 'Which download do you want to move?'
@@ -37,19 +35,11 @@ read -r title
 echo
 
 echo 'What is it?'
-category="$(choose "${catnames[@]}")"
+names="$(array-odds "${categories[@]}")"
+readarray -t names <<<"${names[@]}"
+category="${1:-"$(choose "${names[@]}")"}"
+destination="$(array-tuple-select "$category" "${categories[@]}")"
 echo
-
-destination=''
-for i in $(seq 0 1 ${catnames[#]}); do
-	v="${catnames[$i]}"
-	if test "$v" = "$category"; then
-		destination="${catpaths[$i]}"
-done
-if test -z "$destination"; then
-	stderr echo 'invalid category configuration'
-	exit 1
-fi
 
 if test -n "$title"; then
 	destination="$(fs-join "$destination" "$title")"
