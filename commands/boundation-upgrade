@@ -1,6 +1,5 @@
 #!/usr/bin/env bash
 source "$DOROTHY/sources/essentials.sh"
-source "$DOROTHY/sources/extras.sh"
 source "$DOROTHY/sources/strict.bash"
 
 # prepare
