@@ -1,0 +1,33 @@
+#!/usr/bin/env bash
+source "$DOROTHY/sources/strict.bash"
+
+# config
+varfile="$DOROTHY/user/env/permanence.bash"
+if test -f "$varfile"; then
+	source "$varfile"
+else
+	stderr echo "config file missing: $varfile"
+	exit 1
+fi
+
+# prepare
+_sources="$(array-odds "${tuples[@]}")"
+readarray -t _sources <<<"${_sources[@]}"
+_destinations="$(array-evens "${tuples[@]}")"
+readarray -t _destinations <<<"${_destinations[@]}"
+
+# verify
+if test "${#_sources[@]}" -ne "${#_destinations[@]}"; then
+	stderr echo 'invalid tuples'
+	exit 1
+fi
+
+# cycle
+for i in $(seq 0 1 "${#_sources[@]}"); do
+	_source="${_sources[$i]}"
+	_destination="${_destinations[$i]}"
+	mkdir -p "$_destination"
+	pushd "$_destination"
+		youtube-dl-archive "$_source"
+	popd > /dev/null
+done
