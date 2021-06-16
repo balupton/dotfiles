@@ -77,7 +77,7 @@ export APT_ADD=(
 )
 
 export SNAP_INSTALL=(
-	code
+	# code
 	deno
 	go --classic
 )
