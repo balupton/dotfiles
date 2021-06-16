@@ -77,9 +77,10 @@ export APT_ADD=(
 )
 
 # https://code.visualstudio.com/docs/setup/linux
+# if [[ "$(get-arch)" == 'x'* ]]; then
 export SNAP_INSTALL=(
-	# --classic code
-	deno
+	# code --classic
+	# deno
 	go --classic
 )
 
