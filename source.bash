@@ -79,9 +79,9 @@ export APT_ADD=(
 # https://code.visualstudio.com/docs/setup/linux
 # if [[ "$(get-arch)" == 'x'* ]]; then
 export SNAP_INSTALL=(
-	# code --classic
+	# 'code --classic'
 	# deno
-	go --classic
+	'go --classic'
 )
 
 if "$DOROTHY/commands/is-mac"; then
