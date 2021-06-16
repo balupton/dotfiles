@@ -82,10 +82,19 @@ export SNAP_INSTALL=(
 	go --classic
 )
 
-# https://github.com/Microsoft/vscode-go/wiki/Go-tools-that-the-Go-extension-depends-on
-# https://github.com/golang/go/wiki/gopls#editors-instructions
 if "$DOROTHY/commands/is-mac"; then
+	# https://github.com/golang/vscode-go/blob/master/docs/tools.md
+	# https://github.com/golang/tools/blob/master/gopls/README.md
 	export GO_INSTALL=(
+		golang.org/x/tools/gopls@latest # go vscode
+		github.com/go-delve/delve/cmd/dlv@latest # go vscode
+		github.com/uudashr/gopkgs/cmd/gopkgs # go vscode
+		github.com/ramya-rao-a/go-outline # go vscode
+		github.com/haya14busa/goplay # go vscode
+		github.com/haya14busa/goplay/cmd/goplay # go vscode
+		github.com/fatih/gomodifytags # go vscode
+		github.com/josharian/impl # go vscode
+		github.com/cweill/gotests/... # go vscode
 		changkun.de/x/rmtrash
 		github.com/cloudflare/utahfs/cmd/utahfs-client
 	)
@@ -120,7 +129,6 @@ export HOMEBREW_INSTALL=(
 	hashicorp/tap/nomad
 	hashicorp/tap/terraform
 	hashicorp/tap/vault
-	hub
 	ImageMagick
 	jq
 	mas
