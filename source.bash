@@ -76,8 +76,9 @@ export APT_ADD=(
 	vim
 )
 
+# https://code.visualstudio.com/docs/setup/linux
 export SNAP_INSTALL=(
-	# code
+	# --classic code
 	deno
 	go --classic
 )
