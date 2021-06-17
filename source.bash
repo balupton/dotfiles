@@ -60,7 +60,6 @@ export APT_REMOVE=(
 )
 
 export APT_ADD=(
-	# ruby-dev
 	# software-properties-common
 	atomicparsley # a youtube-dl dependency
 	build-essential
@@ -72,7 +71,7 @@ export APT_ADD=(
 	make
 	openssl
 	python
-	ruby
+	ruby-full
 	vim
 )
 
