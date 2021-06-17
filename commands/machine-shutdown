@@ -1,10 +1,11 @@
 #!/usr/bin/env bash
 source "$DOROTHY/sources/strict.bash"
 
-unmount-all
-
+# stop the apps first, obviously
 if test -f "$DOROTHY/user/env/seedbox.bash"; then
 	seedbox-runner stop
 fi
 
+# then unmount everything and shutdown
+unmount-all
 sudo shutdown --reboot
