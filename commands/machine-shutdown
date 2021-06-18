@@ -8,4 +8,12 @@ fi
 
 # then unmount everything and shutdown
 unmount-all
-sudo shutdown --reboot
+
+# ask the user if reboot or shutdown
+echo 'Do you want to reboot or shutdown?'
+action="${1:-"$(choose reboot shutdown)"}"
+if test "$action" = "reboot"; then
+	sudo shutdown --reboot
+else
+	sudo shutdown --poweroff
+fi
