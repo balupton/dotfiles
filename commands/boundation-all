@@ -51,7 +51,7 @@ while read -r slug <&3; do
 			echo ''
 			echo "upgrading $repo"
 			ok rm -Rf "$repo"
-			hub clone "$slug"
+			gh repo clone "$slug"
 			cd "$repo" || exit
 			echo "'$(npm view . name)': '$(npm view . version)'," >> ../list.txt
 			boundation-upgrade --auto --lts

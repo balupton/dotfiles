@@ -1,4 +1,5 @@
 #!/usr/bin/env bash
 source "$DOROTHY/sources/strict.bash"
 
-padd && secret env GITHUB_ACCESS_TOKEN -- npm run our:release:prepare
+padd
+github-auth npm run our:release:prepare
