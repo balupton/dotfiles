@@ -26,12 +26,21 @@ if "$DOROTHY/commands/is-mac"; then
 	# )
 fi
 
-export USER_SHELLS=(
-	fish
-	bash
-	zsh
-	sh
-)
+if "$DOROTHY/commands/is-mac"; then
+	export USER_SHELLS=(
+		fish
+		bash
+		zsh
+		sh
+	)
+else
+	export USER_SHELLS=(
+		bash
+		zsh
+		fish
+		sh
+	)
+fi
 
 export APK_INSTALL=(
 	# gocryptfs: use `setup-gocryptfs` instead, as this version lags behind
