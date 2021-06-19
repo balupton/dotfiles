@@ -41,7 +41,7 @@ function seedbox_id {
 	# fetch container identifier
 	# sudo docker container ls
 	# sudo docker ps
-	sudo docker ps --filter ancestor="$image" --format '{{ .ID }}'
+	sudo docker ps -a --filter ancestor="$image" --format '{{ .ID }}'
 }
 function seedbox_create {
 	sudo docker run --cap-add=NET_ADMIN -d \
