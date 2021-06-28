@@ -28,6 +28,7 @@ for i in $(seq 0 1 "${#_sources[@]}"); do
 	_destination="${_destinations[$i]}"
 	mkdir -p "$_destination"
 	pushd "$_destination"
-		youtube-dl-archive "$_source"
+		referrer="$(get-url-domain "$_source")"
+		youtube-dl-archive --referer "$referrer" "$_source"
 	popd > /dev/null
 done
