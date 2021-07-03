@@ -75,7 +75,9 @@ export APT_ADD=(
 	curl
 	fish
 	git
+	gnome-keyring
 	jq
+	libnotify-bin
 	libssl-dev
 	make
 	openssl
@@ -245,6 +247,7 @@ if "$DOROTHY/commands/is-ubuntu"; then
 	PYTHON_INSTALL+=('youtube_dl')
 fi
 
+# npm/yarn
 export NODE_INSTALL=(
 	# bevry
 	"@bevry/testen"
@@ -272,14 +275,42 @@ export NODE_INSTALL=(
 	# now
 
 	# tooling
+	# tldr: replaced with tealdeer
 	# typescript@next
 	eslint
 	json
 	prettier
-	tldr
 	typescript
 
 	# cryptocurrency
 	# cartera
 	# coinmon
+)
+
+# rust/cargo/crates.io
+# --locked: Require Cargo.lock is up to date
+# as rust packages can be supported by many package managers, and as cargo requires downloading every dependency, most rust packages are better installed via UTIL_INSTALL
+export RUST_INSTALL=()
+
+# utilities
+# setup-util-*
+# https://zaiste.net/posts/shell-commands-rust/
+export SETUP_UTILS=(
+	bandwich
+	bat
+	bottom
+	delta
+	dust
+	exa
+	fd
+	gh
+	grex
+	hyperfine
+	procs
+	ripgrep
+	rmesg
+	sd
+	tealdeer
+	tokei
+	zoxide
 )
