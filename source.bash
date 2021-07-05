@@ -70,8 +70,11 @@ export APT_REMOVE=(
 
 export APT_ADD=(
 	# software-properties-common
+	aria2
 	atomicparsley # a youtube-dl dependency
 	build-essential
+	clang # rust ecosystem dep
+	cmake # rust ecosystem dep
 	curl
 	fish
 	git
@@ -79,6 +82,7 @@ export APT_ADD=(
 	jq
 	libnotify-bin
 	libssl-dev
+	llvm # rust ecosystem dep
 	make
 	openssl
 	python
