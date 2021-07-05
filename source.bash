@@ -73,8 +73,6 @@ export APT_ADD=(
 	aria2
 	atomicparsley # a youtube-dl dependency
 	build-essential
-	clang # rust ecosystem dep
-	cmake # rust ecosystem dep
 	curl
 	fish
 	git
@@ -82,11 +80,11 @@ export APT_ADD=(
 	jq
 	libnotify-bin
 	libssl-dev
-	llvm # rust ecosystem dep
 	make
 	openssl
 	python
 	ruby-full
+	traceroute
 	vim
 )
 
