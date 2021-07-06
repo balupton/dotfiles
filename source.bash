@@ -74,7 +74,6 @@ export APT_ADD=(
 	atomicparsley # a youtube-dl dependency
 	build-essential
 	curl
-	fish
 	git
 	gnome-keyring
 	libnotify-bin
@@ -301,6 +300,7 @@ export SETUP_UTILS=(
 	dust
 	exa
 	fd
+	fish
 	gh
 	grex
 	httpie

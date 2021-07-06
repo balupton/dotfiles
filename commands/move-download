@@ -1,6 +1,9 @@
 #!/usr/bin/env bash
 source "$DOROTHY/sources/strict.bash"
 
+# args
+filter="${1-}"
+
 # config
 varfile="$DOROTHY/user/env/downloads.bash"
 if test -f "$varfile"; then
@@ -21,7 +24,7 @@ fi
 
 # which
 echo 'Which download do you want to move?'
-what="$(choose-path "$completed")"
+what="$(choose-path "$completed" "$filter")"
 dir="$(basename "$what")"
 echo
 
@@ -37,7 +40,7 @@ echo
 echo 'What is it?'
 names="$(array-odds "${categories[@]}")"
 readarray -t names <<<"${names[@]}"
-category="${1:-"$(choose "${names[@]}")"}"
+category="$(choose "${names[@]}")"
 destination="$(array-tuple-select "$category" "${categories[@]}")"
 echo
 
