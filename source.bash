@@ -77,7 +77,6 @@ export APT_ADD=(
 	fish
 	git
 	gnome-keyring
-	jq
 	libnotify-bin
 	libssl-dev
 	make
@@ -144,7 +143,6 @@ export HOMEBREW_INSTALL=(
 	hashicorp/tap/terraform
 	hashicorp/tap/vault
 	ImageMagick
-	jq
 	mas
 	micro
 	openssh
@@ -242,7 +240,6 @@ export RUBY_INSTALL=(
 export PYTHON_INSTALL=(
 	# bitcoinlib
 	# cairosvg
-	httpie
 	PyPDF2
 )
 if "$DOROTHY/commands/is-ubuntu"; then
@@ -296,7 +293,6 @@ export RUST_INSTALL=()
 
 # utilities
 # setup-util-*
-# https://zaiste.net/posts/shell-commands-rust/
 export SETUP_UTILS=(
 	bandwich
 	bat
@@ -307,7 +303,9 @@ export SETUP_UTILS=(
 	fd
 	gh
 	grex
+	httpie
 	hyperfine
+	jq
 	procs
 	ripgrep
 	rmesg
