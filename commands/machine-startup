@@ -9,5 +9,5 @@ mount-all
 
 # start our apps
 if test -f "$DOROTHY/user/env/seedbox.bash"; then
-	seedbox-runner start
+	seedbox start
 fi

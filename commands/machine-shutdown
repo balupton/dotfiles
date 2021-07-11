@@ -3,7 +3,7 @@ source "$DOROTHY/sources/strict.bash"
 
 # stop the apps first, obviously
 if test -f "$DOROTHY/user/env/seedbox.bash"; then
-	seedbox-runner stop
+	seedbox stop
 fi
 
 # then unmount everything and shutdown
