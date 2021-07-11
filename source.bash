@@ -13,17 +13,17 @@ source "$DOROTHY/user/source.sh"
 # http://ytdl-org.github.io/youtube-dl/download.html
 
 # dns
-if "$DOROTHY/commands/is-mac"; then
-	export DNS_NOFAP="yes"
-	export DNS_SERVICE="system"
-	export DNS_PROVIDER="cf-family"
-	# export DNS_PROVIDER="env"
-	# export DNS_IPV4SERVERS=(
-	# 	"192.168.5.20"
-	# )
-	# export DNS_IPV6SERVERS=(
-	# 	"fd4a:1de5:c962:1:dea6:32ff:fec1:a6fc"
-	# )
+export DNS_NOFAP='maybe'
+hostname="$("$DOROTHY/commands/get-hostname")"
+if test "$hostname" = 'raspi2'; then
+	export DNS_SERVICE='aghome'
+	export DNS_PROVIDER='local'
+else
+	export DNS_SERVICE='system'
+	export DNS_PROVIDER='env'
+	export DNS_IPV4SERVERS=(
+		'192.168.5.20'
+	)
 fi
 
 if "$DOROTHY/commands/is-mac"; then
@@ -236,6 +236,11 @@ export RUBY_INSTALL=(
 )
 
 # pip
+# @todo swap PyPDF2 fro one of the following
+# > https://stackoverflow.com/a/63557138/130638
+# - https://github.com/pymupdf/PyMuPDF
+# - https://github.com/pikepdf/pikepdf
+# - https://github.com/pdfminer/pdfminer.six
 export PYTHON_INSTALL=(
 	# bitcoinlib
 	# cairosvg
