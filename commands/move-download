@@ -33,16 +33,18 @@ echo
 # 	exit 1
 # fi
 
-echo 'What do you want to call it?'
-read -r title
+# title
+title="$(echo "$dir" | sd '[.]' ' ' | sd '(.+?)\s*[(]?([12][90][0-9][0-9])[)]?.*' '$1 [$2]')"
+title="$(ask-default 'What do you want to call it?' "$title")"
 echo
 
-destination="$(choose-tuple 'What is it?' '' -- "${categories[@]}")"
-echo
-
+# destination
+category=''
+destination="$(choose-tuple 'What is it?' "$category" -- "${categories[@]}")"
 if test -n "$title"; then
 	destination="$(fs-join "$destination" "$title")"
 fi
+echo
 
 echo "We will MOVE"
 echo "=> $what"
