@@ -37,11 +37,7 @@ echo 'What do you want to call it?'
 read -r title
 echo
 
-echo 'What is it?'
-names="$(array-odds "${categories[@]}")"
-readarray -t names <<<"${names[@]}"
-category="$(choose "${names[@]}")"
-destination="$(array-tuple-select "$category" "${categories[@]}")"
+destination="$(choose-tuple 'What is it?' '' -- "${categories[@]}")"
 echo
 
 if test -n "$title"; then
