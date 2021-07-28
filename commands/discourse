@@ -2,8 +2,17 @@
 source "$DOROTHY/sources/strict.bash"
 # https://discuss.bevry.me/t/creating-managing-a-discourse-instance/691?u=balupton
 
-sshpass="$(secret get BEVRY_DISCOURSE_SSH)"
-sshfile='/root/.ssh/root-discuss.bevry.me-github'
+which="$(choose-option 'Which discourse instance do you wish to upgrade?' '' -- 'bevry' 'liberland')"
+if test "$which" = 'bevry'; then
+	sshpass="$(secret get BEVRY_DISCOURSE_SSH)"
+	sshfile='/root/.ssh/root-discuss.bevry.me-github'
+elif test "$which" = 'liberland'; then
+	sshpass="$(secret get LIBERLAND_DISCOURSE_SSH)"
+	sshfile='/root/.ssh/root-discuss.liberland.me-github'
+else
+	stderr echo "Error: Invalid discourse instance."
+	exit 1
+fi
 sshhelp='/root/ssh_stdin_password.bash'
 
 ssh -T discourse <<EOF
