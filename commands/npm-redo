@@ -1,0 +1,4 @@
+#!/usr/bin/env bash
+
+rm-modules && npm i && npm run our:release:prepare && npm link
+
