@@ -1,0 +1,34 @@
+#!/usr/bin/env bash
+
+if confirm-positive 'Are you streaming?'; then
+	# stop arq backups
+	#osascript -e 'tell application "Arq" to quit'
+	# osascript 2>/dev/null <<EOF
+	# tell application "System Events" to tell process "ArqMonitor"
+	#     tell menu bar item 1 of menu bar 2
+	#         click menu item "Stop" of menu 1
+	#     end tell
+	# end tell
+	# EOF
+	# can't figure out how to stop arq backups, so just open Arq for the user to end it
+	open -a 'Arq'
+
+	# stop seedbox
+	ssh -T raspi8 <<EOF
+seedbox stop
+EOF
+
+	# open twitch studio
+	open -a 'Twitch Studio'
+else
+	# stop twitch studio
+	osascript -e 'tell application "Twitch Studio" to quit'
+
+	# resume seedbox
+	ssh -T raspi8 <<EOF
+seedbox start
+EOF
+
+	# resume arq backups
+	open -a 'Arq'
+fi
