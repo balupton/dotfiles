@@ -15,9 +15,13 @@ function finish {
 }
 trap finish EXIT
 
+# npm workaround
+# https://omrilotan.medium.com/npx-breaking-on-ci-b9f3f61d4676
+export npm_config_yes=true
+
 # user
 user="bevry" # "docpad"
-skip="pluginloader lazy-require make-deno-edition boundation awesome-crypto base billing bindsource designs discourse discourse-component-youtubetimestamps discourser dotfiles fountain gitclone-robust legal macos-getplaytime meetings nextjs-auth0-fauna staticsitegenerators-list staticsitegenerators-website study terraform-scaleway-hashistack testen textandbinaryextensions timezone-converter workers youtube ${*:2}"
+skip="envfile typechecker projectz pluginclerk links caterpillar hooks getcontributors getmembers getrepos github-commit cson dorothy pluginloader lazy-require make-deno-edition boundation awesome-crypto base billing bindsource designs discourse discourse-component-youtubetimestamps discourser dotfiles fountain gitclone-robust legal macos-getplaytime meetings nextjs-auth0-fauna staticsitegenerators-list staticsitegenerators-website study terraform-scaleway-hashistack testen textandbinaryextensions timezone-converter workers youtube ${*:2}"
 start="${1-}"
 matches="" # "-plugin-"
 

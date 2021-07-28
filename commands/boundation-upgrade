@@ -5,9 +5,9 @@ source "$DOROTHY/sources/strict.bash"
 
 # prepare
 name="$(basename "$(pwd)")"
-success="no"
+export upgradeSuccess="no"
 function finish {
-	if test "$success" = "yes"; then
+	if test "$upgradeSuccess" = "yes"; then
 		message="boundation-upgrade completed on $name"
 	else
 		message="boundation-upgrade failed on $name"
@@ -28,11 +28,30 @@ function get-node-engine {
 eo="$(get-node-engine)"
 
 # run boundation
-nvm use 14 # system
+nvm use 16 # system
 if ! command-exists boundation; then
 	npm i -g boundation
 fi
-boundation-authed --nodeVersionsTestedRange='<16' "$@"
+
+# keep going
+# workaround for now, with support for binaryextensions
+# r="$(jq -r '.boundation.nodeVersionsTestedRange' package.json || echo '')"
+# if is-value "$r"; then
+# 	if [[ "$r" = *'<16'* ]]; then
+# 		echo 'custom nodeVersionsTestedRange is okay'
+# 	else
+# 		nr='10 || 12 || 14'
+# 		say "OVERWROTE nodeVersionsTestedRange on $name"
+# 		echo "OVERWROTE nodeVersionsTestedRange on $name"
+# 		echo "from:  $r"
+# 		echo "to:    $nr"
+# 		r="$nr"
+# 	fi
+# else
+# 	r="<16"
+# fi
+# boundation --nodeVersionsTestedRange="$r" "$@"
+boundation "$@"
 
 # engine: fetch new
 en="$(get-node-engine)"
@@ -63,7 +82,7 @@ $l
 $t" > HISTORY.md
 
 # prepare
-github-prepare
+npm run our:meta
 
 # release
 ok git rm -rf docs
@@ -74,7 +93,6 @@ git commit -am "$v - boundation, changelog, version bump"
 # 	sleep 2m
 # 	npm owner add bevryme
 # fi
-github-release
-
-# prepare
-success='yes'
+set -x
+npm run our:release
+upgradeSuccess='yes'
