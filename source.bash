@@ -15,7 +15,9 @@ source "$DOROTHY/user/source.sh"
 # dns
 export DNS_NOFAP='maybe'
 hostname="$("$DOROTHY/commands/get-hostname")"
-if test "$hostname" = 'raspi2'; then
+if [[ "$hostname" = *'vm' ]]; then
+	export DNS_PROVIDER='quad9'
+elif test "$hostname" = 'raspi2'; then
 	export DNS_SERVICE='aghome'
 	export DNS_PROVIDER='local'
 else
