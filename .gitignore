@@ -1,4 +1,10 @@
+# generic
+**/.DS_Store
+.vscode/
+
+# custom to dorothy user configuration
 **/env/
 **/env.*
 **/secrets/
-commands/mount-vaults
+
+# custom to my user configuration
