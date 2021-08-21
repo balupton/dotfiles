@@ -2,7 +2,7 @@
 source "$DOROTHY/sources/essentials.sh"
 source "$DOROTHY/sources/strict.bash"
 
-if test -z "${1-}" -o "${user-}" -o -z "${group-}"; then
+if test -z "${1-}" -o -z "${user-}" -o -z "${group-}"; then
 	stderr echo 'USAGE: env user=<user> group=<group> fix-permissions <...dir>'
 	exit 1
 fi

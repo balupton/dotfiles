@@ -15,8 +15,8 @@ function mount_drive {
 	local mount_source="$1"
 	local mount_target="$2"
 	sudo mkdir -p "$mount_target"
-	echo "$mount_source => $mount_target"
-	sudo umount -l "$mount_target" || echo 'already unmounted'
+	sudo umount -l "$mount_target" || echo "already unmounted: $mount_source => $mount_target"
+	echo "mounting: $mount_source => $mount_target"
 	sudo mount "$mount_source" "$mount_target"
 	sudo btrfs dev stats "$mount_target"
 	env user="$SHARE_USER" group="$SHARE_GROUP" fix-permissions "$mount_target"
