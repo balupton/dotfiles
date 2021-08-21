@@ -1,0 +1,9 @@
+#!/usr/bin/env bash
+source "$DOROTHY/sources/strict.bash"
+
+setup-samba
+setup-gocryptfs
+mount-all
+setup-resilio
+setup-plex
+seedbox create

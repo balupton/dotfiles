@@ -1,27 +1,33 @@
 #!/usr/bin/env bash
 source "$DOROTHY/sources/strict.bash"
 
-# check
+# check system
 if ! is-ubuntu; then
 	stderr echo 'only for ubuntu'
+	exit 1
+fi
+
+# check user config
+varfile="$DOROTHY/user/env/share.bash"
+if test -f "$varfile"; then
+	source "$varfile"
+fi
+if test -z "${SHARE_GROUP-}"; then
+	stderr echo 'USAGE: env SHARE_GROUP=<group> setup-plex'
 	exit 1
 fi
 
 # https://support.plex.tv/articles/235974187#enable-repository-updating-for-supported-linux-server-distributions/
 # https://www.plex.tv/media-server-downloads##plex-media-server
 
-# prepare
-if test -z "${group-}"; then
-	stderr echo 'USAGE: env group=<group> setup-plex'
-	exit 1
+# install
+if is-apt; then
+	sudo apt install apt-transport-https ca-certificates curl
+	curl https://downloads.plex.tv/plex-keys/PlexSign.key | sudo apt-key add -
+	echo deb https://downloads.plex.tv/repo/deb public main | sudo tee /etc/apt/sources.list.d/plexmediaserver.list
+	sudo apt update
+	sudo apt install plexmediaserver
 fi
 
-# install
-sudo apt install apt-transport-https ca-certificates curl
-curl https://downloads.plex.tv/plex-keys/PlexSign.key | sudo apt-key add -
-echo deb https://downloads.plex.tv/repo/deb public main | sudo tee /etc/apt/sources.list.d/plexmediaserver.list
-sudo apt update
-sudo apt install plexmediaserver
-
 # permissions
-sudo gpasswd -a plex "$group"
+sudo gpasswd -a plex "$SHARE_GROUP"

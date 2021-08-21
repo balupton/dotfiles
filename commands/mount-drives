@@ -1,6 +1,16 @@
 #!/usr/bin/env bash
 source "$DOROTHY/sources/strict.bash"
 
+# check user config
+varfile="$DOROTHY/user/env/share.bash"
+if test -f "$varfile"; then
+	source "$varfile"
+fi
+if test -z "${SHARE_USER-}" -o -z "${SHARE_GROUP-}"; then
+	stderr echo 'USAGE: env SHARE_USER=<user> SHARE_GROUP=<group> mount-drives'
+	exit 1
+fi
+
 function mount_drive {
 	local mount_source="$1"
 	local mount_target="$2"
@@ -9,7 +19,7 @@ function mount_drive {
 	sudo umount -l "$mount_target" || echo 'already unmounted'
 	sudo mount "$mount_source" "$mount_target"
 	sudo btrfs dev stats "$mount_target"
-	fix-permissions "$mount_target"
+	env user="$SHARE_USER" group="$SHARE_GROUP" fix-permissions "$mount_target"
 }
 
 function mount_drives {

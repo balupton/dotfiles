@@ -1,6 +1,16 @@
 #!/usr/bin/env bash
 source "$DOROTHY/sources/strict.bash"
 
+# check user config
+varfile="$DOROTHY/user/env/share.bash"
+if test -f "$varfile"; then
+	source "$varfile"
+fi
+if test -z "${SHARE_USER-}" -o -z "${SHARE_GROUP-}"; then
+	stderr echo 'USAGE: env SHARE_USER=<user> SHARE_GROUP=<group> mount-vaults'
+	exit 1
+fi
+
 gc="$(which gocryptfs)"
 echo "gocrypt: $gc"
 
@@ -11,7 +21,7 @@ function mount_vault {
 	sudo umount -l "$mount_target" || echo 'already unmounted'
 
 	mkdir -p "$mount_target"
-	fix-permissions "$mount_target"
+	env user="$SHARE_USER" group="$SHARE_GROUP" fix-permissions "$mount_target"
 
 	echo 'Enter the cipher password for:'
 	echo "$mount_source => $mount_target"
@@ -19,7 +29,7 @@ function mount_vault {
 	if is-mac; then
 		gocryptfs "$mount_source" "$mount_target"
 	elif is-ubuntu; then
-		sudo -H -u "$user" "$gc" -noprealloc -allow_other -force_owner "$(uid "$user"):$(gid "$group")" "$mount_source" "$mount_target"
+		sudo -H -u "$SHARE_USER" "$gc" -noprealloc -allow_other -force_owner "$(uid "$SHARE_USER"):$(gid "$SHARE_GROUP")" "$mount_source" "$mount_target"
 	else
 		stderr echo 'unsupported operating system'
 		exit 1
@@ -31,7 +41,7 @@ function mount_vault {
 	ls -la "$r"
 	rm "$r"
 	# fix permissions
-	fix-permissions "$mount_target"
+	env user="$SHARE_USER" group="$SHARE_GROUP" fix-permissions "$mount_target"
 	sudo systemctl restart smbd
 }
 

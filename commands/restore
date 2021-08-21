@@ -1,0 +1,49 @@
+#!/usr/bin/env bash
+source "$DOROTHY/sources/strict.bash"
+
+# 192.168.7.40
+source_host="$(ask-mandatory "What is the hostname you want to restore from?" "${1-}")"
+# balupton
+source_user="$(ask-mandatory "What is the username on that host?" "${2-}")"
+source_root=''
+
+export TOOL=rsync
+export ACTION=copy
+function do_restore {
+	cpr "$source_user"@"$source_host":"$1" "$2"
+}
+function do_home_restore {
+	dir="$1"
+	src="$(fs-join "/home/${source_user}" "$dir")"
+	target="$(fs-join "$HOME" "$dir")"
+	cpr "$source_user"@"$source_host":"$src" "$target"
+}
+function do_root_restore {
+	dir="$1"
+	src="$(fs-join "$source_root" "$dir")"
+	cpr "$source_user"@"$source_host":"$src" "$dir"
+}
+
+echo 'Restoring essentials...'
+do_home_restore .ssh/
+do_home_restore .gnupg/
+do_home_restore .dorothy/user/
+
+if test "$(get-hostname)" = 'raspi8'; then
+	# /
+	# /run/media/balupton/writable/sys
+	source_root="$(ask-mandatory "Where on that source is the root filesystem to restore app configuration from?" "${3-}")"
+
+	# samba
+	do_root_restore /etc/samba/smb.conf
+
+	# resilio
+	do_root_restore /lib/systemd/system/resilio-sync.service
+	do_root_restore /etc/resilio-sync/config.json
+	do_root_restore /var/lib/resilio-sync
+	# do_home_restore .config/resilio-sync
+
+	# plex
+	do_root_restore /var/lib/plexmediaserver
+
+fi
