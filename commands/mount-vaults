@@ -40,8 +40,11 @@ function mount_vault {
 	touch "$r"
 	ls -la "$r"
 	rm "$r"
+
 	# fix permissions
 	env user="$SHARE_USER" group="$SHARE_GROUP" fix-permissions "$mount_target"
+
+	# restart samba
 	sudo systemctl restart smbd
 }
 
