@@ -1,0 +1,28 @@
+#!/usr/bin/env bash
+source "$DOROTHY/sources/strict.bash"
+
+source_root="$(ask-mandatory "Where is root file system to copy from?" "${1-}")"
+
+export TOOL=rsync
+export ACTION=copy
+function do_root_restore {
+	dir="$1"
+	src="$(fs-join "$source_root" "$dir")"
+	env CPR_SUDO=y cpr "$src" "$dir"
+}
+
+# /
+# /run/media/balupton/writable/sys
+
+# samba
+do_root_restore /etc/samba/
+
+# resilio
+do_root_restore /lib/systemd/system/resilio-sync.service
+do_root_restore /etc/resilio-sync/
+do_root_restore /var/lib/resilio-sync/
+# do_home_restore .config/resilio-sync
+
+# plex
+do_root_restore /var/lib/plexmediaserver/
+
