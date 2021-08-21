@@ -1,17 +1,23 @@
 #!/usr/bin/env bash
 source "$DOROTHY/sources/strict.bash"
 
+# get the latest release
 tag="$(github-latest-release 'rfjakob/gocryptfs')"
 
-dir="$HOME/gocryptfs-$tag"
-ok rm -Rf "$dir"
+# setup a temporary directory
+tdir="$(mktemp -d)"
 
-git clone --quiet --depth 1 --branch "$tag" 'https://github.com/rfjakob/gocryptfs.git' "$dir" > /dev/null
-pushd "$dir" > /dev/null
+# shallow clone the repo, quietly
+git clone --quiet --depth 1 --branch "$tag" 'https://github.com/rfjakob/gocryptfs.git' "$tdir"
+
+# enter into it, build from source, which also installs
+cd "$tdir" || exit 1
 chmod +x ./build.bash
 ./build.bash
-popd > /dev/null
 
-rm -Rf "$dir"
+# confirm it worked
+gocryptfs --version
 
-# gocryptfs --version
+# cleanup
+cd "$HOME" || exit 1
+rm -Rf "$tdir"
