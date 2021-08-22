@@ -31,6 +31,7 @@ fi
 
 # permissions
 sudo gpasswd -a plex "$SHARE_GROUP"
+env user=plex group=plex fix-permissions /var/lib/plexmediaserver/
 
 # start
 sudo systemctl daemon-reload
@@ -38,4 +39,4 @@ sudo systemctl restart plexmediaserver
 sudo systemctl status plexmediaserver --no-pager
 
 # log
-cat /var/lib/plexmediaserver/Library/Application\ Support/Plex\ Media\ Server/Logs/Plex\ Media\ Server.log
+journalctl -u plexmediaserver.service --no-pager

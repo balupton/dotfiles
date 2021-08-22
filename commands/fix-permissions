@@ -7,18 +7,28 @@ if test -z "${1-}" -o -z "${user-}" -o -z "${group-}"; then
 	exit 1
 fi
 
-function act {
-	sudo -H -u "$user" "$@" || sudo "$@" || echo "failed to run: $*"
-	echo
+function do_user_then_root {
+	#   -H, --set-home                set HOME variable to target user's home dir
+	#   -u, --user=user               run command (or edit file) as specified user name or ID
+	echo "sudo -H -u $user $*"
+	if ! sudo -H -u "$user" "$@"; then
+		echo "^ failed, trying an alternative..."
+		echo "sudo $*"
+		if ! sudo "$@"; then
+			echo "^ alternative failed too, giving up."
+			return 1
+		fi
+	fi
+	echo "^ success"
 }
 
 for dir in "$@"; do
 	echo
 	ls -la "$dir"
 	echo
-	act chown -Rv "$user:$group" "$dir"
-	act chmod -Rv g+rwx "$dir"
-	act chmod -Rv u+rwx "$dir"
+	sudo chown -Rv "$user:$group" "$dir"
+	do_user_then_root chmod -Rv g+rwx "$dir"
+	do_user_then_root chmod -Rv u+rwx "$dir"
 	echo
 	ls -la "$dir"
 	echo

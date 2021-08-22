@@ -27,5 +27,6 @@ do_root_restore /var/lib/resilio-sync/
 # do_home_restore .config/resilio-sync
 
 # plex
+do_root_restore /lib/systemd/system/plexmediaserver.service
 do_root_restore /var/lib/plexmediaserver/
 
