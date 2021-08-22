@@ -18,6 +18,7 @@ hostname="$("$DOROTHY/commands/get-hostname")"
 if [[ "$hostname" = *'vm' ]]; then
 	export DNS_PROVIDER='quad9'
 elif test "$hostname" = 'raspi2'; then
+	export DNS_BACKUP_PROVIDER='quad9'
 	export DNS_SERVICE='aghome'
 	export DNS_PROVIDER='local'
 else
@@ -47,25 +48,24 @@ fi
 export APK_INSTALL=(
 	# gocryptfs: use `setup-gocryptfs` instead, as this version lags behind
 	aria2
-	bash
 	git
 	gnupg
 	tree
 	wget
 )
 
-export APT_REMOVE=(
-	aisleriot
-	gnome-mahjongg
-	gnome-mines
-	gnome-sudoku
-	gnomine
-	imagemagick
-	"libreoffice*"
-	rhythmbox
-	shotwell
-	thunderbird
-)
+# export APT_REMOVE=(
+# 	aisleriot
+# 	gnome-mahjongg
+# 	gnome-mines
+# 	gnome-sudoku
+# 	gnomine
+# 	imagemagick
+# 	"libreoffice*"
+# 	rhythmbox
+# 	shotwell
+# 	thunderbird
+# )
 
 export APT_ADD=(
 	# software-properties-common
@@ -123,11 +123,8 @@ export HOMEBREW_INSTALL=(
 	# kryptco/tap/kr
 	# yarn
 	aria2
-	bash
-	bash-completion
 	coreutils
 	deno
-	gh
 	git
 	git-extras
 	git-lfs
@@ -288,13 +285,14 @@ export NODE_INSTALL=(
 
 # rust/cargo/crates.io
 # --locked: Require Cargo.lock is up to date
-# as rust packages can be supported by many package managers, and as cargo requires downloading every dependency, most rust packages are better installed via UTIL_INSTALL
+# as rust packages can be supported by many package managers, and as cargo requires downloading every dependency, most rust packages are better installed via SETUP_UTILS
 export RUST_INSTALL=()
 
 # utilities
 # setup-util-*
 export SETUP_UTILS=(
 	bandwich
+	bash
 	bat
 	bottom
 	delta
