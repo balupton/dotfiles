@@ -48,10 +48,8 @@ export APK_INSTALL=(
 	# gocryptfs: use `setup-gocryptfs` instead, as this version lags behind
 	aria2
 	bash
-	fish
 	git
 	gnupg
-	python
 	tree
 	wget
 )
@@ -81,7 +79,6 @@ export APT_ADD=(
 	libssl-dev
 	make
 	openssl
-	python
 	traceroute
 	vim
 )
@@ -130,7 +127,6 @@ export HOMEBREW_INSTALL=(
 	bash-completion
 	coreutils
 	deno
-	fish
 	gh
 	git
 	git-extras
@@ -244,7 +240,7 @@ export RUBY_INSTALL=(
 export PYTHON_INSTALL=(
 	# bitcoinlib
 	# cairosvg
-	PyPDF2
+	# PyPDF2  # python 2 only
 )
 if "$DOROTHY/commands/is-ubuntu"; then
 	PYTHON_INSTALL+=('youtube_dl')
