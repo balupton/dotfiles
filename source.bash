@@ -52,7 +52,6 @@ export APK_INSTALL=(
 	git
 	gnupg
 	python
-	ruby
 	tree
 	wget
 )
@@ -83,7 +82,6 @@ export APT_ADD=(
 	make
 	openssl
 	python
-	ruby-full
 	traceroute
 	vim
 )
