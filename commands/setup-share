@@ -1,6 +1,51 @@
 #!/usr/bin/env bash
 source "$DOROTHY/sources/strict.bash"
 
+# check user config
+varfile="$DOROTHY/user/env/share.bash"
+if test -f "$varfile"; then
+	source "$varfile"
+fi
+if test -z "${SHARE_USER-}" -o -z "${SHARE_GROUP-}"; then
+	stderr echo 'USAGE: env SHARE_USER=<user> SHARE_GROUP=<group> setup-share'
+	exit 1
+fi
+
+# create the user if necessary
+should_setup_users='yes'
+if is-user "$SHARE_USER"; then
+	if confirm-negative "The share user exists, redo it?"; then
+		should_setup_users='yes'
+	else
+		should_setup_users='no'
+	fi
+fi
+if test "$should_setup_users" = 'yes'; then
+	echo "Creating the share user [$SHARE_USER] and share group [$SHARE_GROUP]..."
+
+	# create user and group
+	sudo useradd "$SHARE_USER"
+	sudo groupadd "$SHARE_GROUP"
+
+	# set a password for the user
+	sudo smbpasswd -a "$SHARE_USER"
+
+	# make it so the user is only a share user, rather than a login user
+	sudo usermod -L "$SHARE_USER"
+
+	# add users to group
+	sudo gpasswd -a "$SHARE_USER" "$SHARE_GROUP"
+	sudo gpasswd -a ubuntu "$SHARE_GROUP"
+	sudo gpasswd -a root "$SHARE_GROUP"
+fi
+
+# confirm current is in the group
+if is-user-in-group "$SHARE_GROUP"; then
+	stderr echo "The current user [$USER] has been added to group [$SHARE_GROUP] as well, as intened, however you have to logout or restart for the change to apply. Do that, then run setup-share to continue."
+	exit 1
+fi
+
+
 setup-samba
 setup-gocryptfs
 mount-all

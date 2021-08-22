@@ -31,3 +31,11 @@ fi
 
 # permissions
 sudo gpasswd -a plex "$SHARE_GROUP"
+
+# start
+sudo systemctl daemon-reload
+sudo systemctl restart plexmediaserver
+sudo systemctl status plexmediaserver --no-pager
+
+# log
+cat /var/lib/plexmediaserver/Library/Application\ Support/Plex\ Media\ Server/Logs/Plex\ Media\ Server.log

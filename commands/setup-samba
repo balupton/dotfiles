@@ -7,16 +7,6 @@ if ! is-ubuntu; then
 	exit 1
 fi
 
-# check user config
-varfile="$DOROTHY/user/env/share.bash"
-if test -f "$varfile"; then
-	source "$varfile"
-fi
-if test -z "${SHARE_USER-}" -o -z "${SHARE_GROUP-}"; then
-	stderr echo 'USAGE: env SHARE_USER=<user> SHARE_GROUP=<group> setup-samba'
-	exit 1
-fi
-
 # install
 env APT=samba setup-util
 env APT=samba-common-bin setup-util
@@ -26,21 +16,6 @@ sudo mkdir -p /etc/samba/credentials/share
 sudo chown root:root /etc/samba/credentials
 sudo chmod 700 /etc/samba/credentials
 sudo chmod 600 /etc/samba/credentials/share
-
-# permissions
-sudo useradd "$SHARE_USER"
-sudo groupadd "$SHARE_GROUP"
-
-# set a password for the user
-sudo smbpasswd -a "$SHARE_USER"
-
-# make it so the user is only a share user, rather than a login user
-sudo usermod -L "$SHARE_USER"
-
-# add users to group
-sudo gpasswd -a "$SHARE_USER" "$SHARE_GROUP"
-sudo gpasswd -a ubuntu "$SHARE_GROUP"
-sudo gpasswd -a root "$SHARE_GROUP"
 
 # restart samba
 sudo systemctl restart smbd

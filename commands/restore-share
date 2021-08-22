@@ -14,6 +14,9 @@ function do_root_restore {
 # /
 # /run/media/balupton/writable/sys
 
+# fuse
+do_root_restore /etc/fuse.conf
+
 # samba
 do_root_restore /etc/samba/
 

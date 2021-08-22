@@ -11,8 +11,12 @@ if test -z "${SHARE_USER-}" -o -z "${SHARE_GROUP-}"; then
 	exit 1
 fi
 
-gc="$(which gocryptfs)"
+gc="/usr/local/bin/gocryptfs"  # a path that is available to sudo
 echo "gocrypt: $gc"
+sudo "$gc" --version || {
+	echo 'gocryptfs was not runnable by sudo, run setup-gocryptfs again'
+	exit 1
+}
 
 function mount_vault {
 	local mount_source="$1"
@@ -20,7 +24,7 @@ function mount_vault {
 
 	sudo umount -l "$mount_target" || echo 'already unmounted'
 
-	mkdir -p "$mount_target"
+	sudo mkdir -p "$mount_target"
 	env user="$SHARE_USER" group="$SHARE_GROUP" fix-permissions "$mount_target"
 
 	echo 'Enter the cipher password for:'
@@ -35,14 +39,14 @@ function mount_vault {
 		exit 1
 	fi
 
+	# fix permissions
+	env user="$SHARE_USER" group="$SHARE_GROUP" fix-permissions "$mount_target"
+
 	# verify permissions
 	r="$mount_target/random-$(rand)"
 	touch "$r"
 	ls -la "$r"
 	rm "$r"
-
-	# fix permissions
-	env user="$SHARE_USER" group="$SHARE_GROUP" fix-permissions "$mount_target"
 
 	# restart samba
 	sudo systemctl restart smbd
