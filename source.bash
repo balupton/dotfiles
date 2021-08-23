@@ -88,22 +88,10 @@ export APT_ADD=(
 export SNAP_INSTALL=(
 	# 'code --classic'
 	# deno
-	'go --classic'
 )
 
 if "$DOROTHY/commands/is-mac"; then
-	# https://github.com/golang/vscode-go/blob/master/docs/tools.md
-	# https://github.com/golang/tools/blob/master/gopls/README.md
 	export GO_INSTALL=(
-		golang.org/x/tools/gopls@latest # go vscode
-		github.com/go-delve/delve/cmd/dlv@latest # go vscode
-		github.com/uudashr/gopkgs/cmd/gopkgs # go vscode
-		github.com/ramya-rao-a/go-outline # go vscode
-		github.com/haya14busa/goplay # go vscode
-		github.com/haya14busa/goplay/cmd/goplay # go vscode
-		github.com/fatih/gomodifytags # go vscode
-		github.com/josharian/impl # go vscode
-		github.com/cweill/gotests/... # go vscode
 		changkun.de/x/rmtrash
 		github.com/cloudflare/utahfs/cmd/utahfs-client
 	)
@@ -128,7 +116,6 @@ export HOMEBREW_INSTALL=(
 	git
 	git-extras
 	git-lfs
-	go
 	hashicorp/tap/boundary
 	hashicorp/tap/consul
 	hashicorp/tap/nomad
