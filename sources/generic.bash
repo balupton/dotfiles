@@ -5,25 +5,6 @@
 # however, ubuntu is slow to maintain, so install via pip instead
 # http://ytdl-org.github.io/youtube-dl/download.html
 
-# prepare
-hostname="$("$DOROTHY/commands/get-hostname")"
-
-# dns
-export DNS_NOFAP='maybe'
-if [[ "$hostname" = *'vm' ]]; then
-	export DNS_PROVIDER='quad9'
-elif test "$hostname" = 'raspi2'; then
-	export DNS_BACKUP_PROVIDER='quad9'
-	export DNS_SERVICE='aghome'
-	export DNS_PROVIDER='local'
-else
-	export DNS_SERVICE='system'
-	export DNS_PROVIDER='env'
-	export DNS_IPV4SERVERS=(
-		'192.168.5.20'
-	)
-fi
-
 if "$DOROTHY/commands/is-mac"; then
 	export USER_SHELLS=(
 		fish
