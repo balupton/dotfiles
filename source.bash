@@ -15,7 +15,8 @@ if test -f "$DOROTHY/user/env/$hostname.bash"; then
 	source "$DOROTHY/user/env/$hostname.bash"
 elif test -f "$DOROTHY/user/sources/$hostname.bash"; then
 	source "$DOROTHY/user/sources/$hostname.bash"
-else
+elif test -f "$DOROTHY/user/env/generic.bash"; then
+	source "$DOROTHY/user/env/generic.bash"
+elif test -f "$DOROTHY/user/sources/generic.bash"; then
 	source "$DOROTHY/user/sources/generic.bash"
 fi
-
