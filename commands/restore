@@ -2,9 +2,9 @@
 source "$DOROTHY/sources/strict.bash"
 
 # 192.168.4.42
-source_host="$(ask-mandatory "What is the hostname you want to restore from?" "${1-}")"
+source_host="$(ask --question="What is the hostname you want to restore from?" --default="${1-}")"
 # balupton
-source_user="$(ask-mandatory "What is the username on that host?" "${2-}")"
+source_user="$(ask --question="What is the username on that host?" --default="${2-}")"
 
 export TOOL=rsync
 export ACTION=copy

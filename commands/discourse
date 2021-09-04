@@ -2,7 +2,7 @@
 source "$DOROTHY/sources/strict.bash"
 # https://discuss.bevry.me/t/creating-managing-a-discourse-instance/691?u=balupton
 
-which="$(choose-option 'Which discourse instance do you wish to upgrade?' '' -- 'bevry' 'liberland')"
+which="$(choose-option --question='Which discourse instance do you wish to upgrade?' -- 'bevry' 'liberland')"
 if test "$which" = 'bevry'; then
 	sshpass="$(secret get BEVRY_DISCOURSE_SSH)"
 	sshfile='/root/.ssh/root-discuss.bevry.me-github'

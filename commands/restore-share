@@ -1,7 +1,7 @@
 #!/usr/bin/env bash
 source "$DOROTHY/sources/strict.bash"
 
-source_root="$(ask-mandatory "Where is root file system to copy from?" "${1-}")"
+source_root="$(ask --question="Where is root file system to copy from?" --default="${1-}")"
 
 export TOOL=rsync
 export ACTION=copy
