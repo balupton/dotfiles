@@ -1,6 +1,11 @@
 #!/usr/bin/env bash
 source "$DOROTHY/sources/strict.bash"
 
+# suspend share
+sudo systemctl stop smbd || :
+sudo systemctl stop plexmediaserver || :
+sudo systemctl stop resilio-sync || :
+
 # stop the apps first, obviously
 if test -f "$DOROTHY/user/env/seedbox.bash"; then
 	seedbox stop

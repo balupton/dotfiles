@@ -46,4 +46,5 @@ sudo systemctl restart resilio-sync
 sudo systemctl status resilio-sync --no-pager
 
 # log
-journalctl -u resilio-sync.service --no-pager
+# journalctl -u resilio-sync.service --no-pager
+# ^ journalctl logs everything, thousands of lines

@@ -45,10 +45,8 @@ if is-user-in-group "$SHARE_GROUP"; then
 	exit 1
 fi
 
-
-setup-samba
-setup-gocryptfs
 mount-all
+setup-samba
 setup-resilio
 setup-plex
 seedbox create

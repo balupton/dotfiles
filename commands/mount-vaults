@@ -1,6 +1,9 @@
 #!/usr/bin/env bash
 source "$DOROTHY/sources/strict.bash"
 
+# dependencies
+setup-util-gocryptfs
+
 # check user config
 varfile="$DOROTHY/user/env/share.bash"
 if test -f "$varfile"; then

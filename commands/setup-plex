@@ -39,4 +39,5 @@ sudo systemctl restart plexmediaserver
 sudo systemctl status plexmediaserver --no-pager
 
 # log
-journalctl -u plexmediaserver.service --no-pager
+# journalctl -u plexmediaserver.service --no-pager
+# ^ journalctl logs everything, thousands of lines

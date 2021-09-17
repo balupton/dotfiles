@@ -22,7 +22,7 @@ else
 fi
 
 export APK_INSTALL=(
-	# gocryptfs: use `setup-gocryptfs` instead, as this version lags behind
+	# gocryptfs: use `setup-util-gocryptfs` instead, as this version lags behind
 	aria2
 	git
 	gnupg
@@ -74,7 +74,7 @@ if "$DOROTHY/commands/is-mac"; then
 else
 	export GO_INSTALL=(
 		changkun.de/x/rmtrash
-		# github.com/rfjakob/gocryptfs: use `setup-gocryptfs` instead, as this version lags behind
+		# github.com/rfjakob/gocryptfs: use `setup-util-gocryptfs` instead, as this version lags behind
 	)
 fi
 
@@ -83,6 +83,11 @@ export HOMEBREW_INSTALL=(
 	# azure-cli
 	# balena-cli
 	# blackbox
+	# hashicorp/tap/boundary
+	# hashicorp/tap/consul
+	# hashicorp/tap/nomad
+	# hashicorp/tap/terraform
+	# hashicorp/tap/vault
 	# heroku
 	# kryptco/tap/kr
 	# yarn
@@ -92,11 +97,6 @@ export HOMEBREW_INSTALL=(
 	git
 	git-extras
 	git-lfs
-	hashicorp/tap/boundary
-	hashicorp/tap/consul
-	hashicorp/tap/nomad
-	hashicorp/tap/terraform
-	hashicorp/tap/vault
 	ImageMagick
 	mas
 	micro
@@ -264,6 +264,7 @@ export SETUP_UTILS=(
 	fd
 	fish
 	gh
+	gocryptfs
 	grex
 	httpie
 	hyperfine
