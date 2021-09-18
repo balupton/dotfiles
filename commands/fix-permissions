@@ -2,34 +2,51 @@
 source "$DOROTHY/sources/essentials.sh"
 source "$DOROTHY/sources/strict.bash"
 
-if test -z "${1-}" -o -z "${user-}" -o -z "${group-}"; then
+if test -z "${1-}"; then
 	stderr echo 'USAGE: env user=<user> group=<group> fix-permissions <...dir>'
 	exit 1
 fi
 
-function do_user_then_root {
+function do_user {
 	#   -H, --set-home                set HOME variable to target user's home dir
 	#   -u, --user=user               run command (or edit file) as specified user name or ID
-	echo "sudo -H -u $user $*"
-	if ! sudo -H -u "$user" "$@"; then
-		echo "^ failed, trying an alternative..."
-		echo "sudo $*"
-		if ! sudo "$@"; then
-			echo "^ alternative failed too, giving up."
-			return 1
-		fi
+	echo "sudo -H -u ${user:?"env user=<user> fix-permissions required for do_user"} $*"
+	sudo -H -u "$user" "$@" | grep --invert-match 'retained'
+}
+
+function do_root {
+	echo "sudo $*"
+	sudo "$@" | grep --invert-match 'retained'
+}
+
+function do_user_then_root {
+	if test -n "${user-}" && do_user "$@"; then
+		return 0
+	elif do_root "$@"; then
+		return 0
+	else
+		echo "^ sudo user, and sudo, both failed, giving up."
+		return 1
 	fi
-	echo "^ success"
 }
 
 for dir in "$@"; do
-	echo
+	echo 'Original listing:'
 	ls -la "$dir"
 	echo
-	sudo chown -Rv "$user:$group" "$dir"
+	echo 'Updating permissions, this can take a while, only displaying changes...  ⏲'
+	if test -n "${user-}" -a -n "${group-}"; then
+		do_root chown -Rv "$user:$group" "$dir"
+	elif test -n "${user-}"; then
+		do_root chown -Rv "$user" "$dir"
+	elif test -n "${group-}"; then
+		do_root chown -Rv ":$group" "$dir"
+	fi
 	do_user_then_root chmod -Rv g+rwx "$dir"
 	do_user_then_root chmod -Rv u+rwx "$dir"
 	echo
+	echo 'Updated listing:'
 	ls -la "$dir"
 	echo
+	echo 'All done. ✅'
 done
