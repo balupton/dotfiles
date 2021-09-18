@@ -28,7 +28,7 @@ function mount_vault {
 	sudo umount -l "$mount_target" || echo 'already unmounted'
 
 	sudo mkdir -p "$mount_target"
-	env user="$SHARE_USER" group="$SHARE_GROUP" fix-permissions "$mount_target"
+	fix-permissions --user="$SHARE_USER" --group="$SHARE_GROUP" -- "$mount_target"
 
 	echo 'Enter the cipher password for:'
 	echo "$mount_source => $mount_target"
@@ -43,7 +43,7 @@ function mount_vault {
 	fi
 
 	# fix permissions
-	env user="$SHARE_USER" group="$SHARE_GROUP" fix-permissions "$mount_target"
+	fix-permissions --user="$SHARE_USER" --group="$SHARE_GROUP" -- "$mount_target"
 
 	# verify permissions
 	r="$mount_target/random-$(rand)"

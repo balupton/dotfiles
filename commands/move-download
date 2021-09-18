@@ -66,7 +66,7 @@ fi
 
 mkdir -p "$destination"
 mv "$what" "$destination"
-fix-permissions "$result"
+fix-permissions -- "$result"
 
 echo
 echo 'Moved successfully, here are the results:'

@@ -31,7 +31,7 @@ fi
 
 # permissions
 sudo gpasswd -a plex "$SHARE_GROUP"
-env user=plex group=plex fix-permissions /var/lib/plexmediaserver/
+fix-permissions --user=plex --group=plex -- /var/lib/plexmediaserver/
 
 # start
 sudo systemctl daemon-reload

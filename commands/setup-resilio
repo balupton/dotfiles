@@ -33,8 +33,7 @@ sudo systemctl enable resilio-sync
 
 # permissions
 sudo gpasswd -a rslsync "$SHARE_GROUP"
-env user=rslsync group=rslsync fix-permissions /etc/resilio-sync/
-env user=rslsync group=rslsync fix-permissions /var/lib/resilio-sync/
+fix-permissions --user=rslsync --group=rslsync -- /etc/resilio-sync/ /var/lib/resilio-sync/
 
 # configure
 sudo vim /lib/systemd/system/resilio-sync.service
