@@ -16,12 +16,12 @@ function do_user {
 	#   -H, --set-home                set HOME variable to target user's home dir
 	#   -u, --user=user               run command (or edit file) as specified user name or ID
 	echo "sudo -H -u $option_user $*"
-	sudo -H -u "$option_user" "$@" | grep --invert-match 'retained'
+	sudo -H -u "$option_user" "$@" | { grep --invert-match 'retained' || :; }
 }
 
 function do_root {
 	echo "sudo $*"
-	sudo "$@" | grep --invert-match 'retained'
+	sudo "$@" | { grep --invert-match 'retained' || :; }
 }
 
 function do_user_then_root {
