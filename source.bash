@@ -10,13 +10,17 @@ source "$DOROTHY/user/source.sh"
 # prepare
 hostname="$("$DOROTHY/commands/get-hostname")"
 
-# redcheetah kill everything
+# act
 if test -f "$DOROTHY/user/env/$hostname.bash"; then
+	# hostname has private configuration
 	source "$DOROTHY/user/env/$hostname.bash"
 elif test -f "$DOROTHY/user/sources/$hostname.bash"; then
+	# hostname has public configuration
 	source "$DOROTHY/user/sources/$hostname.bash"
 elif test -f "$DOROTHY/user/env/generic.bash"; then
+	# use generic secret configuration if it is present
 	source "$DOROTHY/user/env/generic.bash"
 elif test -f "$DOROTHY/user/sources/generic.bash"; then
+	# use generic public configuration if it is present
 	source "$DOROTHY/user/sources/generic.bash"
 fi
