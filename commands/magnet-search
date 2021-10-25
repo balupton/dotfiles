@@ -1,6 +1,9 @@
 #!/usr/bin/env bash
 source "$DOROTHY/sources/strict.bash"
 
+# dependencies
+source "$DOROTHY/sources/ripgrep.bash"
+
 # prepare
 search="$1"
 
