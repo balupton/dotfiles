@@ -1,0 +1,19 @@
+#!/usr/bin/env bash
+source "$DOROTHY/sources/strict.bash"
+
+# prepare
+search="$1"
+
+# fetch
+echo-purple "searching" > /dev/tty
+mapfile -t results < <(magnet-search "$search")
+if test "${#results[@]}" -eq 0; then
+	exit 1
+fi
+
+# select
+choose-option \
+	--question="Which magnet for $search?" \
+	--label=first \
+	--visual='$(echo-magnet-hash "$value")    $label' \
+	-- "${results[@]}"

@@ -1,19 +1,14 @@
 #!/usr/bin/env bash
 source "$DOROTHY/sources/strict.bash"
+source "$DOROTHY/sources/config.sh"
 
-# config
+# configuration:
 tuples=()
-varfile="$DOROTHY/user/env/permanence.bash"
-if test -f "$varfile"; then
-	source "$varfile"
-else
-	stderr echo "config file missing: $varfile"
-	exit 1
-fi
+load_dorothy_config 'permanence.bash'
 
 # verify
 if test "${#tuples[@]}" -eq 0; then
-	stderr echo "make sure [$varfile] outputs an array called tuples, of the sources and destinations"
+	stderr echo "make sure $(get_dorothy_config 'permanence.bash') outputs an array called tuples, of the sources and destinations"
 	exit 1
 fi
 if is-odd "${#tuples[@]}"; then

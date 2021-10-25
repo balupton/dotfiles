@@ -1,5 +1,4 @@
 #!/usr/bin/env bash
 source "$DOROTHY/sources/strict.bash"
 
-
 ffmpeg -i "$1" -i "$2" -map 0 -map 1 -c copy -c:v:1 avif -disposition:v:1 attached_pic out.webm

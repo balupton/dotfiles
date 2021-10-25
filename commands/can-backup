@@ -3,6 +3,7 @@
 # `say` does not work in this environment:
 # Open speech channel failed: -915
 
+# todo, consider cleaning this somewhow
 # arq does not inherent shell environment
 if test -z "$DOROTHY"; then
 	DOROTHY='/Users/balupton/.dorothy'

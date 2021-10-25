@@ -5,26 +5,8 @@
 # however, ubuntu is slow to maintain, so install via pip instead
 # http://ytdl-org.github.io/youtube-dl/download.html
 
-if "$DOROTHY/commands/is-mac"; then
-	export USER_SHELLS=(
-		fish
-		bash
-		zsh
-		sh
-	)
-else
-	export USER_SHELLS=(
-		bash
-		zsh
-		fish
-		sh
-	)
-fi
-
 export APK_INSTALL=(
 	# gocryptfs: use `setup-util-gocryptfs` instead, as this version lags behind
-	aria2
-	git
 	gnupg
 	tree
 	wget
@@ -45,11 +27,8 @@ export APK_INSTALL=(
 
 export APT_ADD=(
 	# software-properties-common
-	aria2
 	atomicparsley # a youtube-dl dependency
 	build-essential
-	curl
-	git
 	gnome-keyring
 	libnotify-bin
 	libssl-dev
@@ -78,7 +57,6 @@ else
 	)
 fi
 
-export HOMEBREW_ARCH="x86_64"
 export HOMEBREW_INSTALL=(
 	# azure-cli
 	# balena-cli
@@ -91,10 +69,8 @@ export HOMEBREW_INSTALL=(
 	# heroku
 	# kryptco/tap/kr
 	# yarn
-	aria2
 	coreutils
 	deno
-	git
 	git-extras
 	git-lfs
 	ImageMagick
@@ -197,14 +173,9 @@ export RUBY_INSTALL=(
 # - https://github.com/pymupdf/PyMuPDF
 # - https://github.com/pikepdf/pikepdf
 # - https://github.com/pdfminer/pdfminer.six
-export PYTHON_INSTALL=(
-	# bitcoinlib
-	# cairosvg
-	# PyPDF2  # python 2 only
-)
-if "$DOROTHY/commands/is-ubuntu"; then
-	PYTHON_INSTALL+=('youtube_dl')
-fi
+export PIPX_INSTALL=('youtube_dl' 'stig' 'katcr' 'poetry')
+# export PYTHON3_PIP_INSTALL=('bitcoinlib' 'cairosvg')
+# export PYTHON2_PIP_INSTALL=('PyPDF2')
 
 # npm/yarn
 export NODE_INSTALL=(
@@ -254,16 +225,19 @@ export RUST_INSTALL=()
 # utilities
 # setup-util-*
 export SETUP_UTILS=(
+	aria2
 	bandwich
 	bash
 	bat
 	bottom
+	curl
 	delta
 	dust
 	exa
 	fd
 	fish
 	gh
+	git
 	gocryptfs
 	grex
 	httpie

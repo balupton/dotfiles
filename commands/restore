@@ -21,4 +21,4 @@ function do_home_restore {
 echo 'Restoring essentials...'
 do_home_restore .ssh/
 do_home_restore .gnupg/
-do_home_restore .dorothy/user/
+do_home_restore .dorothy/user/  # todo does this need reworking for user config rewrite?
