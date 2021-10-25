@@ -3,8 +3,6 @@
 .vscode/
 
 # custom to dorothy user configuration
-**/env/
-**/secrets/
 commands.local/
 config.local/
 
