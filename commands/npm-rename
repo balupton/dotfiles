@@ -1,0 +1,3 @@
+#!/usr/bin/env bash
+
+npm deprecate "$1" "$1 has been renamed to $2: npm uninstall '$1' && npm install '$2' && open 'https://www.npmjs.com/package/$2'"
