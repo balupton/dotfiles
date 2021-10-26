@@ -2,48 +2,50 @@
 source "$DOROTHY/sources/strict.bash"
 # https://discuss.bevry.me/t/creating-managing-a-discourse-instance/691?u=balupton
 
-which="$(choose-option --question='Which discourse instance do you wish to upgrade?' -- 'bevry' 'liberland')"
+which="$(choose-option --question='Which discourse instance do you wish to upgrade?' --filter="${1-}" -- 'bevry' 'liberland')"
+action="$(choose-option --question='Which action do you wish to take?' --filter="${2-}" -- 'login' 'upgrade')"
 if test "$which" = 'bevry'; then
-	sshpass="$(secret get BEVRY_DISCOURSE_SSH)"
-	sshfile='/root/.ssh/root-discuss.bevry.me-github'
+	# secret map BEVRY_DISCOURSE_IP personal 'SSH Keys' 'bevry-discourse-ip'
+	# secret map BEVRY_DISCOURSE_SSH_PASSWORD personal 'SSH Keys' 'bevry-scaleway-2017'
+	# secret map BEVRY_DISCOURSE_INTERNAL_SSH_PASSWORD personal 'SSH Keys' 'bevry-discourse'
+	ssh_ip="$(secret get BEVRY_DISCOURSE_IP)"
+	ssh_pass_external="$(secret get BEVRY_DISCOURSE_SSH_PASSWORD)"
+	ssh_pass_internal="$(secret get BEVRY_DISCOURSE_INTERNAL_SSH_PASSWORD)"
+	ssh_file_internal='/root/.ssh/root-discuss.bevry.me-github'
 elif test "$which" = 'liberland'; then
-	sshpass="$(secret get LIBERLAND_DISCOURSE_SSH)"
-	sshfile='/root/.ssh/root-discuss.liberland.me-github'
+	# secret map LIBERLAND_DISCOURSE_IP personal 'Liberland Forum' 'Scaleway IP'
+	# secret map LIBERLAND_DISCOURSE_SSH_PASSWORD personal 'Liberland Forum' 'Scaleway SSH Key'
+	# secret map LIBERLAND_DISCOURSE_INTERNAL_SSH_PASSWORD personal 'Liberland Forum' 'Internal SSH Key'
+	ssh_ip="$(secret get LIBERLAND_DISCOURSE_IP)"
+	ssh_pass_external="$(secret get LIBERLAND_DISCOURSE_SSH_PASSWORD)"
+	ssh_pass_internal="$(secret get LIBERLAND_DISCOURSE_INTERNAL_SSH_PASSWORD)"
+	ssh_file_internal='/root/.ssh/forum.liberland.org'
 else
 	stderr echo "Error: Invalid discourse instance."
 	exit 1
 fi
-sshhelp='/root/ssh_stdin_password.bash'
 
-ssh -T discourse <<EOF
-$(cat "$DOROTHY/sources/strict.bash")
+echo "Logging into [$ssh_ip]..."
+echo "If prompted for an SSH password, it has been copied to your clipboard."
+echo "$ssh_pass_external" | pbcopy
 
-# Check discourse is already setup
-if ! test -d /var/discourse; then
-	echo 'Run this command on the remote discourse server'
-	exit 1
+if test "$action" = 'login'; then
+	ssh "$ssh_ip"
+	exit "$?"  # exit with the above on success and failure
 fi
 
-# Work around SSH password: https://stackoverflow.com/a/52671286/130638
-rm -f "$sshhelp"
-echo '#!/usr/bin/env bash' >> "$sshhelp"
-echo 'read secret' >> "$sshhelp"
-echo 'echo \$secret' >> "$sshhelp"
-chmod +x "$sshhelp"
-
-echo 'Adding the SSH keys...'
-eval "\$(ssh-agent -s)"
-DISPLAY=:0 SSH_ASKPASS="$sshhelp" ssh-add "$sshfile" <<< "$sshpass"
-
-echo 'Updating the local server configuration...'
-cd /
-git fetch origin
-git pull origin "\$(git rev-parse --abbrev-ref HEAD)"
-
-echo 'Updating the discourse docker setup...'
-cd /var/discourse
-git pull origin master
-
-echo 'Rebuilding the discourse docker instance...'
-/var/discourse/launcher rebuild app
-EOF
+upgrader="$(cat "$DOROTHY/user/commands/discourse-upgrader")"
+upgrader="
+ssh_file_internal='$ssh_file_internal'
+ssh_pass_internal='$ssh_pass_internal'
+$upgrader
+"
+( ssh -t "$ssh_ip" "$upgrader" && {
+	echo "Successfully upgraded the discourse instance. 🎉"
+	echo "$ssh_ip"
+	exit 0
+} ) || {
+	stderr echo "Error: Failed to upgrade the discourse instance. 🚨"
+	stderr echo "$ssh_ip"
+	exit 1
+}

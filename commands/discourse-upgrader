@@ -1,0 +1,63 @@
+#!/usr/bin/env bash
+# this runs on the disource machine, do not depend on anything related to dorothy
+set -Eeuo pipefail
+
+# Receive arguments from caller
+if test -z "${ssh_file_internal-}" -o -z "${ssh_pass_internal-}"; then
+	echo 'For automatic SSH password insertion, you must pass the SSH file and password.' > /dev/stderr
+fi
+
+# Check discourse is already setup
+if ! test -d /var/discourse; then
+	echo 'Run this command on the remote discourse server'
+	exit 1
+fi
+
+# Upgrading the host, which may solve SSL issues
+# https://stackoverflow.com/a/61853542/130638
+# https://meta.discourse.org/t/regenerating-letsencrypt-keys-from-behind-nginx/95884/3?u=balupton
+# https://meta.discourse.org/t/ssl-letsencrypt-renewal-not-working-due-to-an-extra-reverse-proxy-on-the-outside/164236/2?u=balupton
+apt-add-repository -y -r ppa:certbot/certbot
+apt-get update -y
+apt-get upgrade -y
+
+# Cron Job
+echo 'Checking cron job upgrader...'
+while ! ( crontab -l | grep -q discourse ) ; do
+	echo 'cron job does not yet exist for upgrading discourse, copy the following into the prompt and save:'
+	echo
+	echo "# at midnight each day, upgrade the discourse forum"
+	echo "0 0 * * * 'cd /var/discourse; git pull origin master; ./launcher rebuild app'"
+	echo
+	read -r -n 1 -p 'Are you ready?'
+	env EDITOR='/bin/nano' crontab -e
+done
+
+# Work around SSH password: https://stackoverflow.com/a/52671286/130638
+if test -n "${ssh_pass_internal-}"; then
+	ssh_stdin_pass_helper='/root/ssh_stdin_password.bash'
+	rm -f "$ssh_stdin_pass_helper"
+	echo '#!/usr/bin/env bash' >> "$ssh_stdin_pass_helper"
+	echo 'read secret' >> "$ssh_stdin_pass_helper"
+	echo 'echo $secret' >> "$ssh_stdin_pass_helper"
+	chmod +x "$ssh_stdin_pass_helper"
+
+	echo 'Adding the SSH keys...'
+	eval "$(ssh-agent -s)"
+	DISPLAY=:0 SSH_ASKPASS="$ssh_stdin_pass_helper" ssh-add "$ssh_file_internal" <<< "$ssh_pass_internal"
+elif test -n "${ssh_file_internal-}"; then
+	ssh-add "$ssh_file_internal"
+fi
+
+echo 'Updating the local server configuration...'
+cd /
+git fetch origin
+git pull origin "$(git rev-parse --abbrev-ref HEAD)"
+
+echo 'Updating the discourse docker setup...'
+cd /var/discourse
+git pull origin master
+
+echo 'Rebuilding the discourse docker instance...'
+/var/discourse/launcher rebuild app
+echo "$?"  # exit with the above on success or failure
