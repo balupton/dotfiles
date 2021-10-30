@@ -9,13 +9,13 @@ source_user="$(ask --question="What is the username on that host?" --default="${
 export TOOL=rsync
 export ACTION=copy
 function do_restore {
-	cpr "$source_user"@"$source_host":"$1" "$2"
+	cpr --source="$source_user"@"$source_host":"$1" --destination="$2"
 }
 function do_home_restore {
 	dir="$1"
 	src="$(fs-join "/home/${source_user}" "$dir")"
 	target="$(fs-join "$HOME" "$dir")"
-	cpr "$source_user"@"$source_host":"$src" "$target"
+	cpr --source="$source_user"@"$source_host":"$src" --destination="$target"
 }
 
 echo 'Restoring essentials...'
