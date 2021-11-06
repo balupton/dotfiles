@@ -45,7 +45,7 @@ export SNAP_INSTALL=(
 	# deno
 )
 
-if "$DOROTHY/commands/is-mac"; then
+if is-mac; then
 	export GO_INSTALL=(
 		changkun.de/x/rmtrash
 		github.com/cloudflare/utahfs/cmd/utahfs-client
