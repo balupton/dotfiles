@@ -1,18 +1,20 @@
 #!/usr/bin/env bash
+# shellcheck disable=SC2034
+# do not use `export` keyword in this file
 
 # note on youtube-dl
 # brew maintains it actively, and also will assist with dependencies
 # however, ubuntu is slow to maintain, so install via pip instead
 # http://ytdl-org.github.io/youtube-dl/download.html
 
-export APK_INSTALL=(
+APK_INSTALL=(
 	# gocryptfs: use `setup-util-gocryptfs` instead, as this version lags behind
 	gnupg
 	tree
 	wget
 )
 
-# export APT_REMOVE=(
+# APT_REMOVE=(
 # 	aisleriot
 # 	gnome-mahjongg
 # 	gnome-mines
@@ -25,7 +27,7 @@ export APK_INSTALL=(
 # 	thunderbird
 # )
 
-export APT_ADD=(
+APT_ADD=(
 	# software-properties-common
 	atomicparsley # a youtube-dl dependency
 	build-essential
@@ -40,24 +42,24 @@ export APT_ADD=(
 
 # https://code.visualstudio.com/docs/setup/linux
 # if [[ "$(get-arch)" == 'x'* ]]; then
-export SNAP_INSTALL=(
+SNAP_INSTALL=(
 	# 'code --classic'
 	# deno
 )
 
 if is-mac; then
-	export GO_INSTALL=(
+	GO_INSTALL=(
 		changkun.de/x/rmtrash
 		github.com/cloudflare/utahfs/cmd/utahfs-client
 	)
 else
-	export GO_INSTALL=(
+	GO_INSTALL=(
 		changkun.de/x/rmtrash
 		# github.com/rfjakob/gocryptfs: use `setup-util-gocryptfs` instead, as this version lags behind
 	)
 fi
 
-export HOMEBREW_INSTALL=(
+HOMEBREW_INSTALL=(
 	# azure-cli
 	# balena-cli
 	# blackbox
@@ -88,11 +90,11 @@ export HOMEBREW_INSTALL=(
 	watchman
 	wget
 )
-export HOMEBREW_INSTALL_SLOW=(
+HOMEBREW_INSTALL_SLOW=(
 	gpg
 	shellcheck
 )
-export HOMEBREW_INSTALL_CASK=(
+HOMEBREW_INSTALL_CASK=(
 	# 1password-cli
 	# acorn
 	# adguard
@@ -158,8 +160,8 @@ export HOMEBREW_INSTALL_CASK=(
 )
 
 # gems
-export RUBY_VERSION="2.7"
-export RUBY_INSTALL=(
+RUBY_VERSION="2.7"
+RUBY_INSTALL=(
 	compass
 	ffi
 	git-up
@@ -173,12 +175,12 @@ export RUBY_INSTALL=(
 # - https://github.com/pymupdf/PyMuPDF
 # - https://github.com/pikepdf/pikepdf
 # - https://github.com/pdfminer/pdfminer.six
-export PIPX_INSTALL=('youtube_dl' 'stig' 'katcr' 'poetry')
-# export PYTHON3_PIP_INSTALL=('bitcoinlib' 'cairosvg')
-# export PYTHON2_PIP_INSTALL=('PyPDF2')
+PIPX_INSTALL=('youtube_dl' 'stig' 'katcr' 'poetry')
+# PYTHON3_PIP_INSTALL=('bitcoinlib' 'cairosvg')
+# PYTHON2_PIP_INSTALL=('PyPDF2')
 
 # npm/yarn
-export NODE_INSTALL=(
+NODE_INSTALL=(
 	# bevry
 	"@bevry/testen"
 	boundation
@@ -220,11 +222,11 @@ export NODE_INSTALL=(
 # rust/cargo/crates.io
 # --locked: Require Cargo.lock is up to date
 # as rust packages can be supported by many package managers, and as cargo requires downloading every dependency, most rust packages are better installed via SETUP_UTILS
-export RUST_INSTALL=()
+RUST_INSTALL=()
 
 # utilities
 # setup-util-*
-export SETUP_UTILS=(
+SETUP_UTILS=(
 	aria2
 	bandwich
 	bash

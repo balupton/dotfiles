@@ -1,14 +1,16 @@
 #!/usr/bin/env bash
+# shellcheck disable=SC2034
+# do not use `export` keyword in this file
 
 if is-mac; then
-	export USER_SHELLS=(
+	USER_SHELLS=(
 		fish
 		bash
 		zsh
 		sh
 	)
 else
-	export USER_SHELLS=(
+	USER_SHELLS=(
 		bash
 		zsh
 		fish

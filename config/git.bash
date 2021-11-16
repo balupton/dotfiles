@@ -1,9 +1,11 @@
 #!/usr/bin/env bash
+# shellcheck disable=SC2034
+# do not use `export` keyword in this file
 
 if test -n "${GPG_SIGNING_KEY-}"; then
-	export GIT_PROTOCOL='ssh'
+	GIT_PROTOCOL='ssh'
 else
-	export GIT_PROTOCOL='https'
+	GIT_PROTOCOL='https'
 fi
 
-export GIT_DEFAULT_BRANCH='main'
+GIT_DEFAULT_BRANCH='main'
