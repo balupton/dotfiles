@@ -1,0 +1,36 @@
+#!/usr/bin/env bash
+source "$DOROTHY/sources/strict.bash"
+
+source="$1"
+shift
+
+# cycle through source files
+for file in "$source"/*; do
+	filename="$(basename "$file")"
+	for alternative in "$@"; do
+		# check it also exists in alt location
+		altfile="$alternative/$filename"
+		if test ! -f "$altfile"; then
+			continue
+		fi
+
+		# prepare
+		file_hashf="$(mktemp)"
+		altfile_hashf="$(mktemp)"
+
+		# checksum
+		echo
+		echo-color --bold="$file"
+		checksum --untitled --algorithm=md5 -- "$file" | tee "$file_hashf"
+		echo-color --bold="$altfile"
+		checksum --untitled --algorithm=md5 -- "$altfile" | tee "$altfile_hashf"
+
+		# compare and possibly remove
+		if test "$(cat "$file_hashf")" = "$(cat "$altfile_hashf")"; then
+			rm "$altfile"
+			echo-color --green='same,' --green+bold=' removed: ' --dim="$altfile"
+		else
+			echo-color --red='different,' --red+bold=' kept'
+		fi
+	done
+done

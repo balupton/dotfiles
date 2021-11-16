@@ -1,24 +1,27 @@
 #!/usr/bin/env bash
 source "$DOROTHY/sources/strict.bash"
 
-# 192.168.4.42
+# options
 source_host="$(ask --question="What is the hostname you want to restore from?" --default="${1-}")"
-# balupton
 source_user="$(ask --question="What is the username on that host?" --default="${2-}")"
 
-export TOOL=rsync
-export ACTION=copy
+# helpers
+function do_cpr {
+	cpr --action=copy --tool=rsync "$@"
+}
 function do_restore {
-	cpr --source="$source_user"@"$source_host":"$1" --destination="$2"
+	do_cpr --source="$source_user"@"$source_host":"$1" --destination="$2"
 }
 function do_home_restore {
 	dir="$1"
 	src="$(fs-join "/home/${source_user}" "$dir")"
 	target="$(fs-join "$HOME" "$dir")"
-	cpr --source="$source_user"@"$source_host":"$src" --destination="$target"
+	do_cpr --source="$source_user"@"$source_host":"$src" --destination="$target"
 }
 
+# perform
 echo 'Restoring essentials...'
 do_home_restore .ssh/
 do_home_restore .gnupg/
-do_home_restore .dorothy/user/  # todo does this need reworking for user config rewrite?
+do_home_restore .strongbox_keyring
+do_home_restore .dorothy/user/
