@@ -47,15 +47,14 @@ SNAP_INSTALL=(
 	# deno
 )
 
+GO_INSTALL=(
+	'github.com/uw-labs/strongbox'
+	# 'github.com/rfjakob/gocryptfs' # use `setup-util-gocryptfs` instead, as this version lags behind
+)
 if is-mac; then
-	GO_INSTALL=(
-		changkun.de/x/rmtrash
-		github.com/cloudflare/utahfs/cmd/utahfs-client
-	)
-else
-	GO_INSTALL=(
-		changkun.de/x/rmtrash
-		# github.com/rfjakob/gocryptfs: use `setup-util-gocryptfs` instead, as this version lags behind
+	GO_INSTALL+=(
+		'changkun.de/x/rmtrash'
+		# 'github.com/cloudflare/utahfs/cmd/utahfs-client'
 	)
 fi
 

@@ -7,3 +7,5 @@ commands.local/
 config.local/
 
 # custom to my user configuration
+!*.local/
+# ^ handled by strongbox
