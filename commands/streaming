@@ -14,7 +14,7 @@ if confirm-positive 'Are you streaming?'; then
 	open -a 'Arq'
 
 	# stop seedbox
-	ssh -T raspi8 <<EOF
+	ssh -T blue-sharebox.lan <<EOF
 seedbox stop
 EOF
 
@@ -25,7 +25,7 @@ else
 	osascript -e 'tell application "Twitch Studio" to quit'
 
 	# resume seedbox
-	ssh -T raspi8 <<EOF
+	ssh -T blue-sharebox.lan <<EOF
 seedbox start
 EOF
 

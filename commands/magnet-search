@@ -35,7 +35,7 @@ search="$1"
 mapfile -t lines < <(torrent-search --sort=seeders "$search" 2>&1 || :)
 for line in "${lines[@]}"; do
 	line="$(echo-no-colors "$line")"
-	if test -z "$line" || rg -q 'ERROR|No results|btih:000000000000' <<< "$line"; then
+	if test -z "$line" || rg -q 'ERROR|No results|btih:000000000000' <<<"$line"; then
 		continue
 	fi
 	echo "$line"
@@ -43,5 +43,5 @@ done
 
 # magnetfinder
 # https://github.com/bleusakura/magnetfinder
-mapfile -t lines < <(magnetfinder --no-interactive --show 5 -aq "$search" 2> /dev/null | rg -v 'No torrents found matching search query' || :)
+mapfile -t lines < <(magnetfinder --no-interactive --show 5 -aq "$search" 2>/dev/null | rg -v 'No torrents found matching search query' || :)
 echo-split $'\t' -- "${lines[@]}"

@@ -8,18 +8,18 @@ load_dorothy_config 'permanence.bash'
 
 # verify
 if test "${#tuples[@]}" -eq 0; then
-	stderr echo "make sure $(get_dorothy_config 'permanence.bash') outputs an array called tuples, of the sources and destinations"
+	echo "make sure $(get_dorothy_config 'permanence.bash') outputs an array called tuples, of the sources and destinations" >/dev/stderr
 	exit 1
 fi
 if is-odd "${#tuples[@]}"; then
-	stderr echo "the tuples do not seem to have one destination for one source"
+	echo "the tuples do not seem to have one destination for one source" >/dev/stderr
 	exit 1
 fi
 
 # cycle
-for ((i = 0; i < ${#tuples[@]}; i=i+2)); do
+for ((i = 0; i < ${#tuples[@]}; i = i + 2)); do
 	src="${tuples[$i]}"
-	dest="${tuples[$i+1]}"
+	dest="${tuples[$i + 1]}"
 	mkdir -p "$dest"
 	cd "$dest" || exit 1
 	ref="$(get-url-domain "$src")"

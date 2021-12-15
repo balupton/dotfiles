@@ -1,3 +1,8 @@
 #!/usr/bin/env bash
+source "$DOROTHY/sources/strict.bash"
 
-npm deprecate "$1" "$1 has been renamed to $2: npm uninstall '$1' && npm install '$2' && open 'https://www.npmjs.com/package/$2'"
+old="$1"
+new="$2"
+url="https://www.npmjs.com/package/$new"
+message="$old has been renamed to $new: npm uninstall ${old@Q} && npm install ${new@Q} && open ${url@Q}"
+npm deprecate "$old" "$message"

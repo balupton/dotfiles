@@ -1,6 +1,0 @@
-#!/usr/bin/env bash
-
-echo 'one' >/dev/tty
-echo 'two' >/dev/tty
-
-echo-count-lines </dev/tty

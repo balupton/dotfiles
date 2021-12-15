@@ -1,4 +1,7 @@
 #!/usr/bin/env bash
+source "$DOROTHY/sources/strict.bash"
 
-rm-modules && npm i && npm run our:release:prepare && npm link
-
+rm-modules
+npm i
+npm run our:release:prepare
+npm link

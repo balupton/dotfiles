@@ -3,6 +3,8 @@ source "$DOROTHY/sources/strict.bash"
 
 dir="${1:-"$(pwd)"}"
 
-while IFS= read -r line; do
-	printf '' >"$line"
-done < <(ls -1 "$dir")
+if confirm-positive --ppid=$$ -- "This will zero-length every file inside $dir, are you sure?" "$(ls -la "$dir")"; then
+	while IFS= read -r line; do
+		printf '' >"$line"
+	done < <(ls -1 "$dir")
+fi

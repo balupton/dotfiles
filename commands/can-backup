@@ -14,7 +14,7 @@ source "$DOROTHY/sources/strict.bash"
 
 # test streaming
 if "$DOROTHY/commands/is-streaming"; then
-	echo stderr 'Streaming is occurring, cancelling backup.'
+	echo 'Streaming is occurring, cancelling backup.' >/dev/stderr
 	exit 1
 else
 	echo 'No streaming is occuring, commencing backup.'

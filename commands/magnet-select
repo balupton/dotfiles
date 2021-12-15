@@ -5,7 +5,7 @@ source "$DOROTHY/sources/strict.bash"
 search="$1"
 
 # fetch
-echo-purple "searching" > /dev/tty
+echo-purple "searching" >/dev/tty
 mapfile -t results < <(magnet-search "$search")
 if test "${#results[@]}" -eq 0; then
 	exit 1

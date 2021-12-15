@@ -21,7 +21,7 @@ elif test "$which" = 'liberland'; then
 	ssh_pass_internal="$(secret get LIBERLAND_DISCOURSE_INTERNAL_SSH_PASSWORD)"
 	ssh_file_internal='/root/.ssh/forum.liberland.org'
 else
-	stderr echo "Error: Invalid discourse instance."
+	echo "Error: Invalid discourse instance." >/dev/stderr
 	exit 1
 fi
 
@@ -31,7 +31,7 @@ echo "$ssh_pass_external" | pbcopy
 
 if test "$action" = 'login'; then
 	ssh "$ssh_ip"
-	exit "$?"  # exit with the above on success and failure
+	exit "$?" # exit with the above on success and failure
 fi
 
 upgrader="$(cat "$DOROTHY/user/commands/discourse-upgrader")"
@@ -40,12 +40,12 @@ ssh_file_internal='$ssh_file_internal'
 ssh_pass_internal='$ssh_pass_internal'
 $upgrader
 "
-( ssh -t "$ssh_ip" "$upgrader" && {
+(ssh -t "$ssh_ip" "$upgrader" && {
 	echo "Successfully upgraded the discourse instance. 🎉"
 	echo "$ssh_ip"
 	exit 0
-} ) || {
-	stderr echo "Error: Failed to upgrade the discourse instance. 🚨"
-	stderr echo "$ssh_ip"
+}) || {
+	echo "Error: Failed to upgrade the discourse instance. 🚨" >/dev/stderr
+	echo "$ssh_ip" >/dev/stderr
 	exit 1
 }
