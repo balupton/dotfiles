@@ -3,7 +3,11 @@
 # use inline `export VAR=...` statements, for fish compatibility`
 
 # Theme
-export DOROTHY_THEME='oz' # 'starship'
+##export DOROTHY_THEME='trial'
+export DOROTHY_THEME='oz'
+
+# Youtube
+alias ytd='youtube-dl'
 
 # Bottom
 alias btm='btm --color default-light'

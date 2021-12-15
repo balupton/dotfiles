@@ -2,19 +2,21 @@
 # shellcheck disable=SC2034
 # do not use `export` keyword in this file
 
+# load the dorothy defaults
+source "$DOROTHY/config/setup.bash"
+
 # note on youtube-dl
 # brew maintains it actively, and also will assist with dependencies
 # however, ubuntu is slow to maintain, so install via pip instead
 # http://ytdl-org.github.io/youtube-dl/download.html
 
 APK_INSTALL=(
-	# gocryptfs: use `setup-util-gocryptfs` instead, as this version lags behind
 	gnupg
 	tree
 	wget
 )
 
-# APT_REMOVE=(
+# APT_UNINSTALL=(
 # 	aisleriot
 # 	gnome-mahjongg
 # 	gnome-mines
@@ -27,8 +29,8 @@ APK_INSTALL=(
 # 	thunderbird
 # )
 
-APT_ADD=(
-	# software-properties-common
+# software-properties-common
+APT_INSTALL=(
 	atomicparsley # a youtube-dl dependency
 	build-essential
 	gnome-keyring
@@ -40,16 +42,15 @@ APT_ADD=(
 	vim
 )
 
+# Snap
 # https://code.visualstudio.com/docs/setup/linux
 # if [[ "$(get-arch)" == 'x'* ]]; then
-SNAP_INSTALL=(
-	# 'code --classic'
-	# deno
-)
+SNAP_INSTALL=()
 
+# Go
+GO_LINTING_INSTALL=no
 GO_INSTALL=(
 	'github.com/uw-labs/strongbox'
-	# 'github.com/rfjakob/gocryptfs' # use `setup-util-gocryptfs` instead, as this version lags behind
 )
 if is-mac; then
 	GO_INSTALL+=(
@@ -58,117 +59,107 @@ if is-mac; then
 	)
 fi
 
-HOMEBREW_INSTALL=(
-	# azure-cli
-	# balena-cli
-	# blackbox
-	# hashicorp/tap/boundary
-	# hashicorp/tap/consul
-	# hashicorp/tap/nomad
-	# hashicorp/tap/terraform
-	# hashicorp/tap/vault
-	# heroku
-	# kryptco/tap/kr
-	# yarn
-	coreutils
-	deno
-	git-extras
-	git-lfs
-	ImageMagick
-	mas
-	micro
-	openssh
-	pkg-config
-	podman
-	screen
-	terminal-notifier
-	tmux
-	tree
-	vim
-	watch
-	watchman
-	wget
-)
-HOMEBREW_INSTALL_SLOW=(
-	gpg
-	shellcheck
-)
-HOMEBREW_INSTALL_CASK=(
-	# 1password-cli
-	# acorn
-	# adguard
-	# airparrot
-	# appzapper
-	# atom
-	# audio-hijack
-	# backblaze
-	# bartender
-	# brave
-	# burn
-	# caption
-	# ccleaner
-	# contexts
-	# dat
-	# devdocs
-	# fantastical
-	# firefox
-	# freedom
-	# geekbench
-	# github-desktop
-	# gitter
-	# google-chrome
-	# google-hangouts
-	# jaikoz
-	# julia
-	# keybase
-	# kodi
-	# little-snitch
-	# loopback
-	# micro-snitch
-	# numi
-	# opera
-	# paragon-ntfs
-	# plex-media-server
-	# pomello
-	# reflector
-	# screenflow
-	# signal
-	# sketch
-	# skype
-	# soundsource
-	# spotify
-	# teamviewer
-	# toggldesktop
-	# torbrowser
-	# tower
-	# transmission
-	# transmit
-	# tunnelbear
-	# tunnelblick
-	# ubersicht
-	# undercover
-	# usage
-	# visual-studio-code
-	# vlc
-	# vmware-fusion
-	# webtorrent
-	# windscribe
-	# workflowy
-	# xld
-	calibre
+# macOS apps / mas
+# https://github.com/mas-cli/mas
+# 441258766 "Magnet"
+# 497799835 "XCode"
+# 803453959 "Slack"
+# 931134707 "Wire"
+# 937984704 "Amphetamine"
+MAS_INSTALL=(
+	'420212497' 'Byword'
+	'1484348796' 'Endel'
+	'430798174' 'HazeOver'
+	'1472777122' 'Honey'
+	'409183694' 'Keynote'
+	'405399194' 'Kindle'
+	'441258766' 'Magnet'
+	'409203825' 'Numbers'
+	'409201541' 'Pages'
+	'639968404' 'Parcel'
+	'497799835' 'Xcode'
 )
 
-# gems
-RUBY_VERSION="2.7"
-RUBY_INSTALL=(
-	compass
-	ffi
+# Homebrew
+HOMEBREW_ENCODING_INSTALL=no
+HOMEBREW_UNINSTALL=(
+	'hashicorp/tap/boundary'
+	'hashicorp/tap/consul'
+	'hashicorp/tap/nomad'
+	'hashicorp/tap/terraform'
+	'hashicorp/tap/vault'
+	'imagemagick'
+	'jswidler/tap/lockgit'
+	'podman'
+	'tmux'
+)
+HOMEBREW_FORMULAS=(
+	'git-extras'
+	'greymd/tools/teip'
+	'micro'
+	'terminal-notifier'
+	'tree'
+	'watch'
+	'tmux'
+	'watchman'
+)
+HOMEBREW_SLOW_FORMULAS=(
+	'shellcheck'
+)
+HOMEBREW_CASKS=(
+	'1password-cli'
+	'adguard'
+	'audio-hijack'
+	'calibre'
+	'cloudflare-warp'
+	'firefox'
+	'loopback'
+	'meld'
+	'multipass'
+	'raspberry-pi-imager'
+	'signal'
+	'soundsource'
+	'spotify'
+	'twitch'
+	'zoom'
+)
+HOMEBREW_FONTS=(
+	'font-cantarell'
+	'font-cascadia-code'
+	'font-fira-code'
+	'font-fira-code-nerd-font'
+	'font-fira-mono'
+	'font-fira-mono-nerd-font'
+	'font-hack'
+	'font-hasklig'
+	'font-ibm-plex'
+	'font-inconsolata-go-nerd-font'
+	'font-inter'
+	'font-jetbrains-mono'
+	'font-jetbrains-mono-nerd-font'
+	'font-lato'
+	'font-maven-pro'
+	'font-monoid'
+	'font-montserrat'
+	'font-open-sans'
+	'font-oxygen'
+	'font-oxygen-mono'
+	'font-roboto'
+	'font-roboto-mono'
+	'font-source-code-pro'
+	'font-ubuntu'
+)
+
+# Ruby
+# compass
+# ffi
+# sass
+# twurl
+GEM_INSTALL=(
 	git-up
-	sass
-	twurl
 )
 
-# pip
+# Python
 # @todo swap PyPDF2 fro one of the following
 # > https://stackoverflow.com/a/63557138/130638
 # - https://github.com/pymupdf/PyMuPDF
@@ -178,8 +169,8 @@ PIPX_INSTALL=('youtube_dl' 'stig' 'katcr' 'poetry')
 # PYTHON3_PIP_INSTALL=('bitcoinlib' 'cairosvg')
 # PYTHON2_PIP_INSTALL=('PyPDF2')
 
-# npm/yarn
-NODE_INSTALL=(
+# Node.js
+NPM_INSTALL=(
 	# bevry
 	"@bevry/testen"
 	boundation
@@ -218,37 +209,48 @@ NODE_INSTALL=(
 	# coinmon
 )
 
-# rust/cargo/crates.io
+# Rust / Cargo / Crates.io
 # --locked: Require Cargo.lock is up to date
 # as rust packages can be supported by many package managers, and as cargo requires downloading every dependency, most rust packages are better installed via SETUP_UTILS
-RUST_INSTALL=()
+CARGO_INSTALL=()
 
 # utilities
 # setup-util-*
 SETUP_UTILS=(
-	aria2
-	bandwich
-	bash
-	bat
-	bottom
-	curl
-	delta
-	dust
-	exa
-	fd
-	fish
-	gh
-	git
-	gocryptfs
-	grex
-	httpie
-	hyperfine
-	jq
-	procs
-	ripgrep
-	rmesg
-	sd
-	tealdeer
-	tokei
-	zoxide
+	'aria2'
+	'bandwhich'
+	'bash'
+	'bat'
+	'bottom'
+	'curl'
+	'delta'
+	'deno'
+	'devel'
+	'driveinfo'
+	'dust'
+	'exa'
+	'fd'
+	'fish'
+	'gh'
+	'git'
+	'glab'
+	'gocryptfs'
+	'grex'
+	'gsed'
+	'httpie'
+	'hyperfine'
+	'jq'
+	'mas'
+	'procs'
+	'python'
+	'ripgrep'
+	'rmesg'
+	'screen'
+	'sd'
+	'starship'
+	'tealdeer'
+	'tokei'
+	'vim'
+	'wget'
+	'zoxide'
 )
