@@ -116,6 +116,8 @@ HOMEBREW_CASKS=(
 	'loopback'
 	'meld'
 	'multipass'
+	'obs'
+	'pocket-casts'
 	'raspberry-pi-imager'
 	'signal'
 	'soundsource'
