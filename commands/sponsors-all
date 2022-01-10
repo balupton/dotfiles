@@ -7,7 +7,7 @@ skip=' legal workers awesome-crypto designs '
 # http://mywiki.wooledge.org/BashFAQ/089
 # https://stackoverflow.com/a/8334759/130638
 f="$(mktemp)"
-fetch https://bevry.me/api/github/repos | json -a > "$f"
+fetch https://bevry.me/api/github/repos | json -a >"$f"
 
 while read -r repo <&3; do
 	if contains-string "$skip" "$repo"; then

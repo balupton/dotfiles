@@ -20,7 +20,7 @@ function finish {
 trap finish EXIT
 
 function get-node-engine {
-	grep -A1 engines < package.json | grep node | head -n1 | xargs
+	grep -A1 engines <package.json | grep node | head -n1 | xargs
 }
 
 # engine: fetch original
@@ -78,7 +78,7 @@ echo "# History
 
 -   Updated dependencies, [base files](https://github.com/bevry/base), and [editions](https://editions.bevry.me) using [boundation](https://github.com/bevry/boundation)
 $l
-$t" > HISTORY.md
+$t" >HISTORY.md
 
 # prepare
 npm run our:meta

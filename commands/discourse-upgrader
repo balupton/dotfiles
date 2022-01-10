@@ -4,7 +4,7 @@ set -Eeuo pipefail
 
 # Receive arguments from caller
 if test -z "${ssh_file_internal-}" -o -z "${ssh_pass_internal-}"; then
-	echo 'For automatic SSH password insertion, you must pass the SSH file and password.' > /dev/stderr
+	echo 'For automatic SSH password insertion, you must pass the SSH file and password.' >/dev/stderr
 fi
 
 # Check discourse is already setup
@@ -23,7 +23,7 @@ apt-get upgrade -y
 
 # Cron Job
 echo 'Checking cron job upgrader...'
-while ! ( crontab -l | grep -q discourse ) ; do
+while ! (crontab -l | grep -q discourse); do
 	echo 'cron job does not yet exist for upgrading discourse, copy the following into the prompt and save:'
 	echo
 	echo "# at midnight each day, upgrade the discourse forum"
@@ -37,14 +37,14 @@ done
 if test -n "${ssh_pass_internal-}"; then
 	ssh_stdin_pass_helper='/root/ssh_stdin_password.bash'
 	rm -f "$ssh_stdin_pass_helper"
-	echo '#!/usr/bin/env bash' >> "$ssh_stdin_pass_helper"
-	echo 'read secret' >> "$ssh_stdin_pass_helper"
-	echo 'echo $secret' >> "$ssh_stdin_pass_helper"
+	echo '#!/usr/bin/env bash' >>"$ssh_stdin_pass_helper"
+	echo 'read secret' >>"$ssh_stdin_pass_helper"
+	echo 'echo $secret' >>"$ssh_stdin_pass_helper"
 	chmod +x "$ssh_stdin_pass_helper"
 
 	echo 'Adding the SSH keys...'
 	eval "$(ssh-agent -s)"
-	DISPLAY=:0 SSH_ASKPASS="$ssh_stdin_pass_helper" ssh-add "$ssh_file_internal" <<< "$ssh_pass_internal"
+	DISPLAY=:0 SSH_ASKPASS="$ssh_stdin_pass_helper" ssh-add "$ssh_file_internal" <<<"$ssh_pass_internal"
 elif test -n "${ssh_file_internal-}"; then
 	ssh-add "$ssh_file_internal"
 fi
@@ -60,4 +60,4 @@ git pull origin master
 
 echo 'Rebuilding the discourse docker instance...'
 /var/discourse/launcher rebuild app
-echo "$?"  # exit with the above on success or failure
+echo "$?" # exit with the above on success or failure
