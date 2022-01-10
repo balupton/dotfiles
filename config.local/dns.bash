@@ -1,5 +1,4 @@
 # STRONGBOX ENCRYPTED RESOURCE ; See https://github.com/uw-labs/strongbox
-# key-id: QaTYmvbTQD6eD1GLWwToVW213MXdK6rETebF4LZ7qHU=
 bOgOFufsKmMAgha4Aa4AGMUMQFpkuFgsm42vK27w1FtGoMo3H+dKToMaUXDGfS6+9H1vs+4JxDdX
 +dWj/mDwbGQOt5x0tQHssl4CxLd+4U1l/W/8EqxblwkHT+Fy1RwoxNWdaYBFj/GOk5mve9NPzmuM
 vyBAImIewFE5dvmf3ANd0R85EEP047pHiLeyshFuK2j/kej0XTAzeFjJW/v3PEb0MP5MN781NxN9
