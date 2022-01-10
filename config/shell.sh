@@ -10,7 +10,7 @@ export DOROTHY_THEME='oz'
 alias ytd='youtube-dl'
 
 # Bottom
-alias btm='btm --color default-light'
+# alias btm='btm --color default-light'
 
 # Go
 alias go-open='open -a /Applications/GoLand.app .'
