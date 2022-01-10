@@ -228,7 +228,7 @@ SETUP_UTILS=(
 	'delta'
 	'deno'
 	'devel'
-	'driveinfo'
+	'drive-info'
 	'dust'
 	'exa'
 	'fd'
