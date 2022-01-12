@@ -2,6 +2,8 @@
 source "$DOROTHY/sources/strict.bash"
 # https://discuss.bevry.me/t/creating-managing-a-discourse-instance/691?u=balupton
 
+ssh_user='root'
+ssh_home="/root"
 which="$(choose-option --question='Which discourse instance do you wish to upgrade?' --filter="${1-}" -- 'bevry' 'liberland')"
 action="$(choose-option --question='Which action do you wish to take?' --filter="${2-}" -- 'login' 'upgrade')"
 if test "$which" = 'bevry'; then
@@ -11,7 +13,7 @@ if test "$which" = 'bevry'; then
 	ssh_ip="$(secret get BEVRY_DISCOURSE_IP)"
 	ssh_pass_external="$(secret get BEVRY_DISCOURSE_SSH_PASSWORD)"
 	ssh_pass_internal="$(secret get BEVRY_DISCOURSE_INTERNAL_SSH_PASSWORD)"
-	ssh_file_internal='/root/.ssh/root-discuss.bevry.me-github'
+	ssh_file_internal="$ssh_home/.ssh/root-discuss.bevry.me-github"
 elif test "$which" = 'liberland'; then
 	# secret map LIBERLAND_DISCOURSE_IP personal 'Liberland Forum' 'Scaleway IP'
 	# secret map LIBERLAND_DISCOURSE_SSH_PASSWORD personal 'Liberland Forum' 'Scaleway SSH Key'
@@ -19,7 +21,7 @@ elif test "$which" = 'liberland'; then
 	ssh_ip="$(secret get LIBERLAND_DISCOURSE_IP)"
 	ssh_pass_external="$(secret get LIBERLAND_DISCOURSE_SSH_PASSWORD)"
 	ssh_pass_internal="$(secret get LIBERLAND_DISCOURSE_INTERNAL_SSH_PASSWORD)"
-	ssh_file_internal='/root/.ssh/forum.liberland.org'
+	ssh_file_internal="$ssh_home/.ssh/forum.liberland.org"
 else
 	echo "Error: Invalid discourse instance." >/dev/stderr
 	exit 1
@@ -30,7 +32,7 @@ echo "If prompted for an SSH password, it has been copied to your clipboard."
 echo "$ssh_pass_external" | pbcopy
 
 if test "$action" = 'login'; then
-	ssh "$ssh_ip"
+	ssh "$ssh_user@$ssh_ip"
 	exit "$?" # exit with the above on success and failure
 fi
 
@@ -40,7 +42,7 @@ ssh_file_internal='$ssh_file_internal'
 ssh_pass_internal='$ssh_pass_internal'
 $upgrader
 "
-(ssh -t "$ssh_ip" "$upgrader" && {
+(ssh -t "$ssh_user@$ssh_ip" "$upgrader" && {
 	echo "Successfully upgraded the discourse instance. 🎉"
 	echo "$ssh_ip"
 	exit 0

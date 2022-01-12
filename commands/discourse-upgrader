@@ -23,23 +23,35 @@ apt-get upgrade -y
 
 # Cron Job
 echo 'Checking cron job upgrader...'
-while ! (crontab -l | grep -q discourse); do
-	echo 'cron job does not yet exist for upgrading discourse, copy the following into the prompt and save:'
-	echo
-	echo "# at midnight each day, upgrade the discourse forum"
-	echo "0 0 * * * 'cd /var/discourse; git pull origin master; ./launcher rebuild app'"
-	echo
-	read -r -n 1 -p 'Are you ready?'
+discourse_cron_script='/root/discourse_cron.bash'
+while ! (crontab -l | grep -q "$discourse_cron_script"); do
+	cat <<-EOF >"$discourse_cron_script"
+		#!/usr/bin/env bash
+		cd /var/discourse
+		git pull origin master
+		/var/discourse/launcher rebuild app
+	EOF
+	chmod +x "$discourse_cron_script"
+
+	cat <<-EOF
+		CRON JOB DOES NOT EXIST FOR UPGRADING DISCOURSE
+		COPY THE BELOW INTO THE PROMPT AND SAVE
+
+		# at midnight each day, upgrade the discourse forum
+		0 0 * * * $discourse_cron_script
+	EOF
+	read -r -n 1 -p 'ARE YOU READY?'
 	env EDITOR='/bin/nano' crontab -e
 done
 
 # Work around SSH password: https://stackoverflow.com/a/52671286/130638
 if test -n "${ssh_pass_internal-}"; then
 	ssh_stdin_pass_helper='/root/ssh_stdin_password.bash'
-	rm -f "$ssh_stdin_pass_helper"
-	echo '#!/usr/bin/env bash' >>"$ssh_stdin_pass_helper"
-	echo 'read secret' >>"$ssh_stdin_pass_helper"
-	echo 'echo $secret' >>"$ssh_stdin_pass_helper"
+	cat <<-EOF >"$ssh_stdin_pass_helper"
+		#!/usr/bin/env bash
+		read secret
+		echo \$secret
+	EOF
 	chmod +x "$ssh_stdin_pass_helper"
 
 	echo 'Adding the SSH keys...'
