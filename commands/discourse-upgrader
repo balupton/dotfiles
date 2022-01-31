@@ -22,17 +22,18 @@ apt-get update -y
 apt-get upgrade -y
 
 # Cron Job
-echo 'Checking cron job upgrader...'
+# Always update cron job file with the latest
 discourse_cron_script='/root/discourse_cron.bash'
+cat <<-EOF >"$discourse_cron_script"
+	#!/usr/bin/env bash
+	cd /var/discourse
+	git pull origin "\$(git rev-parse --abbrev-ref HEAD)"
+	/var/discourse/launcher rebuild app
+EOF
+chmod +x "$discourse_cron_script"
+# Check if the cron job file is actually used
+echo 'Checking cron job upgrader...'
 while ! (crontab -l | grep -q "$discourse_cron_script"); do
-	cat <<-EOF >"$discourse_cron_script"
-		#!/usr/bin/env bash
-		cd /var/discourse
-		git pull origin master
-		/var/discourse/launcher rebuild app
-	EOF
-	chmod +x "$discourse_cron_script"
-
 	cat <<-EOF
 		CRON JOB DOES NOT EXIST FOR UPGRADING DISCOURSE
 		COPY THE BELOW INTO THE PROMPT AND SAVE
@@ -64,11 +65,11 @@ fi
 echo 'Updating the local server configuration...'
 cd /
 git fetch origin
-git pull origin "$(git rev-parse --abbrev-ref HEAD)"
+git pull origin "$(git rev-parse --abbrev-ref HEAD)" # master -> main switches can bust things, so that code figured out the right branch
 
 echo 'Updating the discourse docker setup...'
 cd /var/discourse
-git pull origin master
+git pull origin "$(git rev-parse --abbrev-ref HEAD)" # master -> main switches can bust things, so that code figured out the right branch
 
 echo 'Rebuilding the discourse docker instance...'
 /var/discourse/launcher rebuild app
