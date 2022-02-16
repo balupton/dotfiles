@@ -20,6 +20,7 @@ fi
 apt-add-repository -y -r ppa:certbot/certbot
 apt-get update -y
 apt-get upgrade -y
+apt-get install -y wget
 
 # Cron Job
 # Always update cron job file with the latest
@@ -73,4 +74,4 @@ git pull origin "$(git rev-parse --abbrev-ref HEAD)" # master -> main switches c
 
 echo 'Rebuilding the discourse docker instance...'
 /var/discourse/launcher rebuild app
-echo "$?" # exit with the above on success or failure
+exit "$?" # exit with the above on success or failure
