@@ -27,6 +27,8 @@ apt-get install -y wget
 discourse_cron_script='/root/discourse_cron.bash'
 cat <<-EOF >"$discourse_cron_script"
 	#!/usr/bin/env bash
+	set -Eeuo pipefail
+	docker image prune --force --all --filter "until=28h"
 	cd /var/discourse
 	git pull origin "\$(git rev-parse --abbrev-ref HEAD)"
 	/var/discourse/launcher rebuild app
@@ -62,6 +64,12 @@ if test -n "${ssh_pass_internal-}"; then
 elif test -n "${ssh_file_internal-}"; then
 	ssh-add "$ssh_file_internal"
 fi
+
+echo 'Trimming unused Docker images to free up space...'
+docker ps -a
+docker image list
+docker image prune --force --all --filter "until=28h"
+docker image list
 
 echo 'Updating the local server configuration...'
 cd /
