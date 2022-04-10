@@ -81,7 +81,7 @@ MAS_INSTALL=(
 )
 
 # Homebrew
-HOMEBREW_ENCODING_INSTALL=no
+HOMEBREW_ENCODING_INSTALL=yes
 HOMEBREW_UNINSTALL=(
 	'hashicorp/tap/boundary'
 	'hashicorp/tap/consul'
@@ -167,7 +167,12 @@ GEM_INSTALL=(
 # - https://github.com/pymupdf/PyMuPDF
 # - https://github.com/pikepdf/pikepdf
 # - https://github.com/pdfminer/pdfminer.six
-PIPX_INSTALL=('youtube_dl' 'stig' 'katcr' 'poetry')
+PIPX_INSTALL=(
+	'katcr'
+	'poetry'
+	'stig'
+	'youtube_dl'
+)
 # PYTHON3_PIP_INSTALL=('bitcoinlib' 'cairosvg')
 # PYTHON2_PIP_INSTALL=('PyPDF2')
 

@@ -84,7 +84,7 @@ $t" >HISTORY.md
 npm run our:meta
 
 # release
-ok git rm -rf docs
+git rm -rf docs || :
 git add .
 git commit -am "$v - boundation, changelog, version bump"
 # if ! npm owner add bevryme; then
