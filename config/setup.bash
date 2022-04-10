@@ -208,7 +208,6 @@ NPM_INSTALL=(
 	# typescript@next
 	eslint
 	json
-	prettier
 	typescript
 
 	# cryptocurrency
@@ -248,6 +247,7 @@ SETUP_UTILS=(
 	'hyperfine'
 	'jq'
 	'mas'
+	'prettier'
 	'procs'
 	'python'
 	'ripgrep'
