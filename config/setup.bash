@@ -61,23 +61,23 @@ fi
 
 # macOS apps / mas
 # https://github.com/mas-cli/mas
-# 441258766 "Magnet"
-# 497799835 "XCode"
-# 803453959 "Slack"
-# 931134707 "Wire"
-# 937984704 "Amphetamine"
+# '430798174' 'HazeOver'
+# '441258766' 'Magnet'
+# '441258766' 'Magnet'
+# '497799835' 'Xcode'
+# '497799835' 'XCode'
+# '639968404' 'Parcel'
+# '803453959' 'Slack'
+# '931134707' 'Wire'
+# '937984704' 'Amphetamine'
 MAS_INSTALL=(
 	'420212497' 'Byword'
 	'1484348796' 'Endel'
-	'430798174' 'HazeOver'
 	'1472777122' 'Honey'
 	'409183694' 'Keynote'
 	'405399194' 'Kindle'
-	'441258766' 'Magnet'
 	'409203825' 'Numbers'
 	'409201541' 'Pages'
-	'639968404' 'Parcel'
-	'497799835' 'Xcode'
 )
 
 # Homebrew
@@ -255,6 +255,7 @@ SETUP_UTILS=(
 	'screen'
 	'sd'
 	'starship'
+	'strongbox'
 	'tealdeer'
 	'tokei'
 	'vim'

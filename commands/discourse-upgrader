@@ -1,5 +1,5 @@
 #!/usr/bin/env bash
-# this runs on the disource machine, do not depend on anything related to dorothy
+# internal command: this runs on the disource machine, do not depend on anything related to dorothy
 set -Eeuo pipefail
 
 # Receive arguments from caller
@@ -10,7 +10,7 @@ fi
 # Check discourse is already setup
 if ! test -d /var/discourse; then
 	echo 'Run this command on the remote discourse server'
-	exit 1
+	return 1
 fi
 
 # Upgrading the host, which may solve SSL issues
@@ -82,4 +82,4 @@ git pull origin "$(git rev-parse --abbrev-ref HEAD)" # master -> main switches c
 
 echo 'Rebuilding the discourse docker instance...'
 /var/discourse/launcher rebuild app
-exit "$?" # exit with the above on success or failure
+exit "$?"

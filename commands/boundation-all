@@ -56,10 +56,10 @@ while read -r slug <&3; do
 			echo "upgrading $repo"
 			rm -Rf "$repo" || :
 			gh repo clone "$slug"
-			cd "$repo" || exit
+			cd "$repo"
 			echo "'$(npm view . name)': '$(npm view . version)'," >>../list.txt
 			boundation-upgrade --auto --lts
-			cd .. || exit
+			cd ..
 			rm -Rf "$repo"
 			echo ''
 		else
