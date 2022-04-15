@@ -1,0 +1,8 @@
+#!/usr/bin/env bash
+source "$DOROTHY/sources/strict.bash"
+
+while true; do
+	color="$(ask --question="What is your favorite color?")"
+	echo-style "--$color=$color" || :
+	sleep 2
+done

@@ -1,0 +1,16 @@
+#!/usr/bin/env bash
+source "$DOROTHY/sources/strict.bash"
+
+colors=()
+while true; do
+	color="$(ask --question="What is your favorite color?" || :)"
+	if test -z "$color"; then
+		break
+	fi
+	if echo-style "--$color=$color"; then
+		colors+=("$color")
+	fi
+	sleep 2
+done
+
+echo-verbose "${colors[@]}"
