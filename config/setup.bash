@@ -83,11 +83,6 @@ MAS_INSTALL=(
 # Homebrew
 HOMEBREW_ENCODING_INSTALL=yes
 HOMEBREW_UNINSTALL=(
-	'hashicorp/tap/boundary'
-	'hashicorp/tap/consul'
-	'hashicorp/tap/nomad'
-	'hashicorp/tap/terraform'
-	'hashicorp/tap/vault'
 	'imagemagick'
 	'jswidler/tap/lockgit'
 	'podman'
