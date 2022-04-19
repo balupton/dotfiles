@@ -20,7 +20,10 @@ function finish {
 trap finish EXIT
 
 function get-node-engine {
-	grep -A1 engines <package.json | grep node | head -n1 | xargs
+	grep --after-context=1 --fixed-strings --regexp='engines' <package.json | \
+		grep --fixed-strings --regexp='node' | \
+		head -n1 | \
+		xargs
 }
 
 # engine: fetch original

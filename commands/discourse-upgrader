@@ -36,7 +36,7 @@ EOF
 chmod +x "$discourse_cron_script"
 # Check if the cron job file is actually used
 echo 'Checking cron job upgrader...'
-while ! (crontab -l | grep -q "$discourse_cron_script"); do
+while ! (crontab -l | grep --quiet --fixed-strings --regexp="$discourse_cron_script"); do
 	cat <<-EOF
 		CRON JOB DOES NOT EXIST FOR UPGRADING DISCOURSE
 		COPY THE BELOW INTO THE PROMPT AND SAVE
