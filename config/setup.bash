@@ -30,8 +30,8 @@ APK_INSTALL=(
 # )
 
 # software-properties-common
+# 	`atomicparsley` is a youtube-dl dependency
 APT_INSTALL=(
-	atomicparsley # a youtube-dl dependency
 	build-essential
 	gnome-keyring
 	libnotify-bin
@@ -49,9 +49,7 @@ SNAP_INSTALL=()
 
 # Go
 GO_LINTING_INSTALL=no
-GO_INSTALL=(
-	'github.com/uw-labs/strongbox'
-)
+GO_INSTALL=()
 if is-mac; then
 	GO_INSTALL+=(
 		'changkun.de/x/rmtrash'
@@ -153,7 +151,7 @@ HOMEBREW_FONTS=(
 # sass
 # twurl
 GEM_INSTALL=(
-	git-up
+	'git-up'
 )
 
 # Python
@@ -172,42 +170,36 @@ PIPX_INSTALL=(
 # PYTHON2_PIP_INSTALL=('PyPDF2')
 
 # Node.js
+# SERVERS
+# browser-refresh
+# live-server
+# DATABASE
+# fauna-shell
+# ECOSYSTEMS
+# "@stencil/core"
+# @cloudflare/wrangler
+# apollo
+# ember-cli
+# firebase-tools
+# ionic
+# lasso-cli
+# marko-cli
+# marko-starter
+# netlify-cli
+# now
+# TOOLING
+# tldr # replaced with tealdeer
+# typescript@next
+# CRYPTOCURRENCY
+# cartera
+# coinmon
 NPM_INSTALL=(
-	# bevry
-	"@bevry/testen"
-	boundation
-
-	# servers
-	# browser-refresh
-	# live-server
-	serve
-
-	# database
-	# fauna-shell
-
-	# ecosystems
-	# "@stencil/core"
-	# @cloudflare/wrangler
-	# apollo
-	# ember-cli
-	# firebase-tools
-	# ionic
-	# lasso-cli
-	# marko-cli
-	# marko-starter
-	# netlify-cli
-	# now
-
-	# tooling
-	# tldr: replaced with tealdeer
-	# typescript@next
-	eslint
-	json
-	typescript
-
-	# cryptocurrency
-	# cartera
-	# coinmon
+	'@bevry/testen'
+	'boundation'
+	'serve'
+	'eslint'
+	'json'
+	'typescript'
 )
 
 # Rust / Cargo / Crates.io
@@ -219,7 +211,6 @@ CARGO_INSTALL=()
 # setup-util-*
 SETUP_UTILS=(
 	'aria2'
-	'bandwhich'
 	'bash'
 	'bat'
 	'bottom'
@@ -227,33 +218,18 @@ SETUP_UTILS=(
 	'delta'
 	'deno'
 	'devel'
-	'drive-info'
 	'dust'
 	'exa'
-	'fd'
 	'fish'
-	'gh'
-	'git'
-	'glab'
 	'gocryptfs'
-	'grex'
-	'gsed'
 	'httpie'
-	'hyperfine'
 	'jq'
-	'mas'
 	'prettier'
-	'procs'
-	'python'
 	'ripgrep'
-	'rmesg'
-	'screen'
 	'sd'
 	'starship'
 	'strongbox'
 	'tealdeer'
-	'tokei'
+	'teip'
 	'vim'
-	'wget'
-	'zoxide'
 )
