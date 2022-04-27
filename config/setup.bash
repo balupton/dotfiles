@@ -11,9 +11,7 @@ source "$DOROTHY/config/setup.bash"
 # http://ytdl-org.github.io/youtube-dl/download.html
 
 APK_INSTALL=(
-	gnupg
-	tree
-	wget
+	'tree'
 )
 
 # APT_UNINSTALL=(
@@ -32,14 +30,9 @@ APK_INSTALL=(
 # software-properties-common
 # 	`atomicparsley` is a youtube-dl dependency
 APT_INSTALL=(
-	build-essential
-	gnome-keyring
-	libnotify-bin
-	libssl-dev
-	make
-	openssl
-	traceroute
-	vim
+	'gnome-keyring'
+	'libnotify-bin'
+	'traceroute'
 )
 
 # Snap
@@ -88,12 +81,10 @@ HOMEBREW_UNINSTALL=(
 )
 HOMEBREW_FORMULAS=(
 	'git-extras'
-	'greymd/tools/teip'
-	'micro'
 	'terminal-notifier'
+	'tmux'
 	'tree'
 	'watch'
-	'tmux'
 	'watchman'
 )
 HOMEBREW_SLOW_FORMULAS=(
@@ -104,15 +95,12 @@ HOMEBREW_CASKS=(
 	'adguard'
 	'audio-hijack'
 	'calibre'
-	'cloudflare-warp'
 	'firefox'
 	'loopback'
-	'meld'
 	'multipass'
 	'obs'
 	'pocket-casts'
 	'raspberry-pi-imager'
-	'signal'
 	'soundsource'
 	'spotify'
 	'twitch'
@@ -221,15 +209,19 @@ SETUP_UTILS=(
 	'dust'
 	'exa'
 	'fish'
+	'git'
 	'gocryptfs'
 	'httpie'
 	'jq'
 	'prettier'
 	'ripgrep'
 	'sd'
+	'signal'
 	'starship'
 	'strongbox'
 	'tealdeer'
 	'teip'
 	'vim'
+	'warp'
+	'wget'
 )
