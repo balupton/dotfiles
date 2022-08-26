@@ -1,0 +1,5 @@
+#!/usr/bin/env bash
+
+echo "BASH_SOURCE[0]=${BASH_SOURCE[0]}"
+echo "BASH_SOURCE=${BASH_SOURCE-}"
+echo "0=$0"
