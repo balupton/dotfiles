@@ -39,7 +39,7 @@ fi
 # workaround for now, with support for binaryextensions
 # r="$(jq -r '.boundation.nodeVersionsTestedRange' package.json || echo '')"
 # if is-value "$r"; then
-# 	if [[ "$r" = *'<16'* ]]; then
+# 	if [[ "$r" == *'<16'* ]]; then
 # 		echo 'custom nodeVersionsTestedRange is okay'
 # 	else
 # 		nr='10 || 12 || 14'

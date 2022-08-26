@@ -1,10 +1,14 @@
 #!/usr/bin/env bash
+source "$DOROTHY/sources/strict.bash"
 
 git init
 
-github-file-download bevry/base/master/.editorconfig
-github-file-download bevry/base/master/.gitignore
-github-file-download bevry/base/master/.npmignore
+files=(".editorconfig" ".gitignore" ".npmignore")
+for file in "${files[@]}"; do
+	github-download \
+		--slug="bevry/base" \
+		--pathname="$file"
+done
 
 if is-missing package.json; then
 	npm init -y
