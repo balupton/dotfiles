@@ -5,9 +5,6 @@
 # Theme
 export DOROTHY_THEME='oz'
 
-# Youtube
-alias ytd='youtube-dl'
-
 # Bottom
 # alias btm='btm --color default-light'
 
