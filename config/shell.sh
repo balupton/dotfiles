@@ -1,4 +1,4 @@
-#!/usr/bin/env bash
+#!/usr/bin/env sh
 # shellcheck disable=SC2034
 # use inline `export VAR=...` statements, for fish compatibility`
 
