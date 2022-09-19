@@ -1,0 +1,73 @@
+#!/usr/bin/env bash
+
+function sbs-helper() (
+	source "$DOROTHY/sources/strict.bash"
+
+	# =====================================
+	# Arguments
+
+	function help {
+		cat <<-EOF >/dev/stderr
+			ABOUT:
+			Get details about your watched files.
+
+			USAGE:
+			sbs-helper [...options]
+
+			OPTIONS:
+			--token=<token>
+			    Your bearer token.
+		EOF
+		if test "$#" -ne 0; then
+			echo-error "$@"
+		fi
+		return 22 # Invalid argument
+	}
+
+	# process
+	local item token=''
+	while test "$#" -ne 0; do
+		item="$1"
+		shift
+		case "$item" in
+		'--help' | '-h') help ;;
+		'--token='*) token="${item#*--token=}" ;;
+		'--')
+			mapfile -t paths < <(fs-absolute -- "$@")
+			shift $#
+			break
+			;;
+		'--'*) help "An unrecognised flag was provided: $item" ;;
+		*) help "An unrecognised argument was provided: $item" ;;
+		esac
+	done
+
+	# ensure token
+	if test -z "$token"; then
+		question="$(echo-style --bold="What is your bearer token?" $'\n' "Fetch this by logging into SBS, and monitoring your web console for " --code="/all?context=odwebsite" ' then grabbing it from the request headers.')"
+		token="$(ask --question="$question")"
+	fi
+
+	# =====================================
+	# Arguments
+
+	function get_watched {
+		http --auth "$token" --auth-type 'bearer' 'https://www.sbs.com.au/api/v3/video_progress/all?context=odwebsite' | jq -r '.all | .response | to_entries | map ( {id: .key, completed: .value.completed} ) | .[] | select(.completed==1) | .id'
+	}
+
+	function fetch_title {
+		local id
+		for id in "$@"; do
+			http --auth "$token" --auth-type 'bearer' "https://www.sbs.com.au/api/v3/video_search/fetchbyIds?n=${id}&context=odwebsite&range=1-10" | jq -r '.itemListElement | .[] | .name + " (" + .datePublished[0:4] + ")"'
+		done
+	}
+
+	local ids
+	mapfile -t ids < <(get_watched)
+	fetch_title "${ids[@]}"
+)
+
+# fire if invoked standalone
+if test "$0" = "${BASH_SOURCE[0]}"; then
+	sbs-helper "$@"
+fi
