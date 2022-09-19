@@ -90,6 +90,7 @@ HOMEBREW_FORMULAS=(
 HOMEBREW_SLOW_FORMULAS=(
 	'shellcheck'
 )
+# 'twitch'
 HOMEBREW_CASKS=(
 	'1password-cli'
 	'adguard'
@@ -103,7 +104,6 @@ HOMEBREW_CASKS=(
 	'raspberry-pi-imager'
 	'soundsource'
 	'spotify'
-	'twitch'
 	'zoom'
 )
 HOMEBREW_FONTS=(
@@ -197,6 +197,7 @@ CARGO_INSTALL=()
 
 # utilities
 # setup-util-*
+# 'warp' - caused too many issues, using adguard mac app instead
 SETUP_UTILS=(
 	'aria2'
 	'bash'
@@ -222,6 +223,5 @@ SETUP_UTILS=(
 	'tealdeer'
 	'teip'
 	'vim'
-	'warp'
 	'wget'
 )
