@@ -1,0 +1,85 @@
+#!/usr/bin/env bash
+source "$DOROTHY/sources/strict.bash"
+
+# disable ubuntu firewall
+# sudo-helper -- ufw disable
+# sudo-helper -- ufw status verbose
+
+# https://docs.docker.com/network/bridge/#enable-forwarding-from-docker-containers-to-the-outside-world
+# sudo-helper -- sysctl net.ipv4.conf.all.forwarding=1
+# sudo-helper -- iptables -P FORWARD ACCEPT
+# https://docs.docker.com/config/daemon/ipv6/
+# /etc/docker/daemon.json doesn't seem to exist
+
+# nordvpn among other things doesn't support ipv6
+# sudo-helper -- sysctl net.ipv6.conf.all.disable_ipv6=1
+
+# https://serverfault.com/a/1025183
+# sudo-helper -- update-alternatives --set iptables /usr/sbin/iptables-legacy
+# sudo-helper -- update-alternatives --set ip6tables /usr/sbin/ip6tables-legacy
+# sudo-helper -- update-alternatives --set arptables /usr/sbin/arptables-legacy
+# sudo-helper -- update-alternatives --set ebtables /usr/sbin/ebtables-legacy
+
+# https://serverfault.com/a/200658/63348
+# sudo iptables -P INPUT ACCEPT
+# sudo iptables -P FORWARD ACCEPT
+# sudo iptables -P OUTPUT ACCEPT
+# sudo iptables -t nat -F
+# sudo iptables -t mangle -F
+# sudo iptables -F
+# sudo iptables -X
+# sudo ip6tables -P INPUT ACCEPT
+# sudo ip6tables -P FORWARD ACCEPT
+# sudo ip6tables -P OUTPUT ACCEPT
+# sudo ip6tables -t nat -F
+# sudo ip6tables -t mangle -F
+# sudo ip6tables -F
+# sudo ip6tables -X
+# sudo iptables -nvL
+
+# sudo iptables -A INPUT -m conntrack --ctstate ESTABLISHED,RELATED -j ACCEPT
+# sudo iptables -A INPUT -i lo -j ACCEPT
+# sudo iptables -A FORWARD -m conntrack --ctstate ESTABLISHED,RELATED -j ACCEPT
+# sudo iptables -A FORWARD -i lo -j ACCEPT
+# sudo iptables -A OUTPUT -m conntrack --ctstate ESTABLISHED,RELATED -j ACCEPT
+# sudo iptables -A OUTPUT -o lo -j ACCEPT
+# sudo iptables -A OUTPUT -o tap+ -j ACCEPT
+# sudo iptables -A OUTPUT -o tun+ -j ACCEPT
+# sudo iptables -A OUTPUT -o nordlynx+ -j ACCEPT
+# sudo iptables -t nat -A POSTROUTING -o tap+ -j MASQUERADE
+# sudo iptables -t nat -A POSTROUTING -o tun+ -j MASQUERADE
+# sudo iptables -t nat -A POSTROUTING -o nordlynx+ -j MASQUERADE
+
+# sudo ip6tables -A INPUT -m conntrack --ctstate ESTABLISHED,RELATED -j ACCEPT
+# sudo ip6tables -A INPUT -p icmp -j ACCEPT
+# sudo ip6tables -A INPUT -i lo -j ACCEPT
+# sudo ip6tables -A FORWARD -m conntrack --ctstate ESTABLISHED,RELATED -j ACCEPT
+# sudo ip6tables -A FORWARD -p icmp -j ACCEPT
+# sudo ip6tables -A FORWARD -i lo -j ACCEPT
+# sudo ip6tables -A OUTPUT -m conntrack --ctstate ESTABLISHED,RELATED -j ACCEPT
+# sudo ip6tables -A OUTPUT -o lo -j ACCEPT
+# sudo ip6tables -A OUTPUT -o tap+ -j ACCEPT
+# sudo ip6tables -A OUTPUT -o tun+ -j ACCEPT
+# sudo ip6tables -A OUTPUT -o nordlynx+ -j ACCEPT
+# sudo ip6tables -t nat -A POSTROUTING -o tap+ -j MASQUERADE
+# sudo ip6tables -t nat -A POSTROUTING -o tun+ -j MASQUERADE
+# sudo ip6tables -t nat -A POSTROUTING -o nordlynx+ -j MASQUERADE
+
+# sudo apt install bridge-utils -y
+# ip link set dev docker0 down
+
+# sudo-helper -- sysctl net.ipv4.conf.all.forwarding=1
+# sudo-helper -- sysctl net.ipv6.conf.all.disable_ipv6=1
+
+# docker network prune
+# docker run --rm -it --cap-add=NET_ADMIN --net=bridge --dns="$(what-is-my-dns exposed)" alpine nslookup search
+# docker run --rm -it --cap-add=NET_ADMIN --net=bridge --dns="192.168.5.40" alpine sh -c "$(cat "$DOROTHY/commands/debug-network")"
+# docker run --rm -it --cap-add=NET_ADMIN --net=bridge alpine sh -c "$(cat "$DOROTHY/commands/debug-network")"
+# docker run --rm -it --net=bridge alpine sh -c "$(cat "$DOROTHY/commands/debug-network")"
+
+# docker run --rm -it --cap-add=NET_ADMIN --net=bridge -- ubuntu nslookup search
+# docker run --rm -it --cap-add=NET_ADMIN --net=bridge -- ubuntu nslookup search
+
+# route
+
+# what-is-my-ip
