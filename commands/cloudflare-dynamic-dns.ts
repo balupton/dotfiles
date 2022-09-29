@@ -1,13 +1,13 @@
-#!/usr/bin/env deno run --allow-net --allow-env
+#!/usr/bin/env -S deno run --allow-net --allow-env
 
-async function wanip () {
+async function wanip (): Promise<string> {
 	const response = await fetch('https://whatmyip.bevry.workers.dev')
 	const result = await response.text()
 	return result.replace(/\s/g, '')
 }
 
-async function fetch_cloudflare(token: string, path: string, method: 'GET' | 'PUT', body: string): any{
-	const opts = {
+async function fetch_cloudflare(token: string, path: string, method: 'GET' | 'PUT', body: string): Promise<object>{
+	const opts: RequestInit = {
 		method,
 		headers: {
 			'Authorization': `Bearer ${token}`,
@@ -21,7 +21,7 @@ async function fetch_cloudflare(token: string, path: string, method: 'GET' | 'PU
 	return result
 }
 
-function update_record (token: string, zone_id: string, record_id: string, record_type: string, record_target: string) {
+function update_record (token: string, zone_id: string, record_id: string, record_type: string, record_target: string, record_name: string): Promise<object> {
 	if ( !zone_id ) throw new Error('Invalid zone_id')
 	if ( !record_id ) throw new Error('Invalid record_id')
 	if ( !record_type ) throw new Error('Invalid record_type')
@@ -30,10 +30,10 @@ function update_record (token: string, zone_id: string, record_id: string, recor
 	// https://api.cloudflare.com/#dns-records-for-a-zone-update-dns-record
 	const body = JSON.stringify({
 		'type': record_type,
-		'name': 'ddns.bevry.me',
+		'name': record_name,
 		'content': record_target,
-		'ttl': 1,
-		'proxied': true
+		// 'proxied': false,
+		// 'ttl': 1,
 	})
 	return fetch_cloudflare(
 		token,
@@ -55,9 +55,10 @@ function fetch_records (token: string, zone_id: string) {
 async function run () {
 	const args = Deno.args.slice()
 	const token = Deno.env.get('TOKEN')
+	if ( ! token ) throw new Error('Invalid TOKEN')
 	// console.log({args, token})
 
-	// const zones = await fetch_zones(token)
+	// const zones = await fetch_zones(token) as {result: Array<any>}
 	// console.log('zones:', zones)
 	// for ( const zone of zones.result ) {
 	// 	const records = await fetch_records(token, zone.id)
@@ -65,13 +66,13 @@ async function run () {
 	// }
 
 	const ip = await wanip()
-	console.log({ip})
 	while ( args.length ) {
-		const zone_id = args.shift()
-		const record_id = args.shift()
-		const record_type = args.shift()
+		const zone_id = args.shift() as string
+		const record_id = args.shift() as string
+		const record_type = args.shift() as string
+		const record_name = args.shift() as string
 		const record_target = ip
-		const result = await update_record(token, zone_id, record_id, record_type, record_target)
+		const result = await update_record(token, zone_id, record_id, record_type, record_target, record_name)
 		console.log('result:', result)
 	}
 }
