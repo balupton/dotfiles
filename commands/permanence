@@ -2,6 +2,9 @@
 source "$DOROTHY/sources/strict.bash"
 source "$DOROTHY/sources/config.sh"
 
+# dependencies
+setup-util-deno --quiet
+
 # configuration:
 tuples=()
 load_dorothy_config 'permanence.bash'
@@ -23,5 +26,5 @@ for ((i = 0; i < ${#tuples[@]}; i = i + 2)); do
 	mkdir -p "$dest"
 	cd "$dest" || exit 1
 	ref="$(get-url-domain "$src")"
-	youtube-dl-archive --referer "$ref" "$src"
+	ytd-helper --archive --referer "$ref" "$src"
 done
