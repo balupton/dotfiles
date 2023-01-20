@@ -1,7 +1,7 @@
 #!/usr/bin/env bash
-source "$DOROTHY/sources/strict.bash"
+source "$DOROTHY/sources/bash.bash"
 
-function magnet-select () (
+function magnet-select() (
 	# prepare
 	search="$1"
 

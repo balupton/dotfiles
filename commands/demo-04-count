@@ -1,39 +1,39 @@
 #!/usr/bin/env bash
-source "$DOROTHY/sources/strict.bash"
+source "$DOROTHY/sources/bash.bash"
 
-function echo-count () (
+function echo-count() (
 
 	# =====================================
 	# Arguments
 
-function help {
-	cat <<-EOF >/dev/stderr
-		ABOUT:
-		For each input, count its characters or words.
+	function help {
+		cat <<-EOF >/dev/stderr
+			ABOUT:
+			For each input, count its characters or words.
 
-		USAGE:
-		echo-count [...options] <...input>
-		echo-lines <...input> | echo-count [...options]
+			USAGE:
+			echo-count [...options] <...input>
+			echo-lines <...input> | echo-count [...options]
 
-		OPTIONS:
-		-w, --words
-			Count words instead of characters.
+			OPTIONS:
+			-w, --words
+			    Count words instead of characters.
 
-		EXAMPLE:
+			EXAMPLE:
 
-		echo-count 'hello'
+			echo-count 'hello'
 
-		    5
-		    # exit status: 0
+			    5
+			    # exit status: 0
 
-		echo-lines 'hello' | echo-count
+			echo-lines 'hello' | echo-count
 
-		    5
-		    # exit status: 0
+			    5
+			    # exit status: 0
 
-	EOF
-	return 22 # Invalid argument
-}
+		EOF
+		return 22 # Invalid argument
+	}
 
 	# process
 	local item words='no' ARGS=()
@@ -42,7 +42,7 @@ function help {
 		shift
 		case "$item" in
 		'--help' | '-h') help ;;
-		'-w'|'--words') words='yes' ;;
+		'-w' | '--words') words='yes' ;;
 		'--')
 			ARGS+=("$@")
 			shift "$#"

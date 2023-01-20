@@ -1,5 +1,5 @@
 #!/usr/bin/env bash
-source "$DOROTHY/sources/strict.bash"
+source "$DOROTHY/sources/bash.bash"
 
 if test -z "${GITHUB_ACCESS_TOKEN-}"; then
 	echo 'Environment variable GITHUB_ACCESS_TOKEN empty, fetching it from the secret engine...'

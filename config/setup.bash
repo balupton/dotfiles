@@ -75,7 +75,6 @@ MAS_INSTALL=(
 HOMEBREW_ENCODING_INSTALL=yes
 HOMEBREW_UNINSTALL=(
 	'imagemagick'
-	'jswidler/tap/lockgit'
 	'podman'
 	'tmux'
 )
@@ -138,9 +137,8 @@ HOMEBREW_FONTS=(
 # ffi
 # sass
 # twurl
-GEM_INSTALL=(
-	'git-up'
-)
+# git-up, replaced by `git pull --rebase --autostash`
+GEM_INSTALL=()
 
 # Python
 # @todo swap PyPDF2 fro one of the following

@@ -1,6 +1,6 @@
 #!/usr/bin/env bash
 source "$DOROTHY/sources/nvm.sh"
-source "$DOROTHY/sources/strict.bash"
+source "$DOROTHY/sources/bash.bash"
 
 # prepare
 name="$(basename "$(pwd)")"
@@ -20,9 +20,9 @@ function finish {
 trap finish EXIT
 
 function get-node-engine {
-	grep --after-context=1 --fixed-strings --regexp='engines' <package.json | \
-		grep --fixed-strings --regexp='node' | \
-		head -n1 | \
+	grep --after-context=1 --fixed-strings --regexp='engines' <package.json |
+		grep --fixed-strings --regexp='node' |
+		head -n1 |
 		xargs
 }
 

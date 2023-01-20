@@ -10,7 +10,7 @@ if test -z "$DOROTHY"; then
 fi
 
 # ensure failures are propagated
-source "$DOROTHY/sources/strict.bash"
+source "$DOROTHY/sources/bash.bash"
 
 # test streaming
 if "$DOROTHY/commands/is-streaming"; then
