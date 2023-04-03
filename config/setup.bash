@@ -41,9 +41,10 @@ APT_INSTALL=(
 SNAP_INSTALL=()
 
 # Go
-GO_LINTING_INSTALL=no
+GO_LINTING_INSTALL='no'
 GO_INSTALL=()
 if is-mac; then
+	GO_LINTING_INSTALL='yes'
 	GO_INSTALL+=(
 		'changkun.de/x/rmtrash'
 		# 'github.com/cloudflare/utahfs/cmd/utahfs-client'
@@ -186,6 +187,7 @@ NPM_INSTALL=(
 	'eslint'
 	'json'
 	'typescript'
+	'@githubnext/github-copilot-cli'
 )
 
 # Rust / Cargo / Crates.io
