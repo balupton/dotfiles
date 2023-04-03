@@ -2,6 +2,12 @@
 source "$DOROTHY/sources/nvm.sh"
 source "$DOROTHY/sources/bash.bash"
 
+# check
+if test -z "${GITHUB_ACCESS_TOKEN-}"; then
+	secret env NPM_AUTHTOKEN SURGE_LOGIN SURGE_TOKEN GITHUB_ACCESS_TOKEN GITHUB_CLIENT_ID GITHUB_CLIENT_SECRET -- "$0" "$@"
+	exit $?
+fi
+
 # prepare
 name="$(basename "$(pwd)")"
 export upgradeSuccess="no"
@@ -25,9 +31,13 @@ function get-node-engine {
 		head -n1 |
 		xargs
 }
+function get-node-license {
+	jq -r '.license' package.json
+}
 
-# engine: fetch original
+# fetch original values
 eo="$(get-node-engine)"
+lo="$(get-node-license)"
 
 # run boundation
 nvm use 16 # system
@@ -55,16 +65,24 @@ fi
 # boundation --nodeVersionsTestedRange="$r" "$@"
 boundation "$@"
 
-# engine: fetch new
+# fetch updated values
 en="$(get-node-engine)"
+ln="$(get-node-license)"
 
-# engine: compare
-if test "$en" = "$eo"; then
-	change="minor"
-	l=""
-else
+# compare values
+ec=""
+lc=""
+change="minor"
+if test "$lo" != "$ln"; then
+	if test "$ln" = 'RPL-1.5'; then
+		change="major"
+	fi
+	lc="-   Updated license from [\`$lo\`](http://spdx.org/licenses/$lo.html) to [\`$ln\`](http://spdx.org/licenses/$ln.html)
+"
+fi
+if test "$eo" != "$en"; then
 	change="major"
-	l="-   Minimum required node version changed from \`${eo}\` to \`${en}\` to keep up with mandatory ecosystem changes
+	ec="-   Minimum required node version changed from \`$eo\` to \`$en\` to keep up with mandatory ecosystem changes
 "
 fi
 
@@ -80,7 +98,7 @@ echo "# History
 ## $v $d
 
 -   Updated dependencies, [base files](https://github.com/bevry/base), and [editions](https://editions.bevry.me) using [boundation](https://github.com/bevry/boundation)
-$l
+$lc$ec
 $t" >HISTORY.md
 
 # prepare
