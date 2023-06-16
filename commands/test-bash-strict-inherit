@@ -11,7 +11,7 @@ mapfile -t tuples < <(exit 1)
 
 echo 'two'
 
-mapfile -t tuples <<< "$(exit 1)"
+mapfile -t tuples <<<"$(exit 1)"
 
 echo 'three'
 
@@ -21,7 +21,7 @@ wait $!
 echo 'four'
 
 f="$(mktemp)"
-exit 1 > "$f"
-mapfile -t tuples < "$f"
+exit 1 >"$f"
+mapfile -t tuples <"$f"
 
 echo 'five'

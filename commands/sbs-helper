@@ -32,11 +32,6 @@ function sbs-helper() (
 		case "$item" in
 		'--help' | '-h') help ;;
 		'--token='*) token="${item#*--token=}" ;;
-		'--')
-			mapfile -t paths < <(fs-absolute -- "$@")
-			shift $#
-			break
-			;;
 		'--'*) help "An unrecognised flag was provided: $item" ;;
 		*) help "An unrecognised argument was provided: $item" ;;
 		esac

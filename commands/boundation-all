@@ -51,15 +51,16 @@ while read -r slug <&3; do
 			echo "skipping $repo"
 
 		# does matches exist within repo
-		elif test -z "$matches" || [[ "$repo" == *"$matches"* ]]; then
+		elif test -z "$matches" || [[ $repo == *"$matches"* ]]; then
 			echo ''
 			echo "upgrading $repo"
 			rm -Rf "$repo" || :
 			gh repo clone "$slug"
-			cd "$repo"
-			echo "'$(npm view . name)': '$(npm view . version)'," >>../list.txt
-			boundation-upgrade --auto --lts
-			cd ..
+			(
+				cd "$repo"
+				echo "'$(npm view . name)': '$(npm view . version)'," >>../list.txt
+				boundation-upgrade --auto --lts
+			)
 			rm -Rf "$repo"
 			echo ''
 		else

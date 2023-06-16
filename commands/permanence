@@ -22,7 +22,7 @@ fi
 # cycle
 for ((i = 0; i < ${#tuples[@]}; i = i + 2)); do
 	src="${tuples[$i]}"
-	dest="${tuples[$i + 1]}"
+	dest="${tuples[i + 1]}"
 	mkdir -p "$dest"
 	cd "$dest" || exit 1
 	ref="$(get-url-domain "$src")"

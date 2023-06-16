@@ -16,7 +16,7 @@ case "$hour" in
 '06') walls="$walls/Morning" ;;
 '07') walls="$walls/Morning" ;;
 '08') walls="$walls/Morning" ;;
-'09') walls="$walls/Day" ;;  # day
+'09') walls="$walls/Day" ;; # day
 '10') walls="$walls/Day" ;;
 '11') walls="$walls/Day" ;;
 '12') walls="$walls/Day" ;;
@@ -28,7 +28,7 @@ case "$hour" in
 '18') walls="$walls/Evening" ;;
 '19') walls="$walls/Evening" ;;
 '20') walls="$walls/Evening" ;;
-'21') walls="$walls/Night" ;;  # night
+'21') walls="$walls/Night" ;; # night
 '22') walls="$walls/Night" ;;
 '23') walls="$walls/Night" ;;
 '24') walls="$walls/Night" ;;

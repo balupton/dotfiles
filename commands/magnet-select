@@ -13,10 +13,12 @@ function magnet-select() (
 	fi
 
 	# select
+	# trunk-ignore(shellcheck/SC2016)
+	local option_visual='$(echo-magnet-hash "$value")    $label'
 	choose-option \
 		--question="Which magnet for $search?" \
 		--label=first \
-		--visual='$(echo-magnet-hash "$value")    $label' \
+		--visual="$option_visual" \
 		-- "${results[@]}"
 )
 

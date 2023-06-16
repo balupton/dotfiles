@@ -1,6 +1,13 @@
 # generic
 **/.DS_Store
 .vscode/
+node_modules
+package-lock.json
+
+# unused trunk defaults
+.trunk/*
+!.trunk/trunk.yaml
+!.trunk/configs
 
 # custom to dorothy user configuration
 commands.local/

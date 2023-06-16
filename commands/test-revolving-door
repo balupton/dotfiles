@@ -4,7 +4,7 @@ cols="$(tput cols 2>/dev/null || :)"
 if test -n "$cols"; then
 	while true; do
 		printf '\e]0;%s\a' "cols: $(tput cols 2>/dev/null || :)"
-		for ((i=0; i<"$cols"; i++)); do
+		for ((i = 0; i < "$cols"; i++)); do
 			printf '.'
 		done
 		echo
