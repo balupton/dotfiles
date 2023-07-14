@@ -1,4 +1,6 @@
 #!/usr/bin/env -S deno run --allow-net --allow-env
+// trunk-ignore-all(trunk/ignore-does-nothing)
+// trunk-ignore-all(trufflehog)
 // trunk-ignore-all(eslint/camelcase)
 // trunk-ignore-all(eslint/max-params)
 
@@ -12,7 +14,7 @@ async function fetch_cloudflare(
 	token: string,
 	path: string,
 	method: 'GET' | 'PUT',
-	body: string
+	body: string,
 ): Promise<object> {
 	const opts: RequestInit = {
 		method,
@@ -25,7 +27,7 @@ async function fetch_cloudflare(
 	if (body) opts.body = body
 	const response = await fetch(
 		'https://api.cloudflare.com/client/v4/' + path,
-		opts
+		opts,
 	)
 	const result = await response.json()
 	return result
@@ -37,7 +39,7 @@ function update_record(
 	record_id: string,
 	record_type: string,
 	record_target: string,
-	record_name: string
+	record_name: string,
 ): Promise<object> {
 	if (!zone_id) throw new Error('Invalid zone_id')
 	if (!record_id) throw new Error('Invalid record_id')
@@ -56,7 +58,7 @@ function update_record(
 		token,
 		`zones/${zone_id}/dns_records/${record_id}`,
 		'PUT',
-		body
+		body,
 	)
 }
 
@@ -97,7 +99,7 @@ async function run() {
 			record_id,
 			record_type,
 			record_target,
-			record_name
+			record_name,
 		)
 		console.log('result:', result)
 	}

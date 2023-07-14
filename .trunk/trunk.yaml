@@ -1,11 +1,11 @@
 # https://features.trunk.io/check/p/trunk-doesnt-work-in-nested-repo
 version: 0.1
 cli:
-  version: 1.10.0
+  version: 1.12.0
 plugins:
   sources:
     - id: trunk
-      ref: v0.0.17
+      ref: v0.0.21
       uri: https://github.com/trunk-io/plugins
 runtimes:
   enabled:
@@ -20,19 +20,22 @@ actions:
     - trunk-upgrade-available
 lint:
   enabled:
+    - checkov@2.3.324
+    - trivy@0.43.1
+    - trufflehog@3.44.0
     - taplo@0.7.0
-    - actionlint@1.6.24
-    - black@23.3.0
-    - eslint@8.42.0
+    - actionlint@1.6.25
+    - black@23.7.0
+    - eslint@8.44.0
     - flake8@6.0.0
     - git-diff-check@SYSTEM
-    - gitleaks@8.16.4
+    - gitleaks@8.17.0
     - isort@5.12.0
-    - markdownlint@0.34.0
-    - prettier@2.8.8
-    - ruff@0.0.265
+    - markdownlint@0.35.0
+    - prettier@3.0.0
+    - ruff@0.0.278
     - shellcheck@0.9.0
-    - shfmt@3.5.0
+    - shfmt@3.6.0
     - yamllint@1.32.0
   ignore:
     - linters: [ALL]
@@ -42,7 +45,6 @@ lint:
         - node_modules/**
         - config.local/secrets.json
         - commands/test-*
-
-    - linters: [gitleaks]
+    - linters: [gitleaks, trufflehog]
       paths:
         - '*.local/**'
