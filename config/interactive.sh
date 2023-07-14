@@ -2,7 +2,8 @@
 # shellcheck disable=SC2034
 # use inline `export VAR=...` statements, for fish compatibility`
 
-# Theme
+# Dorothy
+alias d='dorothy'
 export DOROTHY_THEME='oz'
 
 # Bottom
