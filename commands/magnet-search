@@ -1,5 +1,6 @@
 #!/usr/bin/env bash
 source "$DOROTHY/sources/bash.bash"
+require_array 'mapfile'
 
 # dependencies
 source "$DOROTHY/sources/ripgrep.bash"

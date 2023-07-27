@@ -1,8 +1,0 @@
-#!/usr/bin/env bash
-source "$DOROTHY/sources/bash.bash"
-
-jq --arg attribute 'eff' --arg level '9' --arg details '"# 106118802598
-0.72 SOL
-lv1
-+2
-+5%' '.gems += [{attribute: $attribute, level: $level, details: $details}]' /Users/balupton/Desktop/stepn.json
