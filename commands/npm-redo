@@ -4,9 +4,9 @@ function npm_redo() (
 	source "$DOROTHY/sources/bash.bash"
 
 	rm-modules
-	npm i
-	npm run our:release:prepare
-	npm link
+	nvm-env npm i
+	nvm-env npm run our:release:prepare
+	nvm-env npm link
 )
 
 # fire if invoked standalone

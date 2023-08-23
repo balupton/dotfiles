@@ -6,7 +6,7 @@ function npm_rename() (
 	local old="$1" new="$2" url message
 	url="https://www.npmjs.com/package/$new"
 	message="$old has been renamed to $new: npm uninstall ${old@Q} && npm install ${new@Q} && open ${url@Q}"
-	npm deprecate "$old" "$message"
+	nvm-env npm deprecate "$old" "$message"
 )
 
 # fire if invoked standalone

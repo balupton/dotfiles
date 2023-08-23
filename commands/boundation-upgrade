@@ -1,7 +1,6 @@
 #!/usr/bin/env bash
 
 function boundation_upgrade() (
-	source "$DOROTHY/sources/nvm.sh"
 	source "$DOROTHY/sources/bash.bash"
 
 	# check
@@ -45,9 +44,8 @@ function boundation_upgrade() (
 	lo="$(get-node-license)"
 
 	# run boundation
-	nvm use default # system
 	if ! command-exists boundation; then
-		npm i -g boundation
+		nvm-env npm i -g boundation
 	fi
 
 	# keep going
@@ -94,10 +92,10 @@ function boundation_upgrade() (
 	fi
 
 	# prettify history.md
-	npx prettier HISTORY.md --write
+	nvm-env npx prettier HISTORY.md --write
 
 	# update version
-	v="$(npm version "${change}" --git-tag-version=false)"
+	v="$(nvm-env npm version "${change}" --git-tag-version=false)"
 	d="$(date +"%Y %B %-d")"
 	t="$(tail -n +3 HISTORY.md)"
 	cat <<-EOF >HISTORY.md
@@ -111,19 +109,19 @@ function boundation_upgrade() (
 	EOF
 
 	# prepare
-	npm run our:meta
+	nvm-env npm run our:meta
 
 	# release
 	git rm -rf docs || :
 	git add .
 	git commit -am "$v - boundation, changelog, version bump"
-	# if ! npm owner add bevryme; then
+	# if ! nvm-env npm owner add bevryme; then
 	# 	print_line 'adding npm owner failed, trying again in two minutes'
 	# 	sleep 2m
-	# 	npm owner add bevryme
+	# 	nvm-env npm owner add bevryme
 	# fi
 	set -x
-	npm run our:release
+	nvm-env npm run our:release
 	upgrade_success='yes'
 )
 

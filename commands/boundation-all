@@ -65,7 +65,7 @@ function boundation_all() (
 				gh repo clone "$slug"
 				(
 					cd "$repo"
-					print_line "'$(npm view . name)': '$(npm view . version)'," >>../list.txt
+					print_line "'$(nvm-env npm view . name)': '$(nvm-env npm view . version)'," >>../list.txt
 					boundation-upgrade --auto --lts
 				)
 				rm -Rf "$repo"

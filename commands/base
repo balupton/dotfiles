@@ -13,7 +13,7 @@ function base() (
 	done
 
 	if is-missing 'package.json'; then
-		npm init -y
+		nvm-env npm init -y
 	fi
 )
 
