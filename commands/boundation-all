@@ -1,74 +1,88 @@
 #!/usr/bin/env bash
-source "$DOROTHY/sources/bash.bash"
 
-# prepare
-repo=""
-function finish {
-	local message
-	if test -z "$repo"; then
-		message="boundation completed"
-	else
-		message="boundation failed on $repo"
-	fi
-	echo ''
-	echo "$message"
-}
-trap finish EXIT
+function boundation_all() (
+	source "$DOROTHY/sources/bash.bash"
 
-# npm workaround
-# https://omrilotan.medium.com/npx-breaking-on-ci-b9f3f61d4676
-export npm_config_yes=true
-
-# user
-user="bevry" # "docpad"
-skip="envfile typechecker projectz pluginclerk links caterpillar hooks getcontributors getmembers getrepos github-commit cson dorothy pluginloader lazy-require make-deno-edition boundation awesome-crypto base billing bindsource designs discourse discourse-component-youtubetimestamps discourser dotfiles fountain gitclone-robust legal macos-getplaytime meetings nextjs-auth0-fauna staticsitegenerators-list staticsitegenerators-website study terraform-scaleway-hashistack testen textandbinaryextensions timezone-converter workers youtube ${*:2}"
-start="${1-}"
-matches="" # "-plugin-"
-
-# local
-if test -z "$start"; then
-	ready='yes'
-else
-	ready='no'
-fi
-
-# use a file at fd 3, as otherwise the repos will be passed as stdin into boundation
-# http://mywiki.wooledge.org/BashFAQ/089
-# https://stackoverflow.com/a/8334759/130638
-f="$(mktemp)"
-fetch "https://bevry.me/api/github/repos/${user}" | json -a >"$f"
-
-echo '' >list.txt
-while read -r slug <&3; do
-	repo="${slug#*/}"
-	if test "$repo" = "$start"; then
-		echo "now ready after $repo"
-		ready='yes'
-	fi
-	if test "$ready" = "yes"; then
-		# does repo exist within skip
-		if [[ " $skip " == *" $repo "* ]]; then
-			echo "skipping $repo"
-
-		# does matches exist within repo
-		elif test -z "$matches" || [[ $repo == *"$matches"* ]]; then
-			echo ''
-			echo "upgrading $repo"
-			rm -Rf "$repo" || :
-			gh repo clone "$slug"
-			(
-				cd "$repo"
-				echo "'$(npm view . name)': '$(npm view . version)'," >>../list.txt
-				boundation-upgrade --auto --lts
-			)
-			rm -Rf "$repo"
-			echo ''
+	# prepare
+	local repo=''
+	function on_finish {
+		local message
+		if test -z "$repo"; then
+			message='boundation completed'
 		else
-			echo "ignoring $repo"
+			message="boundation failed on $repo"
 		fi
-	else
-		echo "skipping $repo"
-	fi
-done 3<"$f"
+		print_line
+		print_line "$message"
+	}
+	trap on_finish EXIT
 
-repo=""
+	# npm workaround
+	# https://omrilotan.medium.com/npx-breaking-on-ci-b9f3f61d4676
+	export npm_config_yes=true
+
+	# user
+	local user skip start matches
+	user='bevry' # "docpad"
+	skip="envfile typechecker projectz pluginclerk links caterpillar hooks getcontributors getmembers getrepos github-commit cson dorothy pluginloader lazy-require make-deno-edition boundation awesome-crypto base billing bindsource designs discourse discourse-component-youtubetimestamps discourser dotfiles fountain gitclone-robust legal macos-getplaytime meetings nextjs-auth0-fauna staticsitegenerators-list staticsitegenerators-website study terraform-scaleway-hashistack testen textandbinaryextensions timezone-converter workers youtube ${*:2}"
+	start="${1-}"
+	matches='' # "-plugin-"
+
+	# local
+	local ready
+	if test -z "$start"; then
+		ready='yes'
+	else
+		ready='no'
+	fi
+
+	# use a file at fd 3, as otherwise the repos will be passed as stdin into boundation
+	# http://mywiki.wooledge.org/BashFAQ/089
+	# https://stackoverflow.com/a/8334759/130638
+	local f
+	f="$(mktemp)"
+	fetch "https://bevry.me/api/github/repos/${user}" | json -a >"$f"
+
+	print_line >list.txt
+
+	local slug
+	while read -r slug <&3; do
+		repo="${slug#*/}"
+		if test "$repo" = "$start"; then
+			print_line "now ready after $repo"
+			ready='yes'
+		fi
+		if test "$ready" = 'yes'; then
+			# does repo exist within skip
+			if [[ " $skip " == *" $repo "* ]]; then
+				print_line "skipping $repo"
+
+			# does matches exist within repo
+			elif test -z "$matches" || [[ $repo == *"$matches"* ]]; then
+				print_line
+				print_line "upgrading $repo"
+				rm -Rf "$repo" || :
+				gh repo clone "$slug"
+				(
+					cd "$repo"
+					print_line "'$(npm view . name)': '$(npm view . version)'," >>../list.txt
+					boundation-upgrade --auto --lts
+				)
+				rm -Rf "$repo"
+				print_line
+			else
+				print_line "ignoring $repo"
+			fi
+		else
+			print_line "skipping $repo"
+		fi
+	done 3<"$f"
+
+	# reset repo for on_finish
+	repo=''
+)
+
+# fire if invoked standalone
+if test "$0" = "${BASH_SOURCE[0]}"; then
+	boundation_all "$@"
+fi

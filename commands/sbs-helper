@@ -1,6 +1,6 @@
 #!/usr/bin/env bash
 
-function sbs-helper() (
+function sbs_helper() (
 	source "$DOROTHY/sources/bash.bash"
 	require_array 'mapfile'
 
@@ -22,7 +22,7 @@ function sbs-helper() (
 		if test "$#" -ne 0; then
 			echo-error "$@"
 		fi
-		return 22 # Invalid argument
+		return 22 # EINVAL 22 Invalid argument
 	}
 
 	# process
@@ -65,5 +65,5 @@ function sbs-helper() (
 
 # fire if invoked standalone
 if test "$0" = "${BASH_SOURCE[0]}"; then
-	sbs-helper "$@"
+	sbs_helper "$@"
 fi

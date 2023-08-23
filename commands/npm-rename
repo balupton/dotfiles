@@ -1,8 +1,15 @@
 #!/usr/bin/env bash
-source "$DOROTHY/sources/bash.bash"
 
-old="$1"
-new="$2"
-url="https://www.npmjs.com/package/$new"
-message="$old has been renamed to $new: npm uninstall ${old@Q} && npm install ${new@Q} && open ${url@Q}"
-npm deprecate "$old" "$message"
+function npm_rename() (
+	source "$DOROTHY/sources/bash.bash"
+
+	local old="$1" new="$2" url message
+	url="https://www.npmjs.com/package/$new"
+	message="$old has been renamed to $new: npm uninstall ${old@Q} && npm install ${new@Q} && open ${url@Q}"
+	npm deprecate "$old" "$message"
+)
+
+# fire if invoked standalone
+if test "$0" = "${BASH_SOURCE[0]}"; then
+	npm_rename "$@"
+fi

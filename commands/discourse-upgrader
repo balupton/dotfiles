@@ -1,6 +1,6 @@
 #!/usr/bin/env bash
 # internal command: this runs on the disource machine, do not depend on anything related to dorothy
-set -Eeuo pipefail
+set -euo pipefail
 
 # Receive arguments from caller
 if test -z "${ssh_file_internal-}" -o -z "${ssh_pass_internal-}"; then
@@ -82,4 +82,3 @@ git pull origin "$(git rev-parse --abbrev-ref HEAD)" # master -> main switches c
 
 echo 'Rebuilding the discourse docker instance...'
 /var/discourse/launcher rebuild app
-exit "$?"

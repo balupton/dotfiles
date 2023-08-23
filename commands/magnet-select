@@ -1,13 +1,14 @@
 #!/usr/bin/env bash
-source "$DOROTHY/sources/bash.bash"
-require_array 'mapfile'
 
-function magnet-select() (
+function magnet_select() (
+	source "$DOROTHY/sources/bash.bash"
+	require_array 'mapfile'
+
 	# prepare
-	search="$1"
+	local search="$1" results option_visual
 
 	# fetch
-	echo-purple "searching" >/dev/tty
+	echo-style --purple='searching' >/dev/tty
 	mapfile -t results < <(magnet-search "$search")
 	if test "${#results[@]}" -eq 0; then
 		return 1
@@ -15,7 +16,7 @@ function magnet-select() (
 
 	# select
 	# trunk-ignore(shellcheck/SC2016)
-	local option_visual='$(echo-magnet-hash "$value")    $label'
+	option_visual='$(echo-magnet-hash "$value")    $label'
 	choose-option \
 		--question="Which magnet for $search?" \
 		--label=first \
@@ -25,5 +26,5 @@ function magnet-select() (
 
 # fire if invoked standalone
 if test "$0" = "${BASH_SOURCE[0]}"; then
-	magnet-select "$@"
+	magnet_select "$@"
 fi

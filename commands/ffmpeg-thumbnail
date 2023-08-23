@@ -1,4 +1,12 @@
 #!/usr/bin/env bash
-source "$DOROTHY/sources/bash.bash"
 
-ffmpeg -i "$1" -i "$2" -map 0 -map 1 -c copy -c:v:1 avif -disposition:v:1 attached_pic out.webm
+function ffmpeg_thumbnail() (
+	source "$DOROTHY/sources/bash.bash"
+
+	ffmpeg -i "$1" -i "$2" -map 0 -map 1 -c copy -c:v:1 avif -disposition:v:1 attached_pic out.webm
+)
+
+# fire if invoked standalone
+if test "$0" = "${BASH_SOURCE[0]}"; then
+	ffmpeg_thumbnail "$@"
+fi

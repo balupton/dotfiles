@@ -1,10 +1,18 @@
 #!/usr/bin/env bash
-source "$DOROTHY/sources/bash.bash"
 
-for arg in "$@"; do
-	filename="${arg%.mov*}"
+function ffmpeg_separate() (
+	source "$DOROTHY/sources/bash.bash"
 
-	ffmpeg -i "$arg" -map 0:0 -map 0:2 -c copy "$filename [00+02].mov"
-	ffmpeg -i "$arg" -map 0:1 -map 0:3 -c copy "$filename [01+03].mov"
+	local arg filename
+	for arg in "$@"; do
+		filename="${arg%.mov*}"
 
-done
+		ffmpeg -i "$arg" -map 0:0 -map 0:2 -c copy "$filename [00+02].mov"
+		ffmpeg -i "$arg" -map 0:1 -map 0:3 -c copy "$filename [01+03].mov"
+	done
+)
+
+# fire if invoked standalone
+if test "$0" = "${BASH_SOURCE[0]}"; then
+	ffmpeg_separate "$@"
+fi

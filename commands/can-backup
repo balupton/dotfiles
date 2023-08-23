@@ -1,22 +1,25 @@
 #!/usr/bin/env bash
 
-# `say` does not work in this environment:
-# Open speech channel failed: -915
+function can_backup() (
+	# @todo figure out a better option for this
+	# Arq (like cron) does not inherit the shell environment.
+	# [say] does not work in this environment: Open speech channel failed: -915
+	if test -z "$DOROTHY"; then
+		DOROTHY="$HOME/.local/share/.dorothy"
+	fi
+	source "$DOROTHY/sources/bash.bash"
 
-# todo, consider cleaning this somewhow
-# arq does not inherent shell environment
-if test -z "$DOROTHY"; then
-	DOROTHY='/Users/balupton/.dorothy'
-fi
+	# test streaming
+	if "$DOROTHY/commands/is-streaming"; then
+		print_line 'Streaming is occurring, cancelling backup.' >/dev/stderr
+		return 1
+	else
+		print_line 'No streaming is occuring, commencing backup.'
+		return 0
+	fi
+)
 
-# ensure failures are propagated
-source "$DOROTHY/sources/bash.bash"
-
-# test streaming
-if "$DOROTHY/commands/is-streaming"; then
-	echo 'Streaming is occurring, cancelling backup.' >/dev/stderr
-	return 1
-else
-	echo 'No streaming is occuring, commencing backup.'
-	return
+# fire if invoked standalone
+if test "$0" = "${BASH_SOURCE[0]}"; then
+	can_backup "$@"
 fi

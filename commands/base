@@ -1,15 +1,23 @@
 #!/usr/bin/env bash
-source "$DOROTHY/sources/bash.bash"
 
-git init
+function base() (
+	source "$DOROTHY/sources/bash.bash"
 
-files=(".editorconfig" ".gitignore" ".npmignore")
-for file in "${files[@]}"; do
-	github-download \
-		--slug="bevry/base" \
-		--pathname="$file"
-done
+	git init
 
-if is-missing package.json; then
-	npm init -y
+	local file files=('.editorconfig' '.gitignore' '.npmignore')
+	for file in "${files[@]}"; do
+		github-download \
+			--slug='bevry/base' \
+			--pathname="$file"
+	done
+
+	if is-missing 'package.json'; then
+		npm init -y
+	fi
+)
+
+# fire if invoked standalone
+if test "$0" = "${BASH_SOURCE[0]}"; then
+	base "$@"
 fi

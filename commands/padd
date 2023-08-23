@@ -1,26 +1,37 @@
 #!/usr/bin/env bash
-source "$DOROTHY/sources/bash.bash"
 
-# help
-if is-help "$@"; then
-	cat <<-EOF >/dev/stderr
-		ABOUT:
-		Forward to the correct package manager for your project.
-		If [yarn.lock] is present, uses [yarn].
-		If [package.json] is present, uses [package.json].
+function padd() (
+	source "$DOROTHY/sources/bash.bash"
 
-		USAGE:
-		padd ...
-	EOF
-	exit 22 # Invalid argument
-fi
+	# help
+	function help {
+		cat <<-EOF >/dev/stderr
+			ABOUT:
+			Forward to the correct package manager for your project.
+			If [yarn.lock] is present, uses [yarn].
+			If [package.json] is present, uses [package.json].
 
-# act
-if test -f 'yarn.lock'; then
-	yarn add "$@"
-elif test -f 'package.json'; then
-	npm install "$@"
-else
-	stderr echo 'could not determine the correct package manager this project'
-	exit 1
+			USAGE:
+			padd ...
+		EOF
+		return 22 # EINVAL 22 Invalid argument
+	}
+	if is-help "$@"; then
+		help
+	fi
+
+	# act
+	if test -f 'yarn.lock'; then
+		yarn add "$@"
+	elif test -f 'package.json'; then
+		npm install "$@"
+	else
+		echo-error "$0: Could not determine the correct package manager this project."
+		return 1
+	fi
+)
+
+# fire if invoked standalone
+if test "$0" = "${BASH_SOURCE[0]}"; then
+	padd "$@"
 fi

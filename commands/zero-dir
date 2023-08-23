@@ -1,10 +1,18 @@
 #!/usr/bin/env bash
-source "$DOROTHY/sources/bash.bash"
 
-dir="${1:-"$(pwd)"}"
+function zero_dir() (
+	source "$DOROTHY/sources/bash.bash"
 
-if confirm-positive --ppid=$$ -- "This will zero-length every file inside $dir, are you sure?" "$(ls -la "$dir")"; then
-	while IFS= read -r line; do
-		printf '' >"$line"
-	done < <(ls -1 "$dir")
+	local dir="${1:-"$(pwd)"}" line
+
+	if confirm-positive --ppid=$$ -- "This will zero-length every file inside $dir, are you sure?" "$(ls -la "$dir")"; then
+		while IFS= read -r line; do
+			printf '' >"$line"
+		done < <(ls -1 "$dir")
+	fi
+)
+
+# fire if invoked standalone
+if test "$0" = "${BASH_SOURCE[0]}"; then
+	zero_dir "$@"
 fi

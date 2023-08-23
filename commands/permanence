@@ -1,30 +1,39 @@
 #!/usr/bin/env bash
-source "$DOROTHY/sources/bash.bash"
-source "$DOROTHY/sources/config.sh"
 
-# dependencies
-setup-util-deno --quiet
+function permanence() (
+	source "$DOROTHY/sources/bash.bash"
+	source "$DOROTHY/sources/config.sh"
 
-# configuration:
-tuples=()
-load_dorothy_config 'permanence.bash'
+	# dependencies
+	setup-util-deno --quiet
 
-# verify
-if test "${#tuples[@]}" -eq 0; then
-	echo "make sure $(get_dorothy_config 'permanence.bash') outputs an array called tuples, of the sources and destinations" >/dev/stderr
-	exit 1
+	# configuration:
+	local tuples=()
+	load_dorothy_config 'permanence.bash'
+
+	# verify
+	if test "${#tuples[@]}" -eq 0; then
+		print_line "make sure $(get_dorothy_config 'permanence.bash') outputs an array called tuples, of the sources and destinations" >/dev/stderr
+		return 1
+	fi
+	if is-odd "${#tuples[@]}"; then
+		print_line "the tuples do not seem to have one destination for one source" >/dev/stderr
+		return 1
+	fi
+
+	# cycle
+	local i src dest ref
+	for ((i = 0; i < ${#tuples[@]}; i = i + 2)); do
+		src="${tuples[$i]}"
+		dest="${tuples[i + 1]}"
+		mkdir -p "$dest"
+		cd "$dest" || return
+		ref="$(get-url-domain "$src")"
+		ytd-helper --archive --referer "$ref" "$src"
+	done
+)
+
+# fire if invoked standalone
+if test "$0" = "${BASH_SOURCE[0]}"; then
+	permanence "$@"
 fi
-if is-odd "${#tuples[@]}"; then
-	echo "the tuples do not seem to have one destination for one source" >/dev/stderr
-	exit 1
-fi
-
-# cycle
-for ((i = 0; i < ${#tuples[@]}; i = i + 2)); do
-	src="${tuples[$i]}"
-	dest="${tuples[i + 1]}"
-	mkdir -p "$dest"
-	cd "$dest" || exit 1
-	ref="$(get-url-domain "$src")"
-	ytd-helper --archive --referer "$ref" "$src"
-done

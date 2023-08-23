@@ -1,118 +1,133 @@
 #!/usr/bin/env bash
-source "$DOROTHY/sources/nvm.sh"
-source "$DOROTHY/sources/bash.bash"
 
-# check
-if test -z "${GITHUB_ACCESS_TOKEN-}"; then
-	secret env NPM_AUTHTOKEN SURGE_LOGIN SURGE_TOKEN GITHUB_ACCESS_TOKEN GITHUB_CLIENT_ID GITHUB_CLIENT_SECRET -- "$0" "$@"
-	exit $?
-fi
+function boundation_upgrade() (
+	source "$DOROTHY/sources/nvm.sh"
+	source "$DOROTHY/sources/bash.bash"
 
-# prepare
-name="$(basename "$(pwd)")"
-export upgradeSuccess="no"
-function finish {
-	if test "$upgradeSuccess" = "yes"; then
-		message="boundation-upgrade completed on $name"
-	else
-		message="boundation-upgrade failed on $name"
-		if ! is-ssh; then
-			say "$message"
+	# check
+	if test -z "${GITHUB_ACCESS_TOKEN-}"; then
+		secret env NPM_AUTHTOKEN SURGE_LOGIN SURGE_TOKEN GITHUB_ACCESS_TOKEN GITHUB_CLIENT_ID GITHUB_CLIENT_SECRET -- "$0" "$@"
+		return
+	fi
+
+	# prepare
+	local name upgrade_success
+	name="$(basename "$(pwd)")"
+	upgrade_success='no'
+	function on_finish {
+		if test "$upgrade_success" = "yes"; then
+			message="boundation-upgrade completed on $name"
+		else
+			message="boundation-upgrade failed on $name"
+			if ! is-ssh; then
+				say "$message"
+			fi
 		fi
+		print_line
+		print_line "$message"
+	}
+	trap on_finish EXIT
+
+	# helpers
+	function get_node_engine {
+		grep --after-context=1 --fixed-strings --regexp='engines' <package.json |
+			grep --fixed-strings --regexp='node' |
+			head -n1 |
+			xargs
+	}
+	function get_node_license {
+		jq -r '.license' package.json
+	}
+
+	# fetch original values
+	local eo lo
+	eo="$(get-node-engine)"
+	lo="$(get-node-license)"
+
+	# run boundation
+	nvm use default # system
+	if ! command-exists boundation; then
+		npm i -g boundation
 	fi
-	echo ''
-	echo "$message"
-}
-trap finish EXIT
 
-function get-node-engine {
-	grep --after-context=1 --fixed-strings --regexp='engines' <package.json |
-		grep --fixed-strings --regexp='node' |
-		head -n1 |
-		xargs
-}
-function get-node-license {
-	jq -r '.license' package.json
-}
+	# keep going
+	# workaround for now, with support for binaryextensions
+	# r="$(jq -r '.boundation.nodeVersionsTestedRange' package.json || print_line)"
+	# if is-value "$r"; then
+	# 	if [[ "$r" == *'<16'* ]]; then
+	# 		print_line 'custom nodeVersionsTestedRange is okay'
+	# 	else
+	# 		nr='10 || 12 || 14'
+	# 		say "OVERWROTE nodeVersionsTestedRange on $name"
+	# 		print_line "OVERWROTE nodeVersionsTestedRange on $name"
+	# 		print_line "from:  $r"
+	# 		print_line "to:    $nr"
+	# 		r="$nr"
+	# 	fi
+	# else
+	# 	r="<16"
+	# fi
+	# boundation --nodeVersionsTestedRange="$r" "$@"
+	boundation "$@"
 
-# fetch original values
-eo="$(get-node-engine)"
-lo="$(get-node-license)"
+	# fetch updated values
+	local en ln
+	en="$(get-node-engine)"
+	ln="$(get-node-license)"
 
-# run boundation
-nvm use 16 # system
-if ! command-exists boundation; then
-	npm i -g boundation
-fi
-
-# keep going
-# workaround for now, with support for binaryextensions
-# r="$(jq -r '.boundation.nodeVersionsTestedRange' package.json || echo '')"
-# if is-value "$r"; then
-# 	if [[ "$r" == *'<16'* ]]; then
-# 		echo 'custom nodeVersionsTestedRange is okay'
-# 	else
-# 		nr='10 || 12 || 14'
-# 		say "OVERWROTE nodeVersionsTestedRange on $name"
-# 		echo "OVERWROTE nodeVersionsTestedRange on $name"
-# 		echo "from:  $r"
-# 		echo "to:    $nr"
-# 		r="$nr"
-# 	fi
-# else
-# 	r="<16"
-# fi
-# boundation --nodeVersionsTestedRange="$r" "$@"
-boundation "$@"
-
-# fetch updated values
-en="$(get-node-engine)"
-ln="$(get-node-license)"
-
-# compare values
-ec=""
-lc=""
-change="minor"
-if test "$lo" != "$ln"; then
-	if test "$ln" = 'RPL-1.5'; then
-		change="major"
+	# compare values
+	local ec lc change
+	ec=''
+	lc=''
+	change='minor'
+	if test "$lo" != "$ln"; then
+		if test "$ln" = 'RPL-1.5'; then
+			change='major'
+		fi
+		lc="-   Updated license from [\`$lo\`](http://spdx.org/licenses/$lo.html) to [\`$ln\`](http://spdx.org/licenses/$ln.html)
+"
 	fi
-	lc="-   Updated license from [\`$lo\`](http://spdx.org/licenses/$lo.html) to [\`$ln\`](http://spdx.org/licenses/$ln.html)
+	if test "$eo" != "$en"; then
+		change='major'
+		ec="-   Minimum required node version changed from \`$eo\` to \`$en\` to keep up with mandatory ecosystem changes
 "
+	fi
+
+	# prettify history.md
+	npx prettier HISTORY.md --write
+
+	# update version
+	v="$(npm version "${change}" --git-tag-version=false)"
+	d="$(date +"%Y %B %-d")"
+	t="$(tail -n +3 HISTORY.md)"
+	cat <<-EOF >HISTORY.md
+		# History
+
+		## $v $d
+
+		-   Updated dependencies, [base files](https://github.com/bevry/base), and [editions](https://editions.bevry.me) using [boundation](https://github.com/bevry/boundation)
+		$lc$ec
+		$t
+	EOF
+
+	# prepare
+	npm run our:meta
+
+	# release
+	git rm -rf docs || :
+	git add .
+	git commit -am "$v - boundation, changelog, version bump"
+	# if ! npm owner add bevryme; then
+	# 	print_line 'adding npm owner failed, trying again in two minutes'
+	# 	sleep 2m
+	# 	npm owner add bevryme
+	# fi
+	set -x
+	npm run our:release
+	upgrade_success='yes'
+)
+
+# fire if invoked standalone
+if test "$0" = "${BASH_SOURCE[0]}"; then
+	boundation_upgrade "$@"
 fi
-if test "$eo" != "$en"; then
-	change="major"
-	ec="-   Minimum required node version changed from \`$eo\` to \`$en\` to keep up with mandatory ecosystem changes
-"
-fi
-
-# prettify history.md
-npx prettier HISTORY.md --write
-
-# update version
-v="$(npm version "${change}" --git-tag-version=false)"
-d="$(date +"%Y %B %-d")"
-t="$(tail -n +3 HISTORY.md)"
-echo "# History
-
-## $v $d
-
--   Updated dependencies, [base files](https://github.com/bevry/base), and [editions](https://editions.bevry.me) using [boundation](https://github.com/bevry/boundation)
-$lc$ec
-$t" >HISTORY.md
-
-# prepare
-npm run our:meta
-
-# release
-git rm -rf docs || :
-git add .
-git commit -am "$v - boundation, changelog, version bump"
-# if ! npm owner add bevryme; then
-# 	echo 'adding npm owner failed, trying again in two minutes'
-# 	sleep 2m
-# 	npm owner add bevryme
-# fi
-set -x
-npm run our:release
-upgradeSuccess='yes'

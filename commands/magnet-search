@@ -1,12 +1,4 @@
 #!/usr/bin/env bash
-source "$DOROTHY/sources/bash.bash"
-require_array 'mapfile'
-
-# dependencies
-source "$DOROTHY/sources/ripgrep.bash"
-
-# prepare
-search="$1"
 
 # https://github.com/casey/intermodal
 
@@ -34,20 +26,37 @@ search="$1"
 # https://github.com/rnestler/attractorr aka torrent-search
 # https://github.com/rnestler/attractorr/issues/55
 # CARGO='--git https://github.com/rnestler/attractorr --tag v0.2.0'
-setup-util --quiet --cli='attractorr' \
-	CARGO='--git https://github.com/rnestler/attractorr'
-mapfile -t lines < <(attractorr --sort=seeders "$search" 2>&1 || :)
-for line in "${lines[@]}"; do
-	line="$(echo-no-colors "$line")"
-	if test -z "$line" || rg -q 'ERROR|No results|btih:000000000000' <<<"$line"; then
-		continue
-	fi
-	echo "$line"
-done
 
 # magnetfinder
 # https://github.com/bleusakura/magnetfinder
-setup-util --quiet --cli='magnetfinder' \
-	CARGO='magnetfinder'
-mapfile -t lines < <(magnetfinder --no-interactive --show 5 -aq "$search" 2>/dev/null | rg -v 'No torrents found matching search query' || :)
-echo-split $'\t' -- "${lines[@]}"
+
+function magnet_search() (
+	source "$DOROTHY/sources/bash.bash"
+	require_array 'mapfile'
+
+	# dependencies
+	source "$DOROTHY/sources/ripgrep.bash"
+	setup-util --quiet --cli='attractorr' \
+		CARGO='--git https://github.com/rnestler/attractorr'
+	setup-util --quiet --cli='magnetfinder' \
+		CARGO='magnetfinder'
+
+	# prepare
+	local search="$1" lines line
+	mapfile -t lines < <(attractorr --sort=seeders "$search" 2>&1 || :)
+	for line in "${lines[@]}"; do
+		line="$(echo-no-colors "$line")"
+		if test -z "$line" || rg -q 'ERROR|No results|btih:000000000000' <<<"$line"; then
+			continue
+		fi
+		print_line "$line"
+	done
+
+	mapfile -t lines < <(magnetfinder --no-interactive --show 5 -aq "$search" 2>/dev/null | rg -v 'No torrents found matching search query' || :)
+	echo-split $'\t' -- "${lines[@]}"
+)
+
+# fire if invoked standalone
+if test "$0" = "${BASH_SOURCE[0]}"; then
+	magnet_search "$@"
+fi

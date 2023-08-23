@@ -148,7 +148,7 @@ HOMEBREW_FONTS=(
 # ffi
 # sass
 # twurl
-# git-up, replaced by `git pull --rebase --autostash`
+# git-up, deprecated, fails to install on macos, replaced by `git-up` alias
 GEM_INSTALL=()
 
 # Python

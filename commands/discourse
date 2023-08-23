@@ -1,53 +1,64 @@
 #!/usr/bin/env bash
-source "$DOROTHY/sources/bash.bash"
+
 # https://discuss.bevry.me/t/creating-managing-a-discourse-instance/691?u=balupton
 
-ssh_user='root'
-ssh_home="/root"
-which="$(choose-option --question='Which discourse instance do you wish to upgrade?' --filter="${1-}" -- 'bevry' 'liberland')"
-action="$(choose-option --question='Which action do you wish to take?' --filter="${2-}" -- 'login' 'upgrade')"
-if test "$which" = 'bevry'; then
-	# secret map BEVRY_DISCOURSE_IP personal 'SSH Keys' 'bevry-discourse-ip'
-	# secret map BEVRY_DISCOURSE_SSH_PASSWORD personal 'SSH Keys' 'bevry-scaleway-2017'
-	# secret map BEVRY_DISCOURSE_INTERNAL_SSH_PASSWORD personal 'SSH Keys' 'bevry-discourse'
-	ssh_ip="$(secret get BEVRY_DISCOURSE_IP)"
-	ssh_pass_external="$(secret get BEVRY_DISCOURSE_SSH_PASSWORD)"
-	ssh_pass_internal="$(secret get BEVRY_DISCOURSE_INTERNAL_SSH_PASSWORD)"
-	ssh_file_internal="$ssh_home/.ssh/root-discuss.bevry.me-github"
-elif test "$which" = 'liberland'; then
-	# secret map LIBERLAND_DISCOURSE_IP personal 'Liberland Forum' 'Scaleway IP'
-	# secret map LIBERLAND_DISCOURSE_SSH_PASSWORD personal 'Liberland Forum' 'Scaleway SSH Key'
-	# secret map LIBERLAND_DISCOURSE_INTERNAL_SSH_PASSWORD personal 'Liberland Forum' 'Internal SSH Key'
-	ssh_ip="$(secret get LIBERLAND_DISCOURSE_IP)"
-	ssh_pass_external="$(secret get LIBERLAND_DISCOURSE_SSH_PASSWORD)"
-	ssh_pass_internal="$(secret get LIBERLAND_DISCOURSE_INTERNAL_SSH_PASSWORD)"
-	ssh_file_internal="$ssh_home/.ssh/forum.liberland.org"
-else
-	echo "Error: Invalid discourse instance." >/dev/stderr
-	return 1
-fi
+function discourse() (
+	source "$DOROTHY/sources/bash.bash"
 
-echo "Logging into [$ssh_ip]..."
-echo "If prompted for an SSH password, it has been copied to your clipboard."
-echo "$ssh_pass_external" | pbcopy
+	local which action ssh_user ssh_home ssh_ip ssh_pass_external ssh_pass_internal ssh_file_internal
+	which="$(choose-option --question='Which discourse instance do you wish to upgrade?' --filter="${1-}" -- 'bevry' 'liberland')"
+	action="$(choose-option --question='Which action do you wish to take?' --filter="${2-}" -- 'login' 'upgrade')"
+	ssh_user='root'
+	ssh_home='/root'
+	if test "$which" = 'bevry'; then
+		# secret map BEVRY_DISCOURSE_IP personal 'SSH Keys' 'bevry-discourse-ip'
+		# secret map BEVRY_DISCOURSE_SSH_PASSWORD personal 'SSH Keys' 'bevry-scaleway-2017'
+		# secret map BEVRY_DISCOURSE_INTERNAL_SSH_PASSWORD personal 'SSH Keys' 'bevry-discourse'
+		ssh_ip="$(secret get BEVRY_DISCOURSE_IP)"
+		ssh_pass_external="$(secret get BEVRY_DISCOURSE_SSH_PASSWORD)"
+		ssh_pass_internal="$(secret get BEVRY_DISCOURSE_INTERNAL_SSH_PASSWORD)"
+		ssh_file_internal="$ssh_home/.ssh/root-discuss.bevry.me-github"
+	elif test "$which" = 'liberland'; then
+		# secret map LIBERLAND_DISCOURSE_IP personal 'Liberland Forum' 'Scaleway IP'
+		# secret map LIBERLAND_DISCOURSE_SSH_PASSWORD personal 'Liberland Forum' 'Scaleway SSH Key'
+		# secret map LIBERLAND_DISCOURSE_INTERNAL_SSH_PASSWORD personal 'Liberland Forum' 'Internal SSH Key'
+		ssh_ip="$(secret get LIBERLAND_DISCOURSE_IP)"
+		ssh_pass_external="$(secret get LIBERLAND_DISCOURSE_SSH_PASSWORD)"
+		ssh_pass_internal="$(secret get LIBERLAND_DISCOURSE_INTERNAL_SSH_PASSWORD)"
+		ssh_file_internal="$ssh_home/.ssh/forum.liberland.org"
+	else
+		print_line "Error: Invalid discourse instance." >/dev/stderr
+		return 1
+	fi
 
-if test "$action" = 'login'; then
-	ssh "$ssh_user@$ssh_ip"
-	return "$?"
-fi
+	print_line "Logging into [$ssh_ip]..."
+	print_line 'If prompted for an SSH password, it has been copied to your clipboard.'
+	print_line "$ssh_pass_external" | pbcopy
 
-upgrader="$(cat "$DOROTHY/user/commands/discourse-upgrader")"
-upgrader="
+	# do login
+	if test "$action" = 'login'; then
+		ssh "$ssh_user@$ssh_ip"
+		return 0
+	fi
+
+	# do upgrade
+	local upgrader
+	upgrader="$(cat "$DOROTHY/user/commands/discourse-upgrader")"
+	upgrader="
 ssh_file_internal='$ssh_file_internal'
 ssh_pass_internal='$ssh_pass_internal'
 $upgrader
 "
-(ssh -t "$ssh_user@$ssh_ip" "$upgrader" && {
-	echo "Successfully upgraded the discourse instance. 🎉"
-	echo "$ssh_ip"
-	return
-}) || {
-	echo "Error: Failed to upgrade the discourse instance. 🚨" >/dev/stderr
-	echo "$ssh_ip" >/dev/stderr
-	return 1
-}
+	(ssh -t "$ssh_user@$ssh_ip" "$upgrader" && {
+		print_line 'Successfully upgraded the discourse instance. 🎉'
+		return 0
+	}) || {
+		print_line 'Error: Failed to upgrade the discourse instance. 🚨' >/dev/stderr
+		return 1
+	}
+)
+
+# fire if invoked standalone
+if test "$0" = "${BASH_SOURCE[0]}"; then
+	discourse "$@"
+fi
