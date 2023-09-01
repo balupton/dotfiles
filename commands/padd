@@ -26,8 +26,8 @@ function padd() (
 	elif test -f 'package.json'; then
 		npm install "$@"
 	else
-		echo-error "$0: Could not determine the correct package manager this project."
-		return 1
+		help 'Could not determine the correct package manager this project.' || :
+		return 43 # EPROTONOSUPPORT 43 Protocol not supported
 	fi
 )
 
