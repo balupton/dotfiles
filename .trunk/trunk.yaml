@@ -5,11 +5,11 @@ cli:
 plugins:
   sources:
     - id: trunk
-      ref: v1.2.1
+      ref: v1.2.2
       uri: https://github.com/trunk-io/plugins
 runtimes:
   enabled:
-    - go@1.19.5
+    - go@1.21.0
     - node@18.12.1
     - python@3.10.8
 actions:
@@ -20,7 +20,7 @@ actions:
     - trunk-upgrade-available
 lint:
   enabled:
-    - checkov@2.4.5
+    - checkov@2.4.9
     - trivy@0.44.1
     - trufflehog@3.48.0
     - taplo@0.8.1
@@ -29,7 +29,7 @@ lint:
     - eslint@8.47.0
     - flake8@6.1.0
     - git-diff-check@SYSTEM
-    - gitleaks@8.17.0
+    - gitleaks@8.18.0
     - isort@5.12.0
     - markdownlint@0.35.0
     - prettier@3.0.2
