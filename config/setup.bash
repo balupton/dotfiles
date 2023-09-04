@@ -92,14 +92,12 @@ HOMEBREW_SLOW_FORMULAS=(
 )
 # 'twitch'
 HOMEBREW_CASKS=(
-	'1password-cli'
 	'adguard'
 	'audio-hijack'
 	'calibre'
 	'firefox'
 	'loopback'
 	'multipass'
-	'obs'
 	'pocket-casts'
 	'raspberry-pi-imager'
 	'soundsource'
@@ -209,6 +207,7 @@ CARGO_INSTALL=()
 # setup-util-*
 # 'warp' - caused too many issues, using adguard mac app instead
 SETUP_UTILS=(
+	'1password-cli'
 	'aria2'
 	'bash'
 	'bat'
@@ -224,6 +223,7 @@ SETUP_UTILS=(
 	'gocryptfs'
 	'httpie'
 	'jq'
+	'obs'
 	'prettier'
 	'ripgrep'
 	'sd'
