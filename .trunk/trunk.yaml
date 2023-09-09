@@ -5,7 +5,7 @@ cli:
 plugins:
   sources:
     - id: trunk
-      ref: v1.2.2
+      ref: v1.2.3
       uri: https://github.com/trunk-io/plugins
 runtimes:
   enabled:
@@ -21,7 +21,7 @@ actions:
 lint:
   enabled:
     - checkov@2.4.9
-    - trivy@0.44.1
+    - trivy@0.45.0
     - trufflehog@3.54.3
     - taplo@0.8.1
     - actionlint@1.6.25
