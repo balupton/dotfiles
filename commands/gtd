@@ -3,9 +3,11 @@
 function gtd() (
 	source "$DOROTHY/sources/bash.bash"
 
-	local tag="$1"
-	git tag -d "$tag"
-	git push origin :"$tag"
+	local branch_or_tag="$1"
+	git branch -D "$branch_or_tag" || :
+	git tag -d "$branch_or_tag" || :
+	git push origin :"$branch_or_tag" || :
+	git branch -a
 )
 
 # fire if invoked standalone
