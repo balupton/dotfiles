@@ -22,17 +22,17 @@ function remove_duplicates() (
 
 			# checksum
 			echo
-			echo-color --bold="$file"
+			echo-style --bold="$file"
 			checksum --untitled --algorithm=md5 -- "$file" | tee "$file_hashf"
-			echo-color --bold="$altfile"
+			echo-style --bold="$altfile"
 			checksum --untitled --algorithm=md5 -- "$altfile" | tee "$altfile_hashf"
 
 			# compare and possibly remove
 			if test "$(cat "$file_hashf")" = "$(cat "$altfile_hashf")"; then
 				rm "$altfile"
-				echo-color --green='same,' --green+bold=' removed: ' --dim="$altfile"
+				echo-style --green='same,' --green+bold=' removed: ' --dim="$altfile"
 			else
-				echo-color --red='different,' --red+bold=' kept'
+				echo-style --red='different,' --red+bold=' kept'
 			fi
 		done
 	done

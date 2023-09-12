@@ -16,7 +16,7 @@ function magnet_select() (
 
 	# select
 	# trunk-ignore(shellcheck/SC2016)
-	option_visual='$(echo-magnet-hash "$value")    $label'
+	option_visual='$(echo-magnet-hash -- "$value")    $label'
 	choose-option \
 		--question="Which magnet for $search?" \
 		--label=first \

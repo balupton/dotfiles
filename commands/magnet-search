@@ -45,7 +45,7 @@ function magnet_search() (
 	local search="$1" lines line
 	mapfile -t lines < <(attractorr --sort=seeders "$search" 2>&1 || :)
 	for line in "${lines[@]}"; do
-		line="$(echo-no-colors "$line")"
+		line="$(echo-trim-colors -- "$line")"
 		if test -z "$line" || rg -q 'ERROR|No results|btih:000000000000' <<<"$line"; then
 			continue
 		fi
