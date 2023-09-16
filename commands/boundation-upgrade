@@ -14,7 +14,7 @@ function boundation_upgrade() (
 	name="$(basename "$(pwd)")"
 	upgrade_success='no'
 	function on_finish {
-		if test "$upgrade_success" = "yes"; then
+		if test "$upgrade_success" = 'yes'; then
 			message="boundation-upgrade completed on $name"
 		else
 			message="boundation-upgrade failed on $name"
