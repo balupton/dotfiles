@@ -10,8 +10,11 @@ fi
 # Check discourse is already setup
 if ! test -d /var/discourse; then
 	echo 'Run this command on the remote discourse server'
-	return 1
+	exit 1
 fi
+
+# Make sure github keys are accurate
+ssh-keygen -f "/root/.ssh/known_hosts" -R github.com
 
 # Upgrading the host, which may solve SSL issues
 # https://stackoverflow.com/a/61853542/130638
