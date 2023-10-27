@@ -10,9 +10,7 @@ source "$DOROTHY/config/setup.bash"
 # however, ubuntu is slow to maintain, so install via pip instead
 # http://ytdl-org.github.io/youtube-dl/download.html
 
-APK_INSTALL=(
-	'tree'
-)
+APK_INSTALL=()
 
 # APT_UNINSTALL=(
 # 	aisleriot
@@ -227,5 +225,6 @@ SETUP_UTILS=(
 	'strongbox'
 	'tealdeer'
 	'teip'
+	'tree'
 	'vim'
 )
