@@ -1,4 +1,4 @@
-#!/usr/bin/env nu
+#!/usr/bin/env xsh
 
 # Dorothy
 $DOROTHY_THEME = 'oz'
