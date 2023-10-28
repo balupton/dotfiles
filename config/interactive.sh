@@ -57,4 +57,4 @@ alias gitclean='rm -rf .git/refs/original/; git reflog expire --expire=now --all
 alias gitsvnupdate='git svn rebase'
 alias gitrm='git ls-files --deleted | xargs git rm'
 alias githooks='edit .git/hooks/pre-commit'
-alias git-up='git pull --rebase --autostash'
+alias git-up='git branch --set-upstream-to=origin/$(git rev-parse --abbrev-ref HEAD) $(git rev-parse --abbrev-ref HEAD); git pull --rebase --autostash'
