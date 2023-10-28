@@ -81,7 +81,6 @@ HOMEBREW_FORMULAS=(
 	'git-extras'
 	'terminal-notifier'
 	'tmux'
-	'tree'
 	'watch'
 	'watchman'
 )
