@@ -3,18 +3,18 @@
 function boundation_upgrade() (
 	source "$DOROTHY/sources/bash.bash"
 
-	# check
+	# if the secrets aren't provided, fetch them and reload
 	if test -z "${GITHUB_ACCESS_TOKEN-}"; then
-		secret env NPM_AUTHTOKEN SURGE_LOGIN SURGE_TOKEN GITHUB_ACCESS_TOKEN GITHUB_CLIENT_ID GITHUB_CLIENT_SECRET -- "$0" "$@"
+		bevry-auth -- "$0" "$@"
 		return
 	fi
 
 	# prepare
-	local name upgrade_success
+	local name UPGRADE_SUCCESS
 	name="$(basename "$(pwd)")"
-	upgrade_success='no'
+	UPGRADE_SUCCESS='no'
 	function on_finish {
-		if test "$upgrade_success" = 'yes'; then
+		if test "$UPGRADE_SUCCESS" = 'yes'; then
 			message="boundation-upgrade completed on $name"
 		else
 			message="boundation-upgrade failed on $name"
@@ -40,8 +40,8 @@ function boundation_upgrade() (
 
 	# fetch original values
 	local eo lo
-	eo="$(get-node-engine)"
-	lo="$(get-node-license)"
+	eo="$(get_node_engine)"
+	lo="$(get_node_license)"
 
 	# run boundation
 	if ! command-exists boundation; then
@@ -66,12 +66,21 @@ function boundation_upgrade() (
 	# 	r="<16"
 	# fi
 	# boundation --nodeVersionsTestedRange="$r" "$@"
-	boundation "$@"
+	nvm-env boundation --auto --expandNodeVersions "$@" || {
+		if confirm --bool --ppid=$$ -- "Revert changes, and automatically trim the unsupported versions?"; then
+			git reset --hard
+			git clean -f
+			nvm-env boundation --auto --maintainedNodeVersions --expandNodeVersions --shrinkNodeVersions "$@"
+		else
+			return 1
+		fi
+	}
+
 
 	# fetch updated values
 	local en ln
-	en="$(get-node-engine)"
-	ln="$(get-node-license)"
+	en="$(get_node_engine)"
+	ln="$(get_node_license)"
 
 	# compare values
 	local ec lc change
@@ -120,9 +129,8 @@ function boundation_upgrade() (
 	# 	sleep 2m
 	# 	nvm-env npm owner add bevryme
 	# fi
-	set -x
 	nvm-env npm run our:release
-	upgrade_success='yes'
+	UPGRADE_SUCCESS='yes'
 )
 
 # fire if invoked standalone

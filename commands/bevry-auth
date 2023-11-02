@@ -1,0 +1,18 @@
+#!/usr/bin/env bash
+
+function bevry_auth() (
+	source "$DOROTHY/sources/bash.bash"
+
+	# if the secrets aren't provided, fetch them and reload
+	if test -z "${GITHUB_ACCESS_TOKEN-}"; then
+		secret env NPM_AUTHTOKEN SURGE_LOGIN SURGE_TOKEN GITHUB_ACCESS_TOKEN GITHUB_CLIENT_ID GITHUB_CLIENT_SECRET -- "$0" "$@"
+		return
+	fi
+
+	nvm-env -- "$@"
+)
+
+# fire if invoked standalone
+if test "$0" = "${BASH_SOURCE[0]}"; then
+	bevry_auth "$@"
+fi

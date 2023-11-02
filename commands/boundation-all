@@ -3,6 +3,63 @@
 function boundation_all() (
 	source "$DOROTHY/sources/bash.bash"
 
+	# if the secrets aren't provided, fetch them and reload
+	if test -z "${GITHUB_ACCESS_TOKEN-}"; then
+		bevry-auth -- "$0" "$@"
+		return
+	fi
+
+	# =====================================
+	# Arguments
+
+	function help {
+		cat <<-EOF >/dev/stderr
+			ABOUT:
+			Upgrade all of a GitHub user's Node.js packages.
+
+			USAGE:
+			boundation-all [...options].
+
+			OPTIONS:
+			--user=<user>
+			--filter=<filter>
+			--start=<repo>
+			--skip=<repo>
+
+			--start-after=<repo>
+			    Same as --start=<repo> --skip=<repo>
+		EOF
+		if test "$#" -ne 0; then
+			echo-error "$@"
+		fi
+		return 22 # EINVAL 22 Invalid argument
+	}
+
+	# process
+	# --user=docpad --filter='-plugin-'
+	local item user='bevry' filter='' start='' skips=(
+		.github envfile typechecker projectz pluginclerk links caterpillar hooks getcontributors getmembers getrepos github-commit cson dorothy pluginloader lazy-require make-deno-edition boundation awesome-crypto base billing bindsource designs discourse discourse-component-youtubetimestamps discourser dotfiles fountain gitclone-robust legal macos-getplaytime meetings nextjs-auth0-fauna staticsitegenerators-list staticsitegenerators-website study terraform-scaleway-hashistack testen textandbinaryextensions timezone-converter workers youtube
+	)
+	while test "$#" -ne 0; do
+		item="$1"
+		shift
+		case "$item" in
+		'--help' | '-h') help ;;
+		'--user='*) user="${item#*--user=}" ;;
+		'--filter='*) filter="${item#*--filter=}" ;;
+		'--start='*) start="${item#*--start=}" ;;
+		'--skip='*) skips+=("${item#*--skip=}") ;;
+		'--start-after='*)
+			start="${item#*--start-after=}"
+			skips+=("$start") ;;
+		'--'*) help "An unrecognised flag was provided: $item" ;;
+		*) help "An unrecognised argument was provided: $item" ;;
+		esac
+	done
+
+	# =====================================
+	# Action
+
 	# prepare
 	local repo=''
 	function on_finish {
@@ -21,13 +78,6 @@ function boundation_all() (
 	# https://omrilotan.medium.com/npx-breaking-on-ci-b9f3f61d4676
 	export npm_config_yes=true
 
-	# user
-	local user skip start matches
-	user='bevry' # 'docpad'
-	skip="envfile typechecker projectz pluginclerk links caterpillar hooks getcontributors getmembers getrepos github-commit cson dorothy pluginloader lazy-require make-deno-edition boundation awesome-crypto base billing bindsource designs discourse discourse-component-youtubetimestamps discourser dotfiles fountain gitclone-robust legal macos-getplaytime meetings nextjs-auth0-fauna staticsitegenerators-list staticsitegenerators-website study terraform-scaleway-hashistack testen textandbinaryextensions timezone-converter workers youtube ${*:2}"
-	start="${1-}"
-	matches='' # '-plugin-'
-
 	# local
 	local ready
 	if test -z "$start"; then
@@ -41,7 +91,7 @@ function boundation_all() (
 	# https://stackoverflow.com/a/8334759/130638
 	local f
 	f="$(mktemp)"
-	fetch "https://bevry.me/api/github/repos/${user}" | json -a >"$f"
+	fetch "https://bevry.me/api/github/repos/${user}" | json -a | sort >"$f"
 
 	print_line >list.txt
 
@@ -49,24 +99,28 @@ function boundation_all() (
 	while read -r slug <&3; do
 		repo="${slug#*/}"
 		if test "$repo" = "$start"; then
-			print_line "now ready after $repo"
+			print_line "found $repo, starting"
 			ready='yes'
 		fi
 		if test "$ready" = 'yes'; then
-			# does repo exist within skip
-			if [[ " $skip " == *" $repo "* ]]; then
+			# does repo exist within skips
+			if is-needle "$repo" "${skips[@]}"; then
 				print_line "skipping $repo"
 
-			# does matches exist within repo
-			elif test -z "$matches" || [[ $repo == *"$matches"* ]]; then
+			# does filters exist within repo
+			elif test -z "$filter" || [[ $repo == *"$filter"* ]]; then
 				print_line
 				print_line "upgrading $repo"
 				rm -Rf "$repo" || :
 				gh repo clone "$slug"
 				(
 					cd "$repo"
-					print_line "'$(nvm-env npm view . name)': '$(nvm-env npm view . version)'," >>../list.txt
-					boundation-upgrade --auto --lts
+					if test -f 'package.json'; then
+						print_line "'$(nvm-env npm view . name)': '$(nvm-env npm view . version)'," >>../list.txt
+						boundation-upgrade
+					else
+						print_line "skipping non node.js repo: $repo"
+					fi
 				)
 				rm -Rf "$repo"
 				print_line
