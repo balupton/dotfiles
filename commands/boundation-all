@@ -51,7 +51,8 @@ function boundation_all() (
 		'--skip='*) skips+=("${item#*--skip=}") ;;
 		'--start-after='*)
 			start="${item#*--start-after=}"
-			skips+=("$start") ;;
+			skips+=("$start")
+			;;
 		'--'*) help "An unrecognised flag was provided: $item" ;;
 		*) help "An unrecognised argument was provided: $item" ;;
 		esac
@@ -112,7 +113,9 @@ function boundation_all() (
 				print_line
 				print_line "upgrading $repo"
 				rm -Rf "$repo" || :
-				gh repo clone "$slug"
+				# gh repo clone "$slug"
+				# ^ don't use gh, as it clones forks then sets the origin to not the fork
+				git clone "git@github.com:$slug.git"
 				(
 					cd "$repo"
 					if test -f 'package.json'; then

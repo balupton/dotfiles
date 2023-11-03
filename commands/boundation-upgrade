@@ -76,7 +76,6 @@ function boundation_upgrade() (
 		fi
 	}
 
-
 	# fetch updated values
 	local en ln
 	en="$(get_node_engine)"
