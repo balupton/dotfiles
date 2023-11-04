@@ -38,7 +38,7 @@ function boundation_all() (
 	# process
 	# --user=docpad --filter='-plugin-'
 	local item user='bevry' filter='' start='' skips=(
-		.github envfile typechecker projectz pluginclerk links caterpillar hooks getcontributors getmembers getrepos github-commit cson dorothy pluginloader lazy-require make-deno-edition boundation awesome-crypto base billing bindsource designs discourse discourse-component-youtubetimestamps discourser dotfiles fountain gitclone-robust legal macos-getplaytime meetings nextjs-auth0-fauna staticsitegenerators-list staticsitegenerators-website study terraform-scaleway-hashistack testen textandbinaryextensions timezone-converter workers youtube
+		.github
 	)
 	while test "$#" -ne 0; do
 		item="$1"
@@ -57,6 +57,53 @@ function boundation_all() (
 		*) help "An unrecognised argument was provided: $item" ;;
 		esac
 	done
+
+	# prepare skips
+	if fetch "https://bevry.me/api/github/orgs" | json -a | grep --quiet --fixed-strings --regexp="$user"; then
+		skips+=(
+			awesome-crypto
+			base
+			billing
+			bindsource
+			boundation
+			caterpillar
+			cson
+			designs
+			discourse
+			discourse-component-youtubetimestamps
+			discourser
+			dorothy
+			dotfiles
+			envfile
+			fountain
+			getcontributors
+			getmembers
+			getrepos
+			gitclone-robust
+			github-commit
+			hooks
+			lazy-require
+			legal
+			links
+			macos-getplaytime
+			make-deno-edition
+			meetings
+			nextjs-auth0-fauna
+			pluginclerk
+			pluginloader
+			projectz
+			staticsitegenerators-list
+			staticsitegenerators-website
+			study
+			terraform-scaleway-hashistack
+			testen
+			textandbinaryextensions
+			timezone-converter
+			typechecker
+			workers
+			youtube
+		)
+	fi
 
 	# =====================================
 	# Action
