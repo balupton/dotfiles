@@ -25,7 +25,7 @@ function boundation_all() (
 			--filter=<filter>
 			--start=<repo>
 			--skip=<repo>
-
+			--only=<repo>
 			--start-after=<repo>
 			    Same as --start=<repo> --skip=<repo>
 		EOF
@@ -37,150 +37,181 @@ function boundation_all() (
 
 	# process
 	# --user=docpad --filter='-plugin-'
-	local item user='bevry' filter='' start='' skips=(
-		.github
-	)
+	local item option_user='bevry' option_filter='' option_start='' option_deps='' option_slugs=() option_args=() option_skips=()
 	while test "$#" -ne 0; do
 		item="$1"
 		shift
 		case "$item" in
 		'--help' | '-h') help ;;
-		'--user='*) user="${item#*--user=}" ;;
-		'--filter='*) filter="${item#*--filter=}" ;;
-		'--start='*) start="${item#*--start=}" ;;
-		'--skip='*) skips+=("${item#*--skip=}") ;;
+		'--user='*) option_user="${item#*--user=}" ;;
+		'--filter='*) option_filter="${item#*--filter=}" ;;
+		'--start='*) option_start="${item#*--start=}" ;;
+		'--zero-deps'*)
+			option_deps="$(get-flag-value zero-deps --missing="$option_deps" -- "$item" | echo-non-affirmative --stdin)"
+			;;
+		'--has-deps'*)
+			option_deps="$(get-flag-value has-deps --missing="$option_deps" -- "$item" | echo-affirmative --stdin)"
+			;;
+		'--skip='*) option_skips+=("${item#*--skip=}") ;;
+		'--slug='*) option_slugs+=("${item#*--slug=}") ;;
 		'--start-after='*)
-			start="${item#*--start-after=}"
-			skips+=("$start")
+			option_start="${item#*--start-after=}"
+			option_skips+=("$option_start")
+			;;
+		'--')
+			option_args+=("$@")
+			shift $#
+			break
 			;;
 		'--'*) help "An unrecognised flag was provided: $item" ;;
 		*) help "An unrecognised argument was provided: $item" ;;
 		esac
 	done
 
-	# prepare skips
-	if fetch "https://bevry.me/api/github/orgs" | json -a | grep --quiet --fixed-strings --regexp="$user"; then
-		skips+=(
-			awesome-crypto
+	# prepare option_skips
+	# if fetch "https://bevry.me/api/github/orgs" | jq -r '.[]' | grep --quiet --fixed-strings --regexp="$user"; then
+	if test "$USER" = 'balupton'; then
+		option_skips+=(
+			.github
 			base
 			billing
-			bindsource
 			boundation
-			caterpillar
-			cson
+			coda-packs
+			cson # @todo
 			designs
-			discourse
 			discourse-component-youtubetimestamps
-			discourser
+			discourser # @todo
 			dorothy
-			dotfiles
-			envfile
+			duration-timestamp # @todo
+			eslint-config-bevry # @todo semver break
+			fellow # @todo
+			figures # @todo
 			fountain
-			getcontributors
-			getmembers
-			getrepos
-			gitclone-robust
+			github-api
 			github-commit
-			hooks
-			lazy-require
+			github-contributors
+			github-members
+			github-repos
 			legal
 			links
-			macos-getplaytime
-			make-deno-edition
+			list # @todo
+			make-deno-edition # @todo
 			meetings
-			nextjs-auth0-fauna
-			pluginclerk
+			nodejs-ecmascript-compatibility # @todo
+			nodejs-versions # @todo
 			pluginloader
-			projectz
-			staticsitegenerators-list
+			ropo # @todo
+			staticsitegenerators-list # @todo
 			staticsitegenerators-website
 			study
 			terraform-scaleway-hashistack
-			testen
-			textandbinaryextensions
-			timezone-converter
-			typechecker
+			testen # @todo semver failure
+			update-contributors # @todo node 12 failure
+			watchr # @todo
 			workers
-			youtube
+		)
+	else
+		option_skips+=(
+			.github
 		)
 	fi
 
 	# =====================================
 	# Action
 
-	# prepare
-	local repo=''
-	function on_finish {
-		local message
-		if test -z "$repo"; then
-			message='boundation completed'
-		else
-			message="boundation failed on $repo"
-		fi
-		print_line
-		print_line "$message"
-	}
-	trap on_finish EXIT
+	# check we aren't in a package
+	if test -f package.json; then
+		echo-error "You just tried to run boundation-all in a package, you forgot to cd out of debugging a package failure."
+		return 22 # EINVAL 22 Invalid argument
+	fi
 
 	# npm workaround
 	# https://omrilotan.medium.com/npx-breaking-on-ci-b9f3f61d4676
 	export npm_config_yes=true
 
-	# local
-	local ready
-	if test -z "$start"; then
-		ready='yes'
-	else
-		ready='no'
-	fi
-
 	# use a file at fd 3, as otherwise the repos will be passed as stdin into boundation
 	# http://mywiki.wooledge.org/BashFAQ/089
 	# https://stackoverflow.com/a/8334759/130638
-	local f
-	f="$(mktemp)"
-	fetch "https://bevry.me/api/github/repos/${user}" | json -a | sort >"$f"
-
-	print_line >list.txt
-
-	local slug
-	while read -r slug <&3; do
+	local repo='' slug index repo_deps ready='no' package
+	if test -z "$option_start"; then
+		ready='yes'
+	fi
+	if test "${#option_slugs[@]}" -eq 0; then
+		mapfile -t option_slugs < <(fetch "https://bevry.me/api/github/repos/${option_user}" | jq -r '.[]' | sort)
+	fi
+	function on_finish {
+		if test -z "$repo"; then
+			echo-style --success='boundation completed'
+		else
+			echo-style --error="boundation failed on $repo"
+		fi
+	}
+	trap on_finish EXIT
+	local -i count="${#option_slugs[@]}"
+	for index in "${!option_slugs[@]}"; do
+		# scan
+		slug="${option_slugs[index]}"
 		repo="${slug#*/}"
-		if test "$repo" = "$start"; then
-			print_line "found $repo, starting"
+		if test "$ready" = 'no' -a "$repo" = "$option_start"; then
+			echo-style --magenta="found $repo, starting"
 			ready='yes'
 		fi
-		if test "$ready" = 'yes'; then
-			# does repo exist within skips
-			if is-needle "$repo" "${skips[@]}"; then
-				print_line "skipping $repo"
 
-			# does filters exist within repo
-			elif test -z "$filter" || [[ $repo == *"$filter"* ]]; then
-				print_line
-				print_line "upgrading $repo"
-				rm -Rf "$repo" || :
-				# gh repo clone "$slug"
-				# ^ don't use gh, as it clones forks then sets the origin to not the fork
-				git clone "git@github.com:$slug.git"
-				(
-					cd "$repo"
-					if test -f 'package.json'; then
-						print_line "'$(nvm-env npm view . name)': '$(nvm-env npm view . version)'," >>../list.txt
-						boundation-upgrade
-					else
-						print_line "skipping non node.js repo: $repo"
-					fi
-				)
-				rm -Rf "$repo"
-				print_line
-			else
-				print_line "ignoring $repo"
-			fi
-		else
-			print_line "skipping $repo"
+		# checks
+		if test "$ready" = 'no'; then
+			echo-style --dim="skipping $repo (not yet ready)"
+			continue
+		elif is-needle "$slug" "${option_skips[@]}"; then
+			echo-style --dim="skipping $slug (slug was in skips)"
+			continue
+		elif is-needle "$repo" "${option_skips[@]}"; then
+			echo-style --dim="skipping $repo (repo was in skips)"
+			continue
+		elif test -n "$option_filter" && [[ $repo != *"$option_filter"* ]]; then
+			echo-style --dim="skipping $repo (repo didn't match filter: $option_filter)"
+			continue
 		fi
-	done 3<"$f"
+
+		# check package
+		package="$(fetch "https://raw.githubusercontent.com/${slug}/HEAD/package.json" 2>/dev/null || :)"
+		if test -z "$package"; then
+			echo-style --dim="skipping $repo (no package.json)"
+			continue
+		fi
+
+		# check package deps
+		repo_deps='no'
+		if jq -r '.dependencies' <<< "$package" | grep --quiet --fixed-strings --regexp='{'; then
+			repo_deps='yes';
+		fi
+		if test "$option_deps" = 'yes' -a "$repo_deps" = 'no'; then
+			echo-style --dim="skipping $repo (it did not have deps)"
+			continue
+		elif test "$option_deps" = 'no' -a "$repo_deps" = 'yes'; then
+			echo-style --dim="skipping $repo (it had deps)"
+			continue
+		fi
+
+
+		# at on the repo
+		rm -rf "$repo" || :
+		git clone "git@github.com:$slug.git" # don't use gh, as it clones forks then sets the origin to not the fork
+		(
+			cd "$repo"
+
+			# set correct origin in case of fork
+			gh repo set-default "$slug" > /dev/null
+
+			# upgrade
+			echo-title -- "$repo [$index/$count]"
+			echo-segment --h1="$repo"
+			boundation-upgrade "${option_args[@]}"
+			echo-segment --g1="$repo"
+		)
+
+		# cleanup
+		rm -rf "$repo"
+	done
 
 	# reset repo for on_finish
 	repo=''

@@ -1,0 +1,64 @@
+#!/usr/bin/env bash
+
+function boundation_ordered() (
+	source "$DOROTHY/sources/bash.bash"
+
+	# if the secrets aren't provided, fetch them and reload
+	if test -z "${GITHUB_ACCESS_TOKEN-}"; then
+		bevry-auth -- "$0" "$@"
+		return
+	fi
+
+	if test "$#" -ne 0; then
+		echo-error 'You passed arguments. How do you expect them to work on multiple boundation-all calls. Modify this file instead.'
+		return 1
+	fi
+
+	local slugs=(
+		# assert-helpers
+		bevry/ansi
+		bevry/errlop
+		bevry/assert-helpers
+
+		# editions
+		bevry/version-compare
+		bevry/version-range
+		bevry/editions
+
+		# ambi/eachr/extendr
+		bevry/typechecker
+
+		# taskgroup
+		bevry/ambi
+		bevry/eachr
+		bevry/extendr
+		bevry/unbounded
+
+		# taskgroup dev deps
+		bevry/extract-opts
+		bevry/safefs
+		bevry/safeps
+
+		# kava
+		bevry/taskgroup
+		bevry/event-emitter-grouped
+		bevry/kava
+
+		# istextorbinary
+    	bevry/binaryextensions
+    	bevry/textextensions
+		bevry/istextorbinary
+	)
+
+	local slug_args=() skip_args=()
+	mapfile -t slug_args < <(echo-lines --prefix='--slug=' -- "${slugs[@]}")
+	mapfile -t skip_args < <(echo-lines --prefix='--skip=' -- "${slugs[@]}")
+	boundation-all "${slug_args[@]}"
+	boundation-all --zero-deps "${skip_args[@]}"
+	boundation-all --has-deps "${skip_args[@]}"
+)
+
+# fire if invoked standalone
+if test "$0" = "${BASH_SOURCE[0]}"; then
+	boundation_ordered "$@"
+fi

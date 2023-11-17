@@ -1,0 +1,23 @@
+#!/usr/bin/env bash
+
+function github_link() (
+	source "$DOROTHY/sources/bash.bash"
+
+	local description slug
+	description="$(jq -r '.description' package.json)"
+	slug="$(jq -r '.badges.config.githubSlug' package.json)"
+
+	if test -z "$slug" -o "$slug" = 'null'; then
+		slug="bevry/$(basename "$(pwd)")"
+	fi
+
+	gh repo create "$slug" --description "$description" --public
+	rm -rf .git
+	git init
+	git remote add origin git@github.com:"$slug".git
+)
+
+# fire if invoked standalone
+if test "$0" = "${BASH_SOURCE[0]}"; then
+github_link "$@"
+fi

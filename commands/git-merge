@@ -1,0 +1,67 @@
+#!/usr/bin/env bash
+
+function git_merge() (
+	source "$DOROTHY/sources/bash.bash"
+
+	# =====================================
+	# Arguments
+
+	function help {
+		cat <<-EOF >/dev/stderr
+			ABOUT:
+			Checkout the main branch, merge the specified branch, push the changes, delete the specified branch.
+
+			USAGE:
+			git-merge <branch>
+
+			OPTIONS:
+			<branch>
+			    If not speciified, the current branch will be used.
+		EOF
+		if test "$#" -ne 0; then
+			echo-error "$@"
+		fi
+		return 22 # EINVAL 22 Invalid argument
+	}
+
+	# process
+	local item option_branch=''
+	while test "$#" -ne 0; do
+		item="$1"
+		shift
+		case "$item" in
+		'--help' | '-h') help ;;
+		'--branch='*) option_branch="${item#*--branch=}" ;;
+		'--'*) help "An unrecognised flag was provided: $item" ;;
+		*)
+			if test -z "$branch"; then
+				branch="$item"
+			else
+				help "An unrecognised argument was provided: $item"
+			fi
+			;;
+		esac
+	done
+
+	# fetch active branch
+	if test -z "$option_branch"; then
+		option_branch="$(get-git-active-branch)"
+	fi
+
+	# fetch default branch to checkout
+	local default_branch
+	default_branch="$(get-git-default-branch)"
+
+	# =======================================================
+	# Action
+
+	eval-helper --wrap --verbose --confirm -- git checkout "$default_branch"
+	eval-helper --wrap --verbose --confirm -- git merge "$option_branch"
+	eval-helper --wrap --verbose --confirm -- git push
+	eval-helper --wrap --verbose --confirm -- gtd "$option_branch"
+)
+
+# fire if invoked standalone
+if test "$0" = "${BASH_SOURCE[0]}"; then
+	git_merge "$@"
+fi

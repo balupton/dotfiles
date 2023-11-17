@@ -10,8 +10,9 @@ function boundation_upgrade() (
 	fi
 
 	# prepare
-	local name UPGRADE_SUCCESS
-	name="$(basename "$(pwd)")"
+	local name slug UPGRADE_SUCCESS
+	name="$(jq -r '.name' package.json)"
+	slug="$(jq -r '.badges.config.githubSlug' package.json)"
 	UPGRADE_SUCCESS='no'
 	function on_finish {
 		if test "$UPGRADE_SUCCESS" = 'yes'; then
@@ -43,10 +44,15 @@ function boundation_upgrade() (
 	eo="$(get_node_engine)"
 	lo="$(get_node_license)"
 
-	# run boundation
+	# install boundation
 	if ! command-exists boundation; then
 		nvm-env npm i -g boundation
 	fi
+
+	# install deps and make deno edition
+	# as boundation no longer tries
+	nvm-env npm i
+	npx make-deno-edition --attempt || :
 
 	# keep going
 	# workaround for now, with support for binaryextensions
@@ -66,14 +72,31 @@ function boundation_upgrade() (
 	# 	r="<16"
 	# fi
 	# boundation --nodeVersionsTestedRange="$r" "$@"
+	local banner=$'\n=======================\n' message
 	nvm-env boundation --auto --expandNodeVersions "$@" || {
-		if confirm --bool --ppid=$$ -- "Revert changes, and automatically trim the unsupported versions?"; then
+		message="failed to continue support on $name, enabling shrinking to mark failed unsupported test versions as optional"
+		say "$message"
+		echo-style --notice="$banner$message$banner"
+		confirm --ppid=$$ -- 'Proceed?'
+
+		git reset --hard
+		git clean -f
+		nvm-env boundation --auto --expandNodeVersions --shrinkNodeVersions "$@" || {
+			message="failed to conintue support on $name for existing node versions, enabling shrinking to maintained node versions"
+			say "$message"
+			echo-style --notice="$banner$message$banner"
+			confirm --ppid=$$ -- 'Proceed?'
+
 			git reset --hard
 			git clean -f
-			nvm-env boundation --auto --maintainedNodeVersions --expandNodeVersions --shrinkNodeVersions "$@"
-		else
-			return 1
-		fi
+			nvm-env boundation --auto --maintainedNodeVersions --expandNodeVersions --shrinkNodeVersions "$@" || {
+				message="failed to shrink support on $name to maintained node versions"
+				say "$message"
+				echo-style --error="$banner$message$banner"
+
+				return 1
+			}
+		}
 	}
 
 	# fetch updated values
@@ -95,7 +118,7 @@ function boundation_upgrade() (
 	fi
 	if test "$eo" != "$en"; then
 		change='major'
-		ec="-   Minimum required node version changed from \`$eo\` to \`$en\` to keep up with mandatory ecosystem changes
+		ec="-   Minimum required Node.js version changed from \`$eo\` to \`$en\` adapting to ecosystem changes
 "
 	fi
 
@@ -106,15 +129,26 @@ function boundation_upgrade() (
 	v="$(nvm-env npm version "${change}" --git-tag-version=false)"
 	d="$(date +"%Y %B %-d")"
 	t="$(tail -n +3 HISTORY.md)"
+	n="$(
+		cat <<-EOF
+			## $v $d
+
+			-   Updated dependencies, [base files](https://github.com/bevry/base), and [editions](https://editions.bevry.me) using [boundation](https://github.com/bevry/boundation)
+			$lc$ec
+		EOF
+	)"
 	cat <<-EOF >HISTORY.md
 		# History
 
-		## $v $d
-
-		-   Updated dependencies, [base files](https://github.com/bevry/base), and [editions](https://editions.bevry.me) using [boundation](https://github.com/bevry/boundation)
-		$lc$ec
+		$n
 		$t
 	EOF
+	nvm-env -- npx prettier HISTORY.md --write
+
+	# log
+	echo-segment --h2='changelog'
+	bat -P <<< "$n"
+	echo-segment --g1='changelog'
 
 	# prepare
 	nvm-env npm run our:meta
@@ -129,6 +163,26 @@ function boundation_upgrade() (
 	# 	nvm-env npm owner add bevryme
 	# fi
 	nvm-env npm run our:release
+
+	# wait for the release to push
+	waiter 15
+
+	# wait for the publish to finish
+	local run_id_of_release
+	while read -r run_id_of_release <&172; do
+		if test -z "$run_id_of_release"; then
+			break
+		fi
+		while true; do
+			gh run watch "$run_id_of_release" --exit-status --repo "$slug"  && break
+			gh run rerun "$run_id_of_release" --failed --repo "$slug"
+		done
+	done 172< <(gh run list --json status,databaseId --repo "$slug" | jq -r '.[] | select(.status != "completed") | .databaseId')
+
+	# publish is done wait for the publish to propagate
+	waiter 60
+
+	# all done
 	UPGRADE_SUCCESS='yes'
 )
 

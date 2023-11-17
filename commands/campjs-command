@@ -1,0 +1,31 @@
+#!/usr/bin/env bash
+
+function campjs_command() (
+	source "$DOROTHY/sources/bash.bash"
+
+	local who
+	who="$(ask --question='Who are you?' | echo-lowercase --stdin)"
+
+	local colors=()
+	mapfile -t colors < <(
+		choose-option --default=red --default=blue --multi --question='What is your favourite color?' \
+			-- green red blue blink jkasdjkasdjkas
+	)
+
+	local color
+	for color in "${colors[@]}"; do
+		if test "$color" = 'blink'; then
+			if ! confirm --positive --ppid=$$ -- 'Are you sure?'; then
+				echo-style --notice='good choice'
+				return 0
+			fi
+		fi
+		echo-style --"$color"="Hello $who"
+	done
+
+)
+
+# fire if invoked standalone
+if test "$0" = "${BASH_SOURCE[0]}"; then
+	campjs_command "$@"
+fi

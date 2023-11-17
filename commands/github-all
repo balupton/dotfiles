@@ -1,0 +1,84 @@
+#!/usr/bin/env bash
+
+function github_auto_merge_all() (
+	source "$DOROTHY/sources/bash.bash"
+
+	# if the secrets aren't provided, fetch them and reload
+	if test -z "${GITHUB_ACCESS_TOKEN-}"; then
+		secret env GITHUB_ACCESS_TOKEN -- "$0" "$@"
+		return
+	fi
+
+	# =====================================
+	# Action
+
+	local org slug pr run package name whoami owners owner need_access_change
+	whoami="$(npm whoami owners)"
+	while read -r org <&3; do
+		# if [[ $org == *'-archive' ]] ; then
+		# 	continue
+		# fi
+		# if test "$org" = 'bevry' -o "$org" = 'docpad' -o "$org" = 'docpad-archive'; then
+		# 	continue
+		# fi
+		while read -r slug <&4; do
+			# title
+			package="$(fetch "https://raw.githubusercontent.com/${slug}/HEAD/package.json" 2>/dev/null | jq -r .name || :)"
+			name="${package:-"$slug"}"
+			echo-title -- "$name"
+			echo-segment --h1="$name"
+
+			# enable auto-merge
+			# gh repo edit "$slug" --enable-auto-merge --enable-rebase-merge --enable-squash-merge || :
+
+			# correct npm owners
+			if test -n "$package" -a "$package" != 'templatebinding'; then
+				owners="$(npm owner ls "$package" 2> /dev/null || :)"
+				if test -n "$owners"; then
+					print_line "$owners"
+					if grep --quiet --fixed-strings --regexp="$whoami" <<< "$owners"; then
+						npm owner add bevryme "$package"
+						npm access grant read-write bevry:developers "$package" || :
+						npm access grant read-only bevry:maintainers "$package" || :
+						if [[ "$org" = *docpad* ]]; then
+							npm access grant read-only docpad:maintainers "$package" || :
+						fi
+						need_access_change='no'
+						while read -r owner <&5; do
+							owner="${owner%% *}" # get everything before the first space
+							if test "$owner" != 'bevryme'; then
+								need_access_change='yes'
+								break
+								# npm owner rm "$owner" "$package"  || :
+							fi
+						done 5< <(print_line "$owners")
+						if test "$need_access_change" = 'yes'; then
+							open "https://www.npmjs.com/package/$package/access"
+						fi
+						# ignore error on this, as if it is already set, it returns E401
+						npm access set mfa=automation "$package" 2> /dev/null || :
+					fi
+				fi
+			fi
+
+			# recreate all dependabot PRs
+			# while read -r pr <&5; do
+			# 	# gh pr comment "$pr" --body '@dependabot recreate'
+			# 	gh pr close "$pr" --repo "$slug" &
+			# done 5< <(gh pr list --repo "$slug" --app 'dependabot' --json url | jq -r '.[].url')
+
+			# close all dependabot actions
+			# while read -r run <&5; do
+			# 	gh run cancel "$run" --repo "$slug" &
+			# done 5< <(gh run list --status 'queued' --user dependabot --repo "$slug" --json databaseId | jq -r '.[].databaseId')
+
+			# done
+			echo-segment --g1="$name"
+		done 4< <(fetch "https://bevry.me/api/github/repos/$org" | jq -r '.[]' | sort)
+	done 3< <(fetch "https://bevry.me/api/github/orgs" | jq -r '.[]' | sort)
+)
+
+# fire if invoked standalone
+if test "$0" = "${BASH_SOURCE[0]}"; then
+	github_auto_merge_all "$@"
+fi
