@@ -199,12 +199,17 @@ function boundation_all() (
 			boundation-upgrade "${option_args[@]}" && {
 				# publish is done wait for the publish to propagate
 				waiter 60
+				# cleanup
+				rm -rf "$repo"
+				# done
+				echo-segment --g1="$repo"
+			} || {
+				# failed
+				echo-segment --e1="$repo"
+				# no need to log, as the repo continues to exist
 			}
-			echo-segment --g1="$repo"
 		)
 
-		# cleanup
-		rm -rf "$repo"
 	done
 
 	# reset repo for on_finish
