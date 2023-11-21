@@ -51,7 +51,7 @@ function boundation_upgrade() (
 
 	# install deps and make deno edition
 	# as boundation no longer tries
-	nvm-env npm i
+	nvm-env -- npm i --force
 	npx make-deno-edition --attempt || :
 
 	# keep going
@@ -72,31 +72,36 @@ function boundation_upgrade() (
 	# 	r="<16"
 	# fi
 	# boundation --nodeVersionsTestedRange="$r" "$@"
-	local banner=$'\n=======================\n' message
+	local message
+	# local banner=$'\n=======================\n'
 	nvm-env boundation --auto --expandNodeVersions "$@" || {
-		message="failed to continue support on $name, enabling shrinking to mark failed unsupported test versions as optional"
+		message="failed to expand support on $name"
 		say "$message"
-		echo-style --notice="$banner$message$banner"
-		confirm --ppid=$$ -- 'Proceed?'
+		return 1
 
-		git reset --hard
-		git clean -f
-		nvm-env boundation --auto --expandNodeVersions --shrinkNodeVersions "$@" || {
-			message="failed to conintue support on $name for existing node versions, enabling shrinking to maintained node versions"
-			say "$message"
-			echo-style --notice="$banner$message$banner"
-			confirm --ppid=$$ -- 'Proceed?'
+		# message="failed to continue support on $name, enabling shrinking to mark failed unsupported test versions as optional"
+		# say "$message"
+		# echo-style --notice="$banner$message$banner"
+		# confirm --ppid=$$ -- 'Proceed?'
 
-			git reset --hard
-			git clean -f
-			nvm-env boundation --auto --maintainedNodeVersions --expandNodeVersions --shrinkNodeVersions "$@" || {
-				message="failed to shrink support on $name to maintained node versions"
-				say "$message"
-				echo-style --error="$banner$message$banner"
+		# git reset --hard
+		# git clean -f
+		# nvm-env boundation --auto --expandNodeVersions --shrinkNodeVersions "$@" || {
+		# 	message="failed to conintue support on $name for existing node versions, enabling shrinking to maintained node versions"
+		# 	say "$message"
+		# 	echo-style --notice="$banner$message$banner"
+		# 	confirm --ppid=$$ -- 'Proceed?'
 
-				return 1
-			}
-		}
+		# 	git reset --hard
+		# 	git clean -f
+		# 	nvm-env boundation --auto --maintainedNodeVersions --expandNodeVersions --shrinkNodeVersions "$@" || {
+		# 		message="failed to shrink support on $name to maintained node versions"
+		# 		say "$message"
+		# 		echo-style --error="$banner$message$banner"
+
+		# 		return 1
+		# 	}
+		# }
 	}
 
 	# fetch updated values
@@ -147,7 +152,7 @@ function boundation_upgrade() (
 
 	# log
 	echo-segment --h2='changelog'
-	bat -P <<< "$n"
+	bat -P <<<"$n"
 	echo-segment --g1='changelog'
 
 	# prepare
@@ -174,13 +179,10 @@ function boundation_upgrade() (
 			break
 		fi
 		while true; do
-			gh run watch "$run_id_of_release" --exit-status --repo "$slug"  && break
+			gh run watch "$run_id_of_release" --exit-status --repo "$slug" && break
 			gh run rerun "$run_id_of_release" --failed --repo "$slug"
 		done
 	done 172< <(gh run list --json status,databaseId --repo "$slug" | jq -r '.[] | select(.status != "completed") | .databaseId')
-
-	# publish is done wait for the publish to propagate
-	waiter 60
 
 	# all done
 	UPGRADE_SUCCESS='yes'

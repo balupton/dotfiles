@@ -12,7 +12,8 @@ function github_auto_merge_all() (
 	# =====================================
 	# Action
 
-	local org slug pr run package name whoami owners owner need_access_change
+	# local pr run
+	local org slug package name whoami owners owner need_access_change
 	whoami="$(npm whoami owners)"
 	while read -r org <&3; do
 		# if [[ $org == *'-archive' ]] ; then
@@ -33,14 +34,14 @@ function github_auto_merge_all() (
 
 			# correct npm owners
 			if test -n "$package" -a "$package" != 'templatebinding'; then
-				owners="$(npm owner ls "$package" 2> /dev/null || :)"
+				owners="$(npm owner ls "$package" 2>/dev/null || :)"
 				if test -n "$owners"; then
 					print_line "$owners"
-					if grep --quiet --fixed-strings --regexp="$whoami" <<< "$owners"; then
+					if grep --quiet --fixed-strings --regexp="$whoami" <<<"$owners"; then
 						npm owner add bevryme "$package"
 						npm access grant read-write bevry:developers "$package" || :
 						npm access grant read-only bevry:maintainers "$package" || :
-						if [[ "$org" = *docpad* ]]; then
+						if [[ $org == *docpad* ]]; then
 							npm access grant read-only docpad:maintainers "$package" || :
 						fi
 						need_access_change='no'
@@ -56,7 +57,7 @@ function github_auto_merge_all() (
 							open "https://www.npmjs.com/package/$package/access"
 						fi
 						# ignore error on this, as if it is already set, it returns E401
-						npm access set mfa=automation "$package" 2> /dev/null || :
+						npm access set mfa=automation "$package" 2>/dev/null || :
 					fi
 				fi
 			fi

@@ -21,6 +21,7 @@ function boundation_ordered() (
 		bevry/assert-helpers
 
 		# editions
+		bevry/version-clean
 		bevry/version-compare
 		bevry/version-range
 		bevry/editions
@@ -45,9 +46,23 @@ function boundation_ordered() (
 		bevry/kava
 
 		# istextorbinary
-    	bevry/binaryextensions
-    	bevry/textextensions
+		bevry/binaryextensions
+		bevry/textextensions
 		bevry/istextorbinary
+
+		# fs-*
+		bevry/fs-accessible
+		bevry/fs-readable
+		bevry/fs-writable
+		bevry/fs-executable
+		bevry/fs-list
+		bevry/fs-read
+		bevry/fs-mkdirp
+		bevry/fs-write
+		bevry/fs-remove
+		bevry/fs-rmdir
+		bevry/fs-unlink
+		bevry/json
 	)
 
 	local slug_args=() skip_args=()

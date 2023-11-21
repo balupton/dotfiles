@@ -77,15 +77,12 @@ function boundation_all() (
 			billing
 			boundation
 			coda-packs
-			cson # @todo
 			designs
 			discourse-component-youtubetimestamps
 			discourser # @todo
 			dorothy
 			duration-timestamp # @todo
-			eslint-config-bevry # @todo semver break
-			fellow # @todo
-			figures # @todo
+			fellow             # @todo
 			fountain
 			github-api
 			github-commit
@@ -94,20 +91,15 @@ function boundation_all() (
 			github-repos
 			legal
 			links
-			list # @todo
 			make-deno-edition # @todo
 			meetings
-			nodejs-ecmascript-compatibility # @todo
-			nodejs-versions # @todo
-			pluginloader
-			ropo # @todo
+			ropo                      # @todo
 			staticsitegenerators-list # @todo
 			staticsitegenerators-website
 			study
 			terraform-scaleway-hashistack
-			testen # @todo semver failure
 			update-contributors # @todo node 12 failure
-			watchr # @todo
+			watchr              # @todo
 			workers
 		)
 	else
@@ -181,8 +173,8 @@ function boundation_all() (
 
 		# check package deps
 		repo_deps='no'
-		if jq -r '.dependencies' <<< "$package" | grep --quiet --fixed-strings --regexp='{'; then
-			repo_deps='yes';
+		if jq -r '.dependencies' <<<"$package" | grep --quiet --fixed-strings --regexp='{'; then
+			repo_deps='yes'
 		fi
 		if test "$option_deps" = 'yes' -a "$repo_deps" = 'no'; then
 			echo-style --dim="skipping $repo (it did not have deps)"
@@ -192,7 +184,6 @@ function boundation_all() (
 			continue
 		fi
 
-
 		# at on the repo
 		rm -rf "$repo" || :
 		git clone "git@github.com:$slug.git" # don't use gh, as it clones forks then sets the origin to not the fork
@@ -200,12 +191,15 @@ function boundation_all() (
 			cd "$repo"
 
 			# set correct origin in case of fork
-			gh repo set-default "$slug" > /dev/null
+			gh repo set-default "$slug" >/dev/null
 
 			# upgrade
 			echo-title -- "$repo [$index/$count]"
 			echo-segment --h1="$repo"
-			boundation-upgrade "${option_args[@]}"
+			boundation-upgrade "${option_args[@]}" && {
+				# publish is done wait for the publish to propagate
+				waiter 60
+			}
 			echo-segment --g1="$repo"
 		)
 

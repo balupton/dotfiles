@@ -11,6 +11,7 @@ function github_link() (
 		slug="bevry/$(basename "$(pwd)")"
 	fi
 
+	set -x
 	gh repo create "$slug" --description "$description" --public
 	rm -rf .git
 	git init
@@ -19,5 +20,5 @@ function github_link() (
 
 # fire if invoked standalone
 if test "$0" = "${BASH_SOURCE[0]}"; then
-github_link "$@"
+	github_link "$@"
 fi
