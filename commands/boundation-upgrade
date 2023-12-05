@@ -46,7 +46,7 @@ function boundation_upgrade() (
 
 	# install boundation
 	if ! command-exists boundation; then
-		nvm-env npm i -g boundation
+		nvm-env -- npm i -g boundation
 	fi
 
 	# install deps and make deno edition
@@ -74,7 +74,7 @@ function boundation_upgrade() (
 	# boundation --nodeVersionsTestedRange="$r" "$@"
 	local message
 	# local banner=$'\n=======================\n'
-	nvm-env boundation --auto --expandNodeVersions "$@" || {
+	nvm-env -- boundation --auto --expandNodeVersions "$@" || {
 		message="failed to expand support on $name"
 		say "$message"
 		return 1
@@ -86,7 +86,7 @@ function boundation_upgrade() (
 
 		# git reset --hard
 		# git clean -f
-		# nvm-env boundation --auto --expandNodeVersions --shrinkNodeVersions "$@" || {
+		# nvm-env -- boundation --auto --expandNodeVersions --shrinkNodeVersions "$@" || {
 		# 	message="failed to conintue support on $name for existing node versions, enabling shrinking to maintained node versions"
 		# 	say "$message"
 		# 	echo-style --notice="$banner$message$banner"
@@ -94,7 +94,7 @@ function boundation_upgrade() (
 
 		# 	git reset --hard
 		# 	git clean -f
-		# 	nvm-env boundation --auto --maintainedNodeVersions --expandNodeVersions --shrinkNodeVersions "$@" || {
+		# 	nvm-env -- boundation --auto --maintainedNodeVersions --expandNodeVersions --shrinkNodeVersions "$@" || {
 		# 		message="failed to shrink support on $name to maintained node versions"
 		# 		say "$message"
 		# 		echo-style --error="$banner$message$banner"
@@ -128,10 +128,10 @@ function boundation_upgrade() (
 	fi
 
 	# prettify history.md
-	nvm-env npx prettier HISTORY.md --write
+	nvm-env -- npx prettier HISTORY.md --write
 
 	# update version
-	v="$(nvm-env npm version "${change}" --git-tag-version=false)"
+	v="$(nvm-env -- npm version "${change}" --git-tag-version=false)"
 	d="$(date +"%Y %B %-d")"
 	t="$(tail -n +3 HISTORY.md)"
 	n="$(
@@ -156,18 +156,18 @@ function boundation_upgrade() (
 	echo-segment --g1='changelog'
 
 	# prepare
-	nvm-env npm run our:meta
+	nvm-env -- npm run our:meta
 
 	# release
 	git rm -rf docs || :
 	git add .
 	git commit -am "$v - boundation, changelog, version bump"
-	# if ! nvm-env npm owner add bevryme; then
+	# if ! nvm-env -- npm owner add bevryme; then
 	# 	print_line 'adding npm owner failed, trying again in two minutes'
 	# 	sleep 2m
-	# 	nvm-env npm owner add bevryme
+	# 	nvm-env -- npm owner add bevryme
 	# fi
-	nvm-env npm run our:release
+	nvm-env -- npm run our:release
 
 	# wait for the release to push
 	waiter 15
