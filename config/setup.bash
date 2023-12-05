@@ -104,29 +104,30 @@ HOMEBREW_CASKS=(
 HOMEBREW_FONTS=(
 	'font-cantarell'
 	'font-cascadia-code'
+	'font-dejavu'
 	'font-fira-code'
 	'font-fira-mono'
-	'font-victor-mono'
 	'font-hack'
 	'font-hasklig'
 	'font-ibm-plex'
-	'font-iosevka'
 	'font-inter'
+	'font-iosevka'
 	'font-jetbrains-mono'
 	'font-lato'
 	'font-maven-pro'
+	'font-monaspace'
 	'font-monoid'
 	'font-montserrat'
 	'font-open-sans'
-	'font-oxygen'
 	'font-oxygen-mono'
+	'font-oxygen'
 	'font-pt-mono'
-	'font-roboto'
 	'font-roboto-mono'
+	'font-roboto'
 	'font-source-code-pro'
-	'font-ubuntu'
-	'font-dejavu'
 	'font-ubuntu-mono'
+	'font-ubuntu'
+	'font-victor-mono'
 )
 # 'font-dejavu-sans-mono-nerd-font'
 # 'font-fira-code-nerd-font'
@@ -193,6 +194,21 @@ NPM_INSTALL=(
 	'json'
 	'typescript'
 	'@githubnext/github-copilot-cli'
+)
+NODE_VERSIONS=(
+	0.8
+	0.10
+	0.12
+	4
+	6
+	8
+	10
+	12
+	14
+	16
+	18
+	20
+	21
 )
 
 # Rust / Cargo / Crates.io
