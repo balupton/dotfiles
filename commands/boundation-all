@@ -196,15 +196,19 @@ function boundation_all() (
 			# upgrade
 			echo-title -- "$repo [$index/$count]"
 			echo-segment --h1="$repo"
-			boundation-upgrade "${option_args[@]}" && {
-				# publish is done wait for the publish to propagate
-				waiter 60
-				# cleanup
-				rm -rf "$repo"
-				# done
+			{
+				# run the upgrade
+				boundation-upgrade "${option_args[@]}"
+				# note it succeeded
 				echo-segment --g1="$repo"
+				# get out of the directory, so it can be removed
+				cd ..
+				# remove the directory
+				rm -rf "$repo"
+				# wait for the publish to propagate
+				waiter 60
 			} || {
-				# failed
+				# note it failed
 				echo-segment --e1="$repo"
 				# no need to log, as the repo continues to exist
 			}
