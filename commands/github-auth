@@ -4,7 +4,7 @@ function github_auth() (
 	source "$DOROTHY/sources/bash.bash"
 
 	if test -z "${GITHUB_ACCESS_TOKEN-}"; then
-		print_line 'Environment variable GITHUB_ACCESS_TOKEN empty, fetching it from the secret engine...'
+		print_line 'Environment variable GITHUB_ACCESS_TOKEN empty, fetching it from the secret engine...' > /dev/tty
 		secret env GITHUB_ACCESS_TOKEN -- "$@"
 	else
 		"$@"
