@@ -5,11 +5,13 @@ function bevry_auth() (
 
 	# if the secrets aren't provided, fetch them and reload
 	if test -z "${GITHUB_ACCESS_TOKEN-}"; then
-		secret env NPM_AUTHTOKEN SURGE_LOGIN SURGE_TOKEN GITHUB_ACCESS_TOKEN GITHUB_CLIENT_ID GITHUB_CLIENT_SECRET -- "$0" "$@"
+		print_line 'Bevry environment variables empty, fetching them from the secret engine...' >/dev/tty
+		secret env NPM_AUTHTOKEN SURGE_LOGIN SURGE_TOKEN GITHUB_ACCESS_TOKEN GITHUB_CLIENT_ID GITHUB_CLIENT_SECRET -- "$@"
+		return
+	else
+		"$@"
 		return
 	fi
-
-	nvm-env -- "$@"
 )
 
 # fire if invoked standalone

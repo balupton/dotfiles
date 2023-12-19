@@ -3,6 +3,12 @@
 function github_all() (
 	source "$DOROTHY/sources/bash.bash"
 
+	# if the secrets aren't provided, fetch them and reload
+	if test -z "${GITHUB_ACCESS_TOKEN-}"; then
+		github-auth -- "$0" "$@"
+		return
+	fi
+
 	# =====================================
 	# Helpers
 
@@ -37,12 +43,11 @@ function github_all() (
 	# correct npm owners
 	local whoami=''
 	function correct_npm_owners {
-		local slug="$1" packageName name owners owner need_access_change
+		local slug="$1" packageName owners owner need_access_change
 		if test -z "$whoami"; then
 			whoami="$(npm whoami owners)"
 		fi
 		packageName="$(fetch_package_data "$slug" | jq -r '.name' || :)"
-		name="${packageName:-"$slug"}"
 		if test -n "$packageName" -a "$packageName" != 'templatebinding'; then
 			owners="$(npm owner ls "$packageName" 2>/dev/null || :)"
 			if test -n "$owners"; then
@@ -93,18 +98,12 @@ function github_all() (
 	# =====================================
 	# Prepare
 
-	# if the secrets aren't provided, fetch them and reload
-	if test -z "${GITHUB_ACCESS_TOKEN-}"; then
-		secret env GITHUB_ACCESS_TOKEN -- "$0" "$@"
-		return
-	fi
-
 	# defaults slugs to all our slugs
 	local slugs=()
 	if test "$#" -eq 0; then
 		mapfile -t slugs < <(fetch_all_repos)
 	else
-		slugs="$@"
+		slugs=("$@")
 		shift $#
 	fi
 
