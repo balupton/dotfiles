@@ -188,6 +188,7 @@ PIPX_INSTALL=(
 # coinmon
 NPM_INSTALL=(
 	'@bevry/testen'
+	'@bevry/github-api'
 	'boundation'
 	'serve'
 	'eslint'

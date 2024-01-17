@@ -1,1 +1,1 @@
-set-env DOROTHY_THEME 'oz'
+set-env DOROTHY_THEME 'starship'

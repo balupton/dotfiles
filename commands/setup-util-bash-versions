@@ -2,8 +2,11 @@
 
 function setup_util_bash_versions() (
 	source "$DOROTHY/sources/bash.bash"
+
+	# enable DOWNLOAD_BUILD_EVAL
 	source "$(type -P setup-util)"
 
+	# setup
 	local version versions options
 	versions=(
 		# 4.0
@@ -25,6 +28,7 @@ function setup_util_bash_versions() (
 			"$@"
 			DOWNLOAD="https://ftp.gnu.org/gnu/bash/bash-${version}.tar.gz"
 			DOWNLOAD_UNZIP_FORMAT='tar'
+			DOWNLOAD_UNZIP_FILTER='bash-*/*'
 			DOWNLOAD_BUILD_EVAL='build_bash'
 			DOWNLOAD_FILENAME="bash-$version"
 		)

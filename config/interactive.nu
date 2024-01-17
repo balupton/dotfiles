@@ -7,7 +7,7 @@ source ~/.local/share/dorothy/config/interactive.nu
 $env.config.show_banner = false
 
 # Dorothy
-$env.DOROTHY_THEME = 'oz'
+$env.DOROTHY_THEME = 'starship'
 
 # Custom
 def greet [name] {
