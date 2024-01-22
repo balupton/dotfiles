@@ -12,7 +12,7 @@ function base() (
 			--pathname="$file"
 	done
 
-	if is-missing 'package.json'; then
+	if is-missing -- 'package.json'; then
 		nvm-env -- npm init -y
 	fi
 )

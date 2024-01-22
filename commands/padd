@@ -16,7 +16,7 @@ function padd() (
 		EOF
 		return 22 # EINVAL 22 Invalid argument
 	}
-	if is-help "$@"; then
+	if is-help -- "$@"; then
 		help
 	fi
 

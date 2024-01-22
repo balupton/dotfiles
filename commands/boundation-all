@@ -47,10 +47,10 @@ function boundation_all() (
 		'--filter='*) option_filter="${item#*--filter=}" ;;
 		'--start='*) option_start="${item#*--start=}" ;;
 		'--zero-deps'*)
-			option_deps="$(get-flag-value zero-deps --missing="$option_deps" -- "$item" | echo-non-affirmative --stdin)"
+			option_deps="$(get-flag-value --non-affirmative -- "$item")"
 			;;
 		'--has-deps'*)
-			option_deps="$(get-flag-value has-deps --missing="$option_deps" -- "$item" | echo-affirmative --stdin)"
+			option_deps="$(get-flag-value --affirmative -- "$item")"
 			;;
 		'--skip='*) option_skips+=("${item#*--skip=}") ;;
 		'--slug='*) option_slugs+=("${item#*--slug=}") ;;
@@ -153,10 +153,10 @@ function boundation_all() (
 		if test "$ready" = 'no'; then
 			echo-style --dim="skipping $repo (not yet ready)"
 			continue
-		elif is-needle "$slug" "${option_skips[@]}"; then
+		elif is-needle --needle="$slug" -- "${option_skips[@]}"; then
 			echo-style --dim="skipping $slug (slug was in skips)"
 			continue
-		elif is-needle "$repo" "${option_skips[@]}"; then
+		elif is-needle --needle="$repo" -- "${option_skips[@]}"; then
 			echo-style --dim="skipping $repo (repo was in skips)"
 			continue
 		elif test -n "$option_filter" && [[ $repo != *"$option_filter"* ]]; then

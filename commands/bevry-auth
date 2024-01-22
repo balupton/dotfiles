@@ -3,6 +3,11 @@
 function bevry_auth() (
 	source "$DOROTHY/sources/bash.bash"
 
+	# trim
+	if test "${1-}" = '--'; then
+		shift
+	fi
+
 	# if the secrets aren't provided, fetch them and reload
 	if test -z "${GITHUB_ACCESS_TOKEN-}"; then
 		print_line 'Bevry environment variables empty, fetching them from the secret engine...' >/dev/tty

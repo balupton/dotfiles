@@ -46,13 +46,13 @@ function magnet_search() (
 	mapfile -t lines < <(attractorr --sort=seeders "$search" 2>&1 || :)
 	for line in "${lines[@]}"; do
 		line="$(echo-trim-colors -- "$line")"
-		if test -z "$line" || rg -q 'ERROR|No results|btih:000000000000' <<<"$line"; then
+		if test -z "$line" || rg --quiet --regexp='ERROR|No results|btih:000000000000' <<<"$line"; then
 			continue
 		fi
 		print_line "$line"
 	done
 
-	mapfile -t lines < <(magnetfinder --no-interactive --show 5 -aq "$search" 2>/dev/null | rg -v 'No torrents found matching search query' || :)
+	mapfile -t lines < <(magnetfinder --no-interactive --show 5 -aq "$search" 2>/dev/null | rg --invert-match --fixed-strings --regexp='No torrents found matching search query' || :)
 	echo-split $'\t' -- "${lines[@]}"
 )
 

@@ -56,8 +56,8 @@ function boundation_upgrade() (
 
 	# keep going
 	# workaround for now, with support for binaryextensions
-	# r="$(jq -r '.boundation.nodeVersionsTestedRange' package.json || print_line)"
-	# if is-value "$r"; then
+	# r="$(jq -r '.boundation.nodeVersionsTestedRange' package.json || __print_line)"
+	# if is-value -- "$r"; then
 	# 	if [[ "$r" == *'<16'* ]]; then
 	# 		print_line 'custom nodeVersionsTestedRange is okay'
 	# 	else

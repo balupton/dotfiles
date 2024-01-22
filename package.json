@@ -29,41 +29,8 @@
     "wsl2",
     "zsh"
   ],
-  "badges": {
-    "list": [
-      "githubworkflow",
-      "---",
-      "githubsponsors",
-      "thanksdev",
-      "patreon",
-      "flattr",
-      "liberapay",
-      "buymeacoffee",
-      "opencollective",
-      "crypto",
-      "paypal",
-      "wishlist"
-    ],
-    "config": {
-      "githubWorkflow": "bevry",
-      "githubSponsorsUsername": "balupton",
-      "thanksdevGithubUsername": "balupton",
-      "buymeacoffeeUsername": "balupton",
-      "cryptoURL": "https://bevry.me/crypto",
-      "flattrUsername": "balupton",
-      "liberapayUsername": "bevry",
-      "opencollectiveUsername": "bevry",
-      "patreonUsername": "bevry",
-      "paypalURL": "https://bevry.me/paypal",
-      "wishlistURL": "https://bevry.me/wishlist",
-      "githubUsername": "balupton",
-      "githubRepository": "dorothy",
-      "githubSlug": "balupton/dorothy",
-      "npmPackageName": "boundation"
-    }
-  },
   "funding": "https://bevry.me/fund",
-  "author": "2013+ Benjamin Lupton <b@lupton.cc> (https://github.com/balupton)",
+  "author": "2013+ Benjamin Lupton <b@lupton.cc> (https://balupton.com)",
   "maintainers": [
     "Benjamin Lupton <b@lupton.cc> (https://github.com/balupton)"
   ],
@@ -99,13 +66,13 @@
   ],
   "devDependencies": {
     "@bevry/update-contributors": "^1.23.0",
-    "@typescript-eslint/eslint-plugin": "^6.18.1",
-    "@typescript-eslint/parser": "^6.18.1",
+    "@typescript-eslint/eslint-plugin": "^6.19.1",
+    "@typescript-eslint/parser": "^6.19.1",
     "eslint-config-bevry": "^5.5.0",
     "eslint-config-prettier": "^9.1.0",
     "eslint-plugin-prettier": "^5.1.3",
     "eslint": "^8.56.0",
-    "prettier": "^3.2.1",
+    "prettier": "^3.2.4",
     "projectz": "^4.2.0",
     "valid-directory": "^4.9.0"
   },
