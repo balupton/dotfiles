@@ -43,19 +43,19 @@ function boundation_all() (
 		shift
 		case "$item" in
 		'--help' | '-h') help ;;
-		'--user='*) option_user="${item#*--user=}" ;;
-		'--filter='*) option_filter="${item#*--filter=}" ;;
-		'--start='*) option_start="${item#*--start=}" ;;
+		'--user='*) option_user="${item#*=}" ;;
+		'--filter='*) option_filter="${item#*=}" ;;
+		'--start='*) option_start="${item#*=}" ;;
 		'--zero-deps'*)
 			option_deps="$(get-flag-value --non-affirmative -- "$item")"
 			;;
 		'--has-deps'*)
 			option_deps="$(get-flag-value --affirmative -- "$item")"
 			;;
-		'--skip='*) option_skips+=("${item#*--skip=}") ;;
-		'--slug='*) option_slugs+=("${item#*--slug=}") ;;
+		'--skip='*) option_skips+=("${item#*=}") ;;
+		'--slug='*) option_slugs+=("${item#*=}") ;;
 		'--start-after='*)
-			option_start="${item#*--start-after=}"
+			option_start="${item#*=}"
 			option_skips+=("$option_start")
 			;;
 		'--')
@@ -164,7 +164,7 @@ function boundation_all() (
 		fi
 
 		# check package
-		package="$(fetch "https://raw.githubusercontent.com/${slug}/HEAD/package.json" 2>/dev/null || :)"
+		package="$(fetch "https://raw.githubusercontent.com/${slug}/HEAD/package.json" 2>/dev/null)"
 		if test -z "$package"; then
 			echo-style --dim="skipping $repo (no package.json)"
 			continue

@@ -10,7 +10,7 @@ function github_auth() (
 
 	# if the secrets aren't provided, fetch them and reload
 	if test -z "${GITHUB_ACCESS_TOKEN-}"; then
-		print_line 'Environment variable GITHUB_ACCESS_TOKEN empty, fetching it from the secret engine...' >/dev/tty
+		echo-style 'Environment variable ' --code='GITHUB_ACCESS_TOKEN' ' is empty, fetching it from the secret engine...' >/dev/tty
 		secret env GITHUB_ACCESS_TOKEN -- "$@"
 		return
 	else

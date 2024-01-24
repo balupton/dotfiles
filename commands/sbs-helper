@@ -32,7 +32,7 @@ function sbs_helper() (
 		shift
 		case "$item" in
 		'--help' | '-h') help ;;
-		'--token='*) token="${item#*--token=}" ;;
+		'--token='*) token="${item#*=}" ;;
 		'--'*) help "An unrecognised flag was provided: $item" ;;
 		*) help "An unrecognised argument was provided: $item" ;;
 		esac

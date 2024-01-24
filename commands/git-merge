@@ -31,7 +31,7 @@ function git_merge() (
 		shift
 		case "$item" in
 		'--help' | '-h') help ;;
-		'--branch='*) option_branch="${item#*--branch=}" ;;
+		'--branch='*) option_branch="${item#*=}" ;;
 		'--'*) help "An unrecognised flag was provided: $item" ;;
 		*)
 			if test -z "$branch"; then
