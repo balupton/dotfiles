@@ -71,6 +71,8 @@ function boundation_ordered() (
 	boundation-all "${slug_args[@]}"
 	boundation-all --zero-deps "${skip_args[@]}"
 	boundation-all --has-deps "${skip_args[@]}"
+	# the ideal would be to implement:
+	# boundation-all "${slug_args[@]}" "$@" -- --username=bevry --zero-deps "${skip_args[@]}" "$@" -- --username=bevry --has-deps "${skip_args[@]}" "$@"
 )
 
 # fire if invoked standalone

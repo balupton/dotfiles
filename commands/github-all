@@ -95,6 +95,39 @@ function github_all() (
 		done 5< <(gh run list --status 'queued' --user dependabot --repo "$slug" --json databaseId | jq -r '.[].databaseId')
 	}
 
+	# clone labels
+	local delete_labels=(
+		'discussion'
+		'documentation'
+		'duplicate'
+		'good first issue'
+		'help wanted'
+		'help'
+		'invalid'
+		'note'
+		'question'
+		'support'
+		'type support / question'
+		'type support/question'
+		'wontfix'
+	)
+	local new_labels
+	mapfile -t new_labels < <(gh label list --repo bevry/dorothy --json=name,description,color | jq -r '.[] | .name + "\n" + .description + "\n" + .color')
+	function fix_labels {
+		local slug="$1" label i
+		if test "$slug" = 'docpad/docpad'; then
+			return 0
+		fi
+		gh label clone bevry/dorothy --repo "$slug" 2>/dev/null || return 0
+		for label in "${delete_labels[@]}"; do
+			gh label delete "$label" --yes --repo "$slug" 2>/dev/null || :
+		done
+		for ((i = 0; i < ${#new_labels[@]}; i += 3)); do
+			label="${new_labels[i]}"
+			gh label edit "$label" --repo "$slug" --description "${new_labels[i + 1]}" --color "${new_labels[i + 2]}" 2>/dev/null || :
+		done
+	}
+
 	# =====================================
 	# Prepare
 
@@ -112,7 +145,7 @@ function github_all() (
 
 	local slug
 	for slug in "${slugs[@]}"; do
-		fetch_backers "$slug"
+		fix_labels "$slug"
 	done
 )
 

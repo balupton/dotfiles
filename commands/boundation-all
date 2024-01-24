@@ -75,37 +75,35 @@ function boundation_all() (
 			.github
 			base
 			billing
-			boundation
+			boundation # manual
 			coda-packs
 			designs
 			discourse-component-youtubetimestamps
 			discourser # @todo
 			dorothy
 			duration-timestamp # @todo
-			fellow             # @todo
 			fountain
-			github-api
-			github-commit
-			github-contributors
-			github-members
-			github-repos
+			github-api # rate limits
 			legal
 			links
-			make-deno-edition # @todo
 			meetings
 			ropo                      # @todo
 			staticsitegenerators-list # @todo
 			staticsitegenerators-website
 			study
 			terraform-scaleway-hashistack
-			update-contributors # @todo node 12 failure
-			watchr              # @todo
+			watchr # @todo
 			workers
 		)
 	else
 		option_skips+=(
 			.github
 		)
+	fi
+
+	# if no slugs, fetch all for the user
+	if test "${#option_slugs[@]}" -eq 0; then
+		mapfile -t option_slugs < <(fetch "https://bevry.me/api/github/repos/${option_user}" | jq -r '.[]' | sort)
 	fi
 
 	# =====================================
@@ -121,25 +119,26 @@ function boundation_all() (
 	# https://omrilotan.medium.com/npx-breaking-on-ci-b9f3f61d4676
 	export npm_config_yes=true
 
-	# use a file at fd 3, as otherwise the repos will be passed as stdin into boundation
-	# http://mywiki.wooledge.org/BashFAQ/089
-	# https://stackoverflow.com/a/8334759/130638
-	local repo='' slug index repo_deps ready='no' package
+	# note progress
+	local failed_repos=() success_repos=()
+	function on_finish {
+		if test "${#success_repos[@]}" -ne 0; then
+			echo-style --success="boundation success on:"
+			echo-lines -- "${success_repos[@]}"
+		fi
+		if test "${#failed_repos[@]}" -ne 0; then
+			echo-style --error="boundation failed on:"
+			echo-lines -- "${failed_repos[@]}"
+		fi
+	}
+	trap on_finish EXIT SIGINT SIGTERM
+
+	# loop
+	local pwd="$PWD" ready='no' repo slug index repo_deps package
+	local -i count="${#option_slugs[@]}"
 	if test -z "$option_start"; then
 		ready='yes'
 	fi
-	if test "${#option_slugs[@]}" -eq 0; then
-		mapfile -t option_slugs < <(fetch "https://bevry.me/api/github/repos/${option_user}" | jq -r '.[]' | sort)
-	fi
-	function on_finish {
-		if test -z "$repo"; then
-			echo-style --success='boundation completed'
-		else
-			echo-style --error="boundation failed on $repo"
-		fi
-	}
-	trap on_finish EXIT
-	local -i count="${#option_slugs[@]}"
 	for index in "${!option_slugs[@]}"; do
 		# scan
 		slug="${option_slugs[index]}"
@@ -184,36 +183,46 @@ function boundation_all() (
 			continue
 		fi
 
-		# at on the repo
-		rm -rf "$repo" || :
-		git clone "git@github.com:$slug.git" # don't use gh, as it clones forks then sets the origin to not the fork
+		# upgrade
+		# use ( as { would cause return to exit our function, use [|| return] as the block conditional, i.e. [) ||] and [} ||] causes errexit to disable
 		(
-			cd "$repo"
-
-			# set correct origin in case of fork
-			gh repo set-default "$slug" >/dev/null
-
-			# upgrade
-			echo-title -- "$repo [$index/$count]"
-			echo-segment --h1="$repo"
-			{
-				# run the upgrade
-				boundation-upgrade "${option_args[@]}"
-				# note it succeeded
-				echo-segment --g1="$repo"
-				# get out of the directory, so it can be removed
-				cd ..
-				# remove the directory
-				rm -rf "$repo"
-				# wait for the publish to propagate
-				waiter 60
-			} || {
-				# note it failed
-				echo-segment --e1="$repo"
-				# no need to log, as the repo continues to exist
-			}
+			# log
+			failed_repos+=("$repo")
+			echo-title -- "$repo [$index/$count]" || return
+			echo-segment --h1="$repo" || return
+			# clone the repo fresh and set the correct origin in case of fork
+			# don't use subshell as that breaks strict mode
+			# don't use gh, as it clones forks then sets the origin to not the fork
+			cd "$pwd" || return
+			rm -rf "$repo" || :
+			git clone "git@github.com:$slug.git" || return
+			cd "$repo" || return
+			gh repo set-default "$slug" >/dev/null || return
+			# run the upgrade
+			boundation-upgrade "${option_args[@]}" || return
+			# get out of the directory, so it can be removed
+			cd "$pwd" || return
+			# remove the directory
+			rm -rf "$repo" || return
+			# wait for the publish to propagate
+			waiter 60 || return
+			# note it succeeded
+			echo-segment --g1="$repo" || return
+			# remove from failed repos
+			failed_repos=("${failed_repos[@]/$repo/}")
+			success_repos+=("$repo")
+		) || (
+			# check status
+			local status="$?"
+			# note failure
+			echo-segment --e1="$repo" ' ' --code="$status" || return
+			# keep repo (if it exists), but ensure we are correct location
+			cd "$pwd" || return
+			# if the status was SIGINT OR SIGTERM then propagate
+			if test "$status" -eq 130 -o "$status" -eq 143; then
+				return "$status"
+			fi
 		)
-
 	done
 
 	# reset repo for on_finish

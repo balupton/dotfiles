@@ -44,36 +44,30 @@ function boundation_upgrade() (
 	eo="$(get_node_engine)"
 	lo="$(get_node_license)"
 
-	# install boundation
+	# install global deps
 	if ! command-exists boundation; then
+		echo-style --bold='installing' ' ' --code='boundation'
 		nvm-env -- npm i -g boundation
 	fi
+	if ! command-exists github-backers; then
+		echo-style --bold='installing' ' ' --code='github-backers'
+		nvm-env -- npm i -g '@bevry/github-api'
+	fi
+	if ! command-exists make-deno-edition; then
+		echo-style --bold='installing' ' ' --code='make-deno-edition'
+		nvm-env -- npm i -g make-deno-edition
+	fi
 
-	# install deps and make deno edition
+	# install local deps
 	# as boundation no longer tries
+	echo-style --bold='installing' ' ' --code='dependencies'
 	nvm-env -- npm i --force
-	npx make-deno-edition --attempt || :
 
-	# keep going
-	# workaround for now, with support for binaryextensions
-	# r="$(jq -r '.boundation.nodeVersionsTestedRange' package.json || __print_line)"
-	# if is-value -- "$r"; then
-	# 	if [[ "$r" == *'<16'* ]]; then
-	# 		print_line 'custom nodeVersionsTestedRange is okay'
-	# 	else
-	# 		nr='10 || 12 || 14'
-	# 		say "OVERWROTE nodeVersionsTestedRange on $name"
-	# 		print_line "OVERWROTE nodeVersionsTestedRange on $name"
-	# 		print_line "from:  $r"
-	# 		print_line "to:    $nr"
-	# 		r="$nr"
-	# 	fi
-	# else
-	# 	r="<16"
-	# fi
-	# boundation --nodeVersionsTestedRange="$r" "$@"
+	# use global up to date version of make-deno-edition
+	nvm-env -- make-deno-edition --attempt || :
+
+	# continue
 	local message
-	# local banner=$'\n=======================\n'
 	nvm-env -- boundation --auto --expandNodeVersions "$@" || {
 		message="failed to expand support on $name"
 		say "$message"
@@ -110,7 +104,7 @@ function boundation_upgrade() (
 	ln="$(get_node_license)"
 
 	# compare values
-	local ec lc change
+	local ec lc sponsors change
 	ec=''
 	lc=''
 	change='minor'
@@ -126,6 +120,8 @@ function boundation_upgrade() (
 		ec="-   Minimum required Node.js version changed from \`$eo\` to \`$en\` adapting to ecosystem changes
 "
 	fi
+	sponsors="$(nvm-env -- github-backers --format=update 2>/dev/null || :)
+"
 
 	# prettify history.md
 	nvm-env -- npx prettier HISTORY.md --write
@@ -139,7 +135,7 @@ function boundation_upgrade() (
 			## $v $d
 
 			-   Updated dependencies, [base files](https://github.com/bevry/base), and [editions](https://editions.bevry.me) using [boundation](https://github.com/bevry/boundation)
-			$lc$ec
+			$lc$ec$sponsors
 		EOF
 	)"
 	cat <<-EOF >HISTORY.md
@@ -179,7 +175,7 @@ function boundation_upgrade() (
 			break
 		fi
 		while true; do
-			gh run watch "$run_id_of_release" --exit-status --repo "$slug" && break
+			timeout --foreground 10m gh run watch "$run_id_of_release" --exit-status --interval 10 --repo "$slug" && break
 			gh run rerun "$run_id_of_release" --failed --repo "$slug"
 		done
 	done 172< <(gh run list --json status,databaseId --repo "$slug" | jq -r '.[] | select(.status != "completed") | .databaseId')

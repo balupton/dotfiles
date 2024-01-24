@@ -13,8 +13,14 @@ if ! test -d /var/discourse; then
 	exit 1
 fi
 
+# Start the ssh agent
+eval "$(ssh-agent -s)"
+
 # Make sure github keys are accurate
-ssh-keygen -f "/root/.ssh/known_hosts" -R github.com
+# remove old github keys and remove its backup
+ssh-keygen -R github.com
+# add new github keys without conflicts
+ssh-keyscan -t rsa github.com >>"/root/.ssh/known_hosts"
 
 # Upgrading the host, which may solve SSL issues
 # https://stackoverflow.com/a/61853542/130638
@@ -62,7 +68,6 @@ if test -n "${ssh_pass_internal-}"; then
 	chmod +x "$ssh_stdin_pass_helper"
 
 	echo 'Adding the SSH keys...'
-	eval "$(ssh-agent -s)"
 	DISPLAY=:0 SSH_ASKPASS="$ssh_stdin_pass_helper" ssh-add "$ssh_file_internal" <<<"$ssh_pass_internal"
 elif test -n "${ssh_file_internal-}"; then
 	ssh-add "$ssh_file_internal"
