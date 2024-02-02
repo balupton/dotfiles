@@ -218,8 +218,8 @@ function boundation_all() (
 			echo-segment --e1="$repo" ' ' --code="$status" || return
 			# keep repo (if it exists), but ensure we are correct location
 			cd "$pwd" || return
-			# if the status was SIGINT OR SIGTERM then propagate
-			if test "$status" -eq 130 -o "$status" -eq 143; then
+			# if aborted, propagate
+			if is-abort -- "$status"; then
 				return "$status"
 			fi
 		)
