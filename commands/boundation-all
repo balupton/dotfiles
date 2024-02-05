@@ -194,7 +194,7 @@ function boundation_all() (
 			# don't use subshell as that breaks strict mode
 			# don't use gh, as it clones forks then sets the origin to not the fork
 			cd "$pwd" || return
-			rm -rf "$repo" || :
+			fs-rm --quiet --no-confirm -- "$repo" || return
 			git clone "git@github.com:$slug.git" || return
 			cd "$repo" || return
 			gh repo set-default "$slug" >/dev/null || return
@@ -203,7 +203,7 @@ function boundation_all() (
 			# get out of the directory, so it can be removed
 			cd "$pwd" || return
 			# remove the directory
-			rm -rf "$repo" || return
+			fs-rm --quiet --no-confirm -- "$repo" || return
 			# wait for the publish to propagate
 			waiter 60 || return
 			# note it succeeded

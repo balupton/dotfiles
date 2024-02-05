@@ -13,7 +13,7 @@ function github_link() (
 
 	set -x
 	gh repo create "$slug" --description "$description" --public
-	rm -rf .git
+	fs-rm --quiet --no-confirm -- .git
 	git init
 	git remote add origin git@github.com:"$slug".git
 )
