@@ -5,27 +5,19 @@
 function discourse() (
 	source "$DOROTHY/sources/bash.bash"
 
-	local which action ssh_user ssh_home ssh_ip ssh_pass_external ssh_pass_internal ssh_file_internal
-	which="$(choose-option --question='Which discourse instance do you wish to upgrade?' --filter="${1-}" -- 'bevry' 'liberland')"
+	local which action ssh_user ssh_home ssh_ip
+	local ssh_pass_external ssh_pass_internal ssh_file_internal discourse_configuration_remote discourse_configuration_branch
+	which="$(choose-option --question='Which discourse instance do you wish to upgrade?' --filter="${1-}" -- 'bevry')"
 	action="$(choose-option --question='Which action do you wish to take?' --filter="${2-}" -- 'login' 'upgrade')"
 	ssh_user='root'
 	ssh_home='/root'
 	if test "$which" = 'bevry'; then
-		# secret map BEVRY_DISCOURSE_IP personal 'SSH Keys' 'bevry-discourse-ip'
-		# secret map BEVRY_DISCOURSE_SSH_PASSWORD personal 'SSH Keys' 'bevry-scaleway-2017'
-		# secret map BEVRY_DISCOURSE_INTERNAL_SSH_PASSWORD personal 'SSH Keys' 'bevry-discourse'
 		ssh_ip="$(secret get BEVRY_DISCOURSE_IP)"
 		ssh_pass_external="$(secret get BEVRY_DISCOURSE_SSH_PASSWORD)"
 		ssh_pass_internal="$(secret get BEVRY_DISCOURSE_INTERNAL_SSH_PASSWORD)"
 		ssh_file_internal="$ssh_home/.ssh/bevry-discourse-github"
-	elif test "$which" = 'liberland'; then
-		# secret map LIBERLAND_DISCOURSE_IP personal 'Liberland Forum' 'Scaleway IP'
-		# secret map LIBERLAND_DISCOURSE_SSH_PASSWORD personal 'Liberland Forum' 'Scaleway SSH Key'
-		# secret map LIBERLAND_DISCOURSE_INTERNAL_SSH_PASSWORD personal 'Liberland Forum' 'Internal SSH Key'
-		ssh_ip="$(secret get LIBERLAND_DISCOURSE_IP)"
-		ssh_pass_external="$(secret get LIBERLAND_DISCOURSE_SSH_PASSWORD)"
-		ssh_pass_internal="$(secret get LIBERLAND_DISCOURSE_INTERNAL_SSH_PASSWORD)"
-		ssh_file_internal="$ssh_home/.ssh/forum.liberland.org"
+		discourse_configuration_remote='git@github.com:bevry/discourse.git'
+		discourse_configuration_branch='bevry'
 	else
 		print_line "Error: Invalid discourse instance." >/dev/stderr
 		return 1
@@ -42,14 +34,16 @@ function discourse() (
 	fi
 
 	# do upgrade
-	local upgrader
-	upgrader="$(cat "$DOROTHY/user/commands/discourse-upgrader")"
-	upgrader="
+	local discourse_setup_script
+	discourse_setup_script="$(cat "$DOROTHY/user/commands/discourse-setup")"
+	discourse_setup_script="
 SSH_FILE_INTERNAL='$ssh_file_internal'
 SSH_PASS_INTERNAL='$ssh_pass_internal'
-$upgrader
+DISCOURSE_CONFIGURATION_REMOTE='$discourse_configuration_remote'
+DISCOURSE_CONFIGURATION_BRANCH='$discourse_configuration_branch'
+$discourse_setup_script
 "
-	(ssh -t "$ssh_user@$ssh_ip" "$upgrader" && {
+	(ssh -t "$ssh_user@$ssh_ip" "$discourse_setup_script" && {
 		print_line 'Successfully upgraded the discourse instance. 🎉'
 		return 0
 	}) || {

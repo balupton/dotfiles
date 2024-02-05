@@ -31,14 +31,9 @@ function discourse_setup() (
 	}
 
 	# Receive arguments from caller
-	if test -z "${SSH_FILE_INTERNAL-}" -o -z "${SSH_PASS_INTERNAL-}"; then
-		print_line 'For automatic SSH password insertion, you must pass the SSH file and password.' >/dev/stderr
-	fi
-
-	# Check discourse is already setup
-	if ! test -d /var/discourse; then
-		print_line 'Run this command on the remote discourse server' >/dev/stderr
-		exit 1
+	if test -z "${SSH_FILE_INTERNAL-}" -o -z "${SSH_PASS_INTERNAL-}" -o -z "${DISCOURSE_CONFIGURATION_REMOTE-}" -o -z "${DISCOURSE_CONFIGURATION_BRANCH-}"; then
+		print_line '[discourse-setup] is to be run via [commands/discourse]' >/dev/stderr
+		return 1
 	fi
 
 	print_line 'Configuring dependencies...'
@@ -62,13 +57,13 @@ function discourse_setup() (
 	eval "$(ssh-agent -s)"
 	# Save Configuration File
 	cat <<-EOF >"$HOME/.ssh/config"
-		# generic settings
+		# Configuration
 		UserKnownHostsFile ~/.ssh/known_hosts
 		IgnoreUnknown UseKeychain,AddKeysToAgent,IdentitiesOnly
 		UseKeychain yes
 		AddKeysToAgent yes
 
-		# identities
+		# Fallback
 		IdentityFile ~/.ssh/$SSH_FILE_INTERNAL
 	EOF
 	# Fix Permissions
@@ -118,18 +113,18 @@ function discourse_setup() (
 	# Install configuration
 	if test ! -e /.git; then
 		print_line 'Configuring remote configuration...'
-		local REMOTE='git@github.com:bevry/discourse.git' BRANCH='bevry'
 		cd /
 		git init
-		git remote add origin "$REMOTE"
+		git remote add origin "$DISCOURSE_CONFIGURATION_REMOTE"
 		git fetch origin
-		git checkout "$BRANCH"
-		git pull origin "$BRANCH"
+		git checkout "$DISCOURSE_CONFIGURATION_BRANCH"
+		git pull origin "$DISCOURSE_CONFIGURATION_BRANCH"
 	fi
 
 	# Cron
 	print_line 'Configuring cron...'
 	# Always update cron job file with the latest
+	local discourse_cron_script
 	discourse_cron_script="$HOME/discourse_cron.bash"
 	cat <<-EOF >"$discourse_cron_script"
 		#!/usr/bin/env bash
@@ -172,7 +167,5 @@ function discourse_setup() (
 	/var/discourse/launcher rebuild app
 )
 
-# fire if invoked standalone
-if test "$0" = "${BASH_SOURCE[0]}"; then
-	discourse_setup "$@"
-fi
+# always fire
+discourse_setup "$@"
