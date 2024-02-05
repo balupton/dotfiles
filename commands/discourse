@@ -17,7 +17,7 @@ function discourse() (
 		ssh_ip="$(secret get BEVRY_DISCOURSE_IP)"
 		ssh_pass_external="$(secret get BEVRY_DISCOURSE_SSH_PASSWORD)"
 		ssh_pass_internal="$(secret get BEVRY_DISCOURSE_INTERNAL_SSH_PASSWORD)"
-		ssh_file_internal="$ssh_home/.ssh/root-discuss.bevry.me-github"
+		ssh_file_internal="$ssh_home/.ssh/bevry-discourse-github"
 	elif test "$which" = 'liberland'; then
 		# secret map LIBERLAND_DISCOURSE_IP personal 'Liberland Forum' 'Scaleway IP'
 		# secret map LIBERLAND_DISCOURSE_SSH_PASSWORD personal 'Liberland Forum' 'Scaleway SSH Key'
@@ -45,8 +45,8 @@ function discourse() (
 	local upgrader
 	upgrader="$(cat "$DOROTHY/user/commands/discourse-upgrader")"
 	upgrader="
-ssh_file_internal='$ssh_file_internal'
-ssh_pass_internal='$ssh_pass_internal'
+SSH_FILE_INTERNAL='$ssh_file_internal'
+SSH_PASS_INTERNAL='$ssh_pass_internal'
 $upgrader
 "
 	(ssh -t "$ssh_user@$ssh_ip" "$upgrader" && {
