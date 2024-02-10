@@ -5,49 +5,47 @@
 function discourse() (
 	source "$DOROTHY/sources/bash.bash"
 
-	local which action ssh_user ssh_home ssh_ip
-	local ssh_pass_external ssh_pass_internal ssh_file_internal discourse_configuration_remote discourse_configuration_branch
-	which="$(choose-option --question='Which discourse instance do you wish to upgrade?' --filter="${1-}" -- 'bevry')"
-	action="$(choose-option --question='Which action do you wish to take?' --filter="${2-}" -- 'login' 'upgrade')"
-	ssh_user='root'
-	ssh_home='/root'
+	local which action ssh_ip
+	local ssh_pass_internal ssh_key_internal discourse_configuration_remote discourse_configuration_branch discourse_configuration_container
+	which="$(choose-option --question='Which discourse instance?' --filter="${1-}" -- 'bevry')"
+	action="$(choose-option --question='Which action do you wish to take?' --filter="${2-}" -- 'login' 'setup')"
 	if test "$which" = 'bevry'; then
-		ssh_ip="$(secret get BEVRY_DISCOURSE_IP)"
-		ssh_pass_external="$(secret get BEVRY_DISCOURSE_SSH_PASSWORD)"
+		ssh_ip='192.168.5.3' # "$(secret get BEVRY_DISCOURSE_IP)"
 		ssh_pass_internal="$(secret get BEVRY_DISCOURSE_INTERNAL_SSH_PASSWORD)"
-		ssh_file_internal="$ssh_home/.ssh/bevry-discourse-github"
+		ssh_key_internal="balupton-2024"
 		discourse_configuration_remote='git@github.com:bevry/discourse.git'
 		discourse_configuration_branch='bevry'
+		discourse_container='bevry-rodeo'
 	else
 		print_line "Error: Invalid discourse instance." >/dev/stderr
 		return 1
 	fi
 
-	print_line "Logging into [$ssh_ip]..."
-	print_line 'If prompted for an SSH password, it has been copied to your clipboard.'
-	print_line "$ssh_pass_external" | pbcopy
+	# log
+	echo-style --invert="Entering $ssh_ip"
 
 	# do login
 	if test "$action" = 'login'; then
-		ssh "$ssh_user@$ssh_ip"
+		ssh "$ssh_ip"
 		return 0
 	fi
 
-	# do upgrade
+	# do setup
 	local discourse_setup_script
 	discourse_setup_script="$(cat "$DOROTHY/user/commands/discourse-setup")"
 	discourse_setup_script="
-SSH_FILE_INTERNAL='$ssh_file_internal'
+SSH_KEY_INTERNAL='$ssh_key_internal'
 SSH_PASS_INTERNAL='$ssh_pass_internal'
 DISCOURSE_CONFIGURATION_REMOTE='$discourse_configuration_remote'
 DISCOURSE_CONFIGURATION_BRANCH='$discourse_configuration_branch'
+DISCOURSE_CONTAINER='$discourse_container'
 $discourse_setup_script
 "
-	(ssh -t "$ssh_user@$ssh_ip" "$discourse_setup_script" && {
-		print_line 'Successfully upgraded the discourse instance. 🎉'
+	(ssh -t "$ssh_ip" "$discourse_setup_script" && {
+		print_line 'Successfully setup the discourse instance. 🎉'
 		return 0
 	}) || {
-		print_line 'Error: Failed to upgrade the discourse instance. 🚨' >/dev/stderr
+		print_line 'Error: Failed to setup the discourse instance. 🚨' >/dev/stderr
 		return 1
 	}
 )

@@ -2,7 +2,7 @@
 
 function discourse_setup() (
 	# Load Dorothy's sensible defaults
-	eval "$(curl -fsSL "https://raw.githubusercontent.com/bevry/dorothy/HEAD/sources/bash.bash")"
+	eval "$(curl -fsSL 'https://raw.githubusercontent.com/bevry/dorothy/HEAD/sources/bash.bash')"
 
 	# see commands/command-missing for details
 	function __command_missing {
@@ -31,140 +31,154 @@ function discourse_setup() (
 	}
 
 	# Receive arguments from caller
-	if test -z "${SSH_FILE_INTERNAL-}" -o -z "${SSH_PASS_INTERNAL-}" -o -z "${DISCOURSE_CONFIGURATION_REMOTE-}" -o -z "${DISCOURSE_CONFIGURATION_BRANCH-}"; then
+	if test -z "${SSH_KEY_INTERNAL-}" -o -z "${SSH_PASS_INTERNAL-}" -o -z "${DISCOURSE_CONFIGURATION_REMOTE-}" -o -z "${DISCOURSE_CONFIGURATION_BRANCH-}"; then
 		print_line '[discourse-setup] is to be run via [commands/discourse]' >/dev/stderr
 		return 1
 	fi
 
 	print_line 'Configuring dependencies...'
 	# Remove old dependencies
-	apt-get remove -y certbot
+	sudo apt-get remove -y certbot
 	# Update existing dependencies
-	apt-get update -y
-	apt-get upgrade -y
+	sudo apt-get update -y
+	sudo apt-get upgrade -y
 	# Add new dependencies
-	apt-get install -y wget git
+	sudo apt-get install -y wget git
 	# Purge unused dependencies
-	apt-get autoremove -y
+	sudo apt-get autoremove -y
 
-	# SSH Keys
-	print_line 'Configuring SSH keys...'
-	# Ensure essentials
-	mkdir -p "$HOME/.ssh"
-	# Replace known hosts with GitHub's SSH keys
-	ssh-keyscan -t rsa github.com >"$HOME/.ssh/known_hosts"
-	# Load our SSH Agent
-	eval "$(ssh-agent -s)"
-	# Save Configuration File
-	cat <<-EOF >"$HOME/.ssh/config"
-		# Configuration
-		UserKnownHostsFile ~/.ssh/known_hosts
-		IgnoreUnknown UseKeychain,AddKeysToAgent,IdentitiesOnly
-		UseKeychain yes
-		AddKeysToAgent yes
+	# # SSH Keys
+	# print_line 'Configuring SSH keys...'
+	# # Ensure essentials
+	# mkdir -p "$HOME/.ssh"
+	# # Replace known hosts with GitHub's SSH keys
+	# ssh-keyscan -t rsa github.com >"$HOME/.ssh/known_hosts"
+	# # Load our SSH Agent
+	# eval "$(ssh-agent -s)"
+	# # Save Configuration File
+	# if test ! -e "$HOME/.ssh/config"; then
+	# 	cat <<-EOF >"$HOME/.ssh/config"
+	# 		# Configuration
+	# 		UserKnownHostsFile ~/.ssh/known_hosts
+	# 		IgnoreUnknown UseKeychain,AddKeysToAgent,IdentitiesOnly
+	# 		UseKeychain yes
+	# 		AddKeysToAgent yes
 
-		# Fallback
-		IdentityFile ~/.ssh/$SSH_FILE_INTERNAL
-	EOF
-	# Fix Permissions
-	chmod --recursive a-xrw,u+Xrw "$HOME/.ssh"
-	# Load our SSH Key: https://stackoverflow.com/a/52671286/130638
-	if test -n "${SSH_PASS_INTERNAL-}"; then
-		ssh_stdin_pass_helper="$HOME/ssh_stdin_password.bash"
-		cat <<-EOF >"$ssh_stdin_pass_helper"
-			#!/usr/bin/env bash
-			read secret
-			echo \$secret
-		EOF
-		chmod +x "$ssh_stdin_pass_helper"
+	# 		# Fallback
+	# 		IdentityFile ~/.ssh/$SSH_KEY_INTERNAL
+	# 	EOF
+	# fi
+	# # Fix Permissions
+	# chmod --recursive a-xrw,u+Xrw "$HOME/.ssh"
+	# # Load our SSH Key: https://stackoverflow.com/a/52671286/130638
+	# if test -n "${SSH_PASS_INTERNAL-}"; then
+	# 	ssh_stdin_pass_helper="$HOME/ssh_stdin_password.bash"
+	# 	cat <<-EOF >"$ssh_stdin_pass_helper"
+	# 		#!/usr/bin/env bash
+	# 		read secret
+	# 		echo \$secret
+	# 	EOF
+	# 	chmod +x "$ssh_stdin_pass_helper"
 
-		print_line 'Adding the SSH keys...'
-		DISPLAY=:0 SSH_ASKPASS="$ssh_stdin_pass_helper" ssh-add "$SSH_FILE_INTERNAL" <<<"$SSH_PASS_INTERNAL"
-	elif test -n "${SSH_FILE_INTERNAL-}"; then
-		ssh-add "$SSH_FILE_INTERNAL"
-	fi
-
-	# Install snap
-	if __command_missing snap; then
-		print_line 'Configuring snap...'
-		apt-get install -y snapd
-	fi
+	# 	print_line 'Adding the SSH keys...'
+	# 	DISPLAY=:0 SSH_ASKPASS="$ssh_stdin_pass_helper" ssh-add "$HOME/.ssh/$SSH_KEY_INTERNAL" <<<"$SSH_PASS_INTERNAL"
+	# elif test -n "${SSH_KEY_INTERNAL-}"; then
+	# 	ssh-add "$HOME/.ssh/$SSH_KEY_INTERNAL"
+	# fi
 
 	# Install certbot
 	if __command_missing certbot; then
+		# fuse necessary due to: error: system does not fully support snapd: The "fuse" filesystem is required on this system but not available. Please try to install the fuse package.
+		print_line 'Configuring snap...'
+		sudo apt-get install -y fuse snapd
+
 		print_line 'Configuring certbot...'
-		snap install --classic certbot
-		ln -s /snap/bin/certbot /usr/bin/certbot
+		sudo snap install --classic certbot
+		sudo ln -s /snap/bin/certbot /usr/bin/certbot
 	fi
 
 	# Install docker
 	if __command_missing docker; then
 		print_line 'Configuring docker...'
-		apt-get install -y docker.io
+		sudo apt-get install -y docker.io
 	fi
 
 	# Install discourse
+	print_line 'Configuring discourse...'
 	if test ! -e /var/discourse; then
-		print_line 'Configuring discourse...'
-		git clone https://github.com/discourse/discourse_docker.git /var/discourse
+		sudo mkdir -p -m 'a-xrw,u+Xrw' /var/discourse
+		sudo chown "$USER:" /var/discourse
+		cd /var/discourse
+		git init
+		git config pull.ff only
+		git remote add origin 'https://github.com/discourse/discourse_docker.git'
+		git fetch origin
+		git checkout main
+		git pull origin main --force --ff-only
+	else
+		cd /var/discourse
+		git pull origin main --force --ff-only
 	fi
-	chmod o-rwx /var/discourse/containers/app.yml
 
 	# Install configuration
-	if test ! -e /.git; then
-		print_line 'Configuring remote configuration...'
-		cd /
-		git init
-		git remote add origin "$DISCOURSE_CONFIGURATION_REMOTE"
-		git fetch origin
-		git checkout "$DISCOURSE_CONFIGURATION_BRANCH"
-		git pull origin "$DISCOURSE_CONFIGURATION_BRANCH"
+	print_line 'Configuring instance...'
+	# if test ! -e /.git; then
+	# 	sudo mkdir -p -m 'a-xrw,u+Xrw' /var/discourse
+	# 	sudo chown "$USER:" /var/discourse
+	# 	cd /
+	# 	git init
+	# 	git remote add origin "$DISCOURSE_CONFIGURATION_REMOTE"
+	# 	git fetch origin
+	# 	git checkout "$DISCOURSE_CONFIGURATION_BRANCH"
+	# 	git pull origin "$DISCOURSE_CONFIGURATION_BRANCH"
+	# else
+	# 	cd /
+	# 	git fetch origin
+	# 	git pull origin master
+	# fi
+	if test ! -e "/var/discourse/containers/${DISCOURSE_CONTAINER}.yml"; then
+		vim "/var/discourse/containers/${DISCOURSE_CONTAINER}.yml"
 	fi
+	chmod --recursive 'o-rwx,u+X' /var/discourse/containers
 
-	# Cron
-	print_line 'Configuring cron...'
-	# Always update cron job file with the latest
-	local discourse_cron_script
-	discourse_cron_script="$HOME/discourse_cron.bash"
-	cat <<-EOF >"$discourse_cron_script"
-		#!/usr/bin/env bash
-		set -Eeuo pipefail
-		docker image prune --force --all --filter "until=28h"
-		cd /var/discourse
-		git pull origin "\$(git rev-parse --abbrev-ref HEAD)"
-		/var/discourse/launcher rebuild app
-	EOF
-	chmod +x "$discourse_cron_script"
-	# Check if the cron job file is actually used
-	while ! (crontab -l | grep --quiet --fixed-strings --regexp="$discourse_cron_script"); do
-		cat <<-EOF
-			CRON JOB DOES NOT EXIST FOR UPGRADING DISCOURSE
-			COPY THE BELOW INTO THE PROMPT AND SAVE
+	# Trim unused/style images to free up space
+	print_line 'Pruning docker...'
+	sudo docker ps -a
+	sudo docker image list
+	sudo docker image prune --force --all --filter 'until=28h'
+	sudo docker image list
 
-			# at midnight each day, upgrade the discourse forum
-			0 0 * * * $discourse_cron_script
-		EOF
-		read -r -n 1 -p 'ARE YOU READY?'
-		env EDITOR='/bin/nano' crontab -e
-	done
+	# Build the app
+	print_line 'Building instance...'
+	sudo apt-get install -y tmux
+	tmux -c "sudo /var/discourse/launcher rebuild $DISCOURSE_CONTAINER; exit \$?"
 
-	print_line 'Trimming unused Docker images to free up space...'
-	docker ps -a
-	docker image list
-	docker image prune --force --all --filter "until=28h"
-	docker image list
+	# # Cron
+	# print_line 'Configuring cron...'
+	# # Always update cron job file with the latest
+	# local discourse_cron_script
+	# discourse_cron_script="$HOME/discourse_cron.bash"
+	# cat <<-EOF >"$discourse_cron_script"
+	# 	#!/usr/bin/env bash
+	# 	set -Eeuo pipefail
+	# 	docker image prune --force --all --filter "until=28h"
+	# 	cd /var/discourse
+	# 	git pull origin "\$(git rev-parse --abbrev-ref HEAD)"
+	# 	/var/discourse/launcher rebuild app
+	# EOF
+	# chmod +x "$discourse_cron_script"
+	# # Check if the cron job file is actually used
+	# while ! (crontab -l | grep --quiet --fixed-strings --regexp="$discourse_cron_script"); do
+	# 	cat <<-EOF
+	# 		CRON JOB DOES NOT EXIST FOR UPGRADING DISCOURSE
+	# 		COPY THE BELOW INTO THE PROMPT AND SAVE
 
-	print_line 'Updating remote configuration...'
-	cd /
-	git fetch origin
-	git pull origin "$(git rev-parse --abbrev-ref HEAD)" # master -> main switches can bust things, so that code figured out the right branch
-
-	print_line 'Updating the discourse docker setup...'
-	cd /var/discourse
-	git pull origin "$(git rev-parse --abbrev-ref HEAD)" # master -> main switches can bust things, so that code figured out the right branch
-
-	print_line 'Rebuilding the discourse docker instance...'
-	/var/discourse/launcher rebuild app
+	# 		# at midnight each day, upgrade the discourse forum
+	# 		0 0 * * * $discourse_cron_script
+	# 	EOF
+	# 	read -r -n 1 -p 'ARE YOU READY?'
+	# 	env EDITOR='/bin/nano' crontab -e
+	# done
 )
 
 # always fire
