@@ -124,11 +124,11 @@ function boundation_all() (
 	function on_finish {
 		if test "${#success_repos[@]}" -ne 0; then
 			echo-style --success="boundation success on:"
-			echo-lines -- "${success_repos[@]}"
+			print_lines "${success_repos[@]}"
 		fi
 		if test "${#failed_repos[@]}" -ne 0; then
 			echo-style --error="boundation failed on:"
-			echo-lines -- "${failed_repos[@]}"
+			print_lines "${failed_repos[@]}"
 		fi
 	}
 	trap on_finish EXIT SIGINT SIGTERM
