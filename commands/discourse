@@ -5,43 +5,95 @@
 function discourse() (
 	source "$DOROTHY/sources/bash.bash"
 
-	local which action ssh_ip
-	local ssh_pass_internal ssh_key_internal discourse_configuration_remote discourse_configuration_branch discourse_configuration_container
-	which="$(choose-option --question='Which discourse instance?' --filter="${1-}" -- 'bevry')"
-	action="$(choose-option --question='Which action do you wish to take?' --filter="${2-}" -- 'login' 'setup')"
-	if test "$which" = 'bevry'; then
-		ssh_ip='192.168.5.3' # "$(secret get BEVRY_DISCOURSE_IP)"
-		ssh_pass_internal="$(secret get BEVRY_DISCOURSE_INTERNAL_SSH_PASSWORD)"
-		ssh_key_internal="balupton-2024"
-		discourse_configuration_remote='git@github.com:bevry/discourse.git'
-		discourse_configuration_branch='bevry'
-		discourse_container='bevry-rodeo'
-	else
-		print_line "Error: Invalid discourse instance." >/dev/stderr
-		return 1
+	# =====================================
+	# Arguments
+
+	function help {
+		cat <<-EOF >/dev/stderr
+			ABOUT:
+			Setup or Login into a Discourse Instance
+
+			USAGE:
+			discourse [...options]
+
+			OPTIONS:
+			--action=<action>
+			    The action to perform. Can be either 'login' or 'setup'.
+			    Default is 'setup'.
+
+			--ssh-ip=<ip>
+			    The IP address of the server to connect to.
+
+			--ssh-key-internal=<key>
+			    The name of the SSH key inside the server to access the configuration repository.
+
+			--ssh-pass-internal=<password>
+			    The password for the SSH key inside the server to access the configuration repository.
+
+			--git-remote=<remote>
+			    The git remote for the discourse instance to access the configuration repository.
+
+			--git-branch=<branch>
+			    The git branch for the discourse instance to access the configuration repository.
+			    Defaults to 'main'.
+
+			--container=<container>
+			    The name of the discourse container to setup.
+			    Defaults to 'app'.
+		EOF
+		if test "$#" -ne 0; then
+			echo-error "$@"
+		fi
+		return 22 # EINVAL 22 Invalid argument
+	}
+
+	# process
+	local item action='' option_ssh_ip option_git_ssh_key option_git_ssh_pass option_git_remote option_git_branch option_container
+	while test "$#" -ne 0; do
+		item="$1"
+		shift
+		case "$item" in
+		'--help' | '-h') help ;;
+		'--action='*) action="${item#*=}" ;;
+		'--ssh-ip='*) option_ssh_ip="${item#*=}" ;;
+		'--git-ssh-key='*) option_git_ssh_key="${item#*=}" ;;
+		'--git-ssh-pass='*) option_git_ssh_pass="${item#*=}" ;;
+		'--git-remote='*) option_git_remote="${item#*=}" ;;
+		'--git-branch='*) option_git_branch="${item#*=}" ;;
+		'--container'*) option_container="${item#*=}" ;;
+		'--'*) help "An unrecognised flag was provided: $item" ;;
+		*) help "An unrecognised argument was provided: $item" ;;
+		esac
+	done
+
+	# validate
+	if test -z "$option_ssh_ip"; then
+		option_ssh_ip="$(ask --required --question='What is the IP address of the server to connect to?')"
+	fi
+	if test -z "$action"; then
+		action="$(choose-option --required --question='Which action do you wish to take?' -- 'login' 'setup')"
 	fi
 
 	# log
-	echo-style --invert="Entering $ssh_ip"
+	echo-style --invert="Entering $option_ssh_ip"
 
 	# do login
 	if test "$action" = 'login'; then
-		ssh "$ssh_ip"
+		ssh "$option_ssh_ip"
 		return 0
 	fi
 
 	# do setup
-	local discourse_setup_script
-	discourse_setup_script="$(cat "$DOROTHY/user/commands/discourse-setup")"
-	discourse_setup_script="
-SSH_KEY_INTERNAL='$ssh_key_internal'
-SSH_PASS_INTERNAL='$ssh_pass_internal'
-DISCOURSE_CONFIGURATION_REMOTE='$discourse_configuration_remote'
-DISCOURSE_CONFIGURATION_BRANCH='$discourse_configuration_branch'
-DISCOURSE_CONTAINER='$discourse_container'
-$discourse_setup_script
+	local discourse_init
+	discourse_init="
+GIT_SSH_KEY='$option_git_ssh_key'
+GIT_SSH_PASS='$option_git_ssh_pass'
+GIT_REMOTE='$option_git_remote'
+GIT_BRANCH='$option_git_branch'
+CONTAINER='$option_container'
+$(cat "$DOROTHY/user/commands/discourse-setup")
 "
-	(ssh -t "$ssh_ip" "$discourse_setup_script" && {
+	(ssh -t "$option_ssh_ip" "$discourse_init" && {
 		print_line 'Successfully setup the discourse instance. 🎉'
 		return 0
 	}) || {

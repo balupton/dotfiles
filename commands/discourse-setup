@@ -31,7 +31,8 @@ function discourse_setup() (
 	}
 
 	# Receive arguments from caller
-	if test -z "${SSH_KEY_INTERNAL-}" -o -z "${SSH_PASS_INTERNAL-}" -o -z "${DISCOURSE_CONFIGURATION_REMOTE-}" -o -z "${DISCOURSE_CONFIGURATION_BRANCH-}"; then
+	local GIT_SSH_KEY="${GIT_SSH_KEY-}" GIT_SSH_PASS="${GIT_SSH_PASS-}" GIT_REMOTE="${GIT_REMOTE-}" GIT_BRANCH="${GIT_BRANCH-}" CONTAINER="${CONTAINER-}"
+	if test -z "$GIT_SSH_KEY" -o -z "$GIT_SSH_PASS" -o -z "$GIT_REMOTE"; then
 		print_line '[discourse-setup] is to be run via [commands/discourse]' >/dev/stderr
 		return 1
 	fi
@@ -47,60 +48,60 @@ function discourse_setup() (
 	# Purge unused dependencies
 	sudo apt-get autoremove -y
 
-	# # SSH Keys
-	# print_line 'Configuring SSH keys...'
-	# # Ensure essentials
-	# mkdir -p "$HOME/.ssh"
-	# # Replace known hosts with GitHub's SSH keys
-	# ssh-keyscan -t rsa github.com >"$HOME/.ssh/known_hosts"
-	# # Load our SSH Agent
-	# eval "$(ssh-agent -s)"
-	# # Save Configuration File
-	# if test ! -e "$HOME/.ssh/config"; then
-	# 	cat <<-EOF >"$HOME/.ssh/config"
-	# 		# Configuration
-	# 		UserKnownHostsFile ~/.ssh/known_hosts
-	# 		IgnoreUnknown UseKeychain,AddKeysToAgent,IdentitiesOnly
-	# 		UseKeychain yes
-	# 		AddKeysToAgent yes
+	# SSH Keys
+	print_line 'Configuring SSH keys...'
+	# Ensure essentials
+	mkdir -p "$HOME/.ssh"
+	# Replace known hosts with GitHub's SSH keys
+	ssh-keyscan -t rsa github.com >"$HOME/.ssh/known_hosts"
+	# Load our SSH Agent
+	eval "$(ssh-agent -s)"
+	# Save Configuration File
+	if test ! -e "$HOME/.ssh/config"; then
+		cat <<-EOF >"$HOME/.ssh/config"
+			# Configuration
+			UserKnownHostsFile ~/.ssh/known_hosts
+			IgnoreUnknown UseKeychain,AddKeysToAgent,IdentitiesOnly
+			UseKeychain yes
+			AddKeysToAgent yes
 
-	# 		# Fallback
-	# 		IdentityFile ~/.ssh/$SSH_KEY_INTERNAL
-	# 	EOF
-	# fi
-	# # Fix Permissions
-	# chmod --recursive a-xrw,u+Xrw "$HOME/.ssh"
-	# # Load our SSH Key: https://stackoverflow.com/a/52671286/130638
-	# if test -n "${SSH_PASS_INTERNAL-}"; then
-	# 	ssh_stdin_pass_helper="$HOME/ssh_stdin_password.bash"
-	# 	cat <<-EOF >"$ssh_stdin_pass_helper"
-	# 		#!/usr/bin/env bash
-	# 		read secret
-	# 		echo \$secret
-	# 	EOF
-	# 	chmod +x "$ssh_stdin_pass_helper"
+			# Fallback
+			IdentityFile ~/.ssh/$GIT_SSH_KEY
+		EOF
+	fi
+	# Fix Permissions
+	chmod --recursive a-xrw,u+Xrw "$HOME/.ssh"
+	# Load our SSH Key: https://stackoverflow.com/a/52671286/130638
+	if test -n "${GIT_SSH_PASS-}"; then
+		ssh_stdin_pass_helper="$HOME/ssh_stdin_password.bash"
+		cat <<-EOF >"$ssh_stdin_pass_helper"
+			#!/usr/bin/env bash
+			read secret
+			echo \$secret
+		EOF
+		chmod +x "$ssh_stdin_pass_helper"
 
-	# 	print_line 'Adding the SSH keys...'
-	# 	DISPLAY=:0 SSH_ASKPASS="$ssh_stdin_pass_helper" ssh-add "$HOME/.ssh/$SSH_KEY_INTERNAL" <<<"$SSH_PASS_INTERNAL"
-	# elif test -n "${SSH_KEY_INTERNAL-}"; then
-	# 	ssh-add "$HOME/.ssh/$SSH_KEY_INTERNAL"
-	# fi
+		print_line 'Adding the SSH keys...'
+		DISPLAY=:0 SSH_ASKPASS="$ssh_stdin_pass_helper" ssh-add "$HOME/.ssh/$GIT_SSH_KEY" <<<"$GIT_SSH_PASS"
+	elif test -n "${GIT_SSH_KEY-}"; then
+		ssh-add "$HOME/.ssh/$GIT_SSH_KEY"
+	fi
 
 	# Install certbot
-	if __command_missing certbot; then
-		# fuse necessary due to: error: system does not fully support snapd: The "fuse" filesystem is required on this system but not available. Please try to install the fuse package.
-		print_line 'Configuring snap...'
-		sudo apt-get install -y fuse snapd
+	# if __command_missing certbot; then
+	# 	# fuse necessary due to: error: system does not fully support snapd: The "fuse" filesystem is required on this system but not available. Please try to install the fuse package.
+	# 	print_line 'Configuring snap...'
+	# 	sudo apt-get install -y fuse snapd
 
-		print_line 'Configuring certbot...'
-		sudo snap install --classic certbot
-		sudo ln -s /snap/bin/certbot /usr/bin/certbot
-	fi
+	# 	print_line 'Configuring certbot...'
+	# 	sudo snap install --classic certbot
+	# 	sudo ln -s /snap/bin/certbot /usr/bin/certbot
+	# fi
 
 	# Install docker
 	if __command_missing docker; then
-		print_line 'Configuring docker...'
-		sudo apt-get install -y docker.io
+		print_line 'Docker is missing, install it via [setup-util-docker] by installing Dorothy [dorothy.bevry.me]...' >/dev/stderr
+		return 1
 	fi
 
 	# Install discourse
@@ -122,36 +123,50 @@ function discourse_setup() (
 
 	# Install configuration
 	print_line 'Configuring instance...'
-	# if test ! -e /.git; then
-	# 	sudo mkdir -p -m 'a-xrw,u+Xrw' /var/discourse
-	# 	sudo chown "$USER:" /var/discourse
-	# 	cd /
-	# 	git init
-	# 	git remote add origin "$DISCOURSE_CONFIGURATION_REMOTE"
-	# 	git fetch origin
-	# 	git checkout "$DISCOURSE_CONFIGURATION_BRANCH"
-	# 	git pull origin "$DISCOURSE_CONFIGURATION_BRANCH"
-	# else
-	# 	cd /
-	# 	git fetch origin
-	# 	git pull origin master
-	# fi
-	if test ! -e "/var/discourse/containers/${DISCOURSE_CONTAINER}.yml"; then
-		vim "/var/discourse/containers/${DISCOURSE_CONTAINER}.yml"
+	if test ! -e /var/discourse/containers/.git; then
+		rm -rf /var/discourse/containers
+		mkdir -p /var/discourse/containers
+		cd /var/discourse/containers
+		git init
+		git config pull.ff only
+		git remote rm origin 2>/dev/null || : # don't care if doesn't exist, and remove to ensure desired URL is applied
+		git remote add --fetch origin "$GIT_REMOTE"
+		git checkout "$GIT_BRANCH"
+		git pull origin "$GIT_BRANCH"
+	else
+		cd /var/discourse/containers
+		git fetch "$GIT_REMOTE"
+		git checkout "$GIT_BRANCH"
+		git pull origin "$GIT_BRANCH"
 	fi
-	chmod --recursive 'o-rwx,u+X' /var/discourse/containers
+	if test ! -e "/var/discourse/containers/$CONTAINER.yml"; then
+		vim "/var/discourse/containers/app.yml"
+	fi
+	if test -e "/var/discourse/containers/$CONTAINER.yml"; then
+		ln -sfF "/var/discourse/containers/$CONTAINER.yml" '/var/discourse/containers/app.yml'
+	fi
+	if test -e "/var/discourse/containers/$CONTAINER.key"; then
+		mkdir -p /var/discourse/shared/standalone/ssl
+		# symlink doesn't work
+		cp -f "/var/discourse/containers/$CONTAINER.key" '/var/discourse/shared/standalone/ssl/ssl.key'
+	fi
+	if test -e "/var/discourse/containers/$CONTAINER.crt"; then
+		mkdir -p /var/discourse/shared/standalone/ssl
+		# symlink doesn't work
+		cp -f "/var/discourse/containers/$CONTAINER.crt" '/var/discourse/shared/standalone/ssl/ssl.crt'
+	fi
 
 	# Trim unused/style images to free up space
 	print_line 'Pruning docker...'
-	sudo docker ps -a
-	sudo docker image list
-	sudo docker image prune --force --all --filter 'until=28h'
-	sudo docker image list
+	docker ps -a
+	docker image list
+	docker image prune --force --all --filter 'until=28h'
+	docker image list
 
 	# Build the app
 	print_line 'Building instance...'
 	sudo apt-get install -y tmux
-	tmux -c "sudo /var/discourse/launcher rebuild $DISCOURSE_CONTAINER; exit \$?"
+	tmux -c '/var/discourse/launcher rebuild app; exit $?'
 
 	# # Cron
 	# print_line 'Configuring cron...'
