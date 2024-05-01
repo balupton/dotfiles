@@ -13,11 +13,11 @@ function permanence() (
 
 	# verify
 	if test "${#tuples[@]}" -eq 0; then
-		print_line "make sure $(get_dorothy_config 'permanence.bash') outputs an array called tuples, of the sources and destinations" >/dev/stderr
+		__print_line "make sure $(get_dorothy_config 'permanence.bash') outputs an array called tuples, of the sources and destinations" >/dev/stderr
 		return 1
 	fi
 	if is-odd -- "${#tuples[@]}"; then
-		print_line "the tuples do not seem to have one destination for one source" >/dev/stderr
+		__print_line "the tuples do not seem to have one destination for one source" >/dev/stderr
 		return 1
 	fi
 

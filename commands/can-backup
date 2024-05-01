@@ -11,10 +11,10 @@ function can_backup() (
 
 	# test streaming
 	if "$DOROTHY/commands/is-streaming"; then
-		print_line 'Streaming is occurring, cancelling backup.' >/dev/stderr
+		__print_line 'Streaming is occurring, cancelling backup.' >/dev/stderr
 		return 1
 	else
-		print_line 'No streaming is occuring, commencing backup.'
+		__print_line 'No streaming is occuring, commencing backup.'
 		return 0
 	fi
 )

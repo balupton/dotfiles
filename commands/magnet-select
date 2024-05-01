@@ -2,7 +2,7 @@
 
 function magnet_select() (
 	source "$DOROTHY/sources/bash.bash"
-	require_array 'mapfile'
+	__require_array 'mapfile'
 
 	# prepare
 	local search="$1" results option_visual
@@ -17,7 +17,7 @@ function magnet_select() (
 	# select
 	# trunk-ignore(shellcheck/SC2016)
 	option_visual='$(echo-magnet-hash -- "$value")    $label'
-	choose-option \
+	choose \
 		--question="Which magnet for $search?" \
 		--label=first \
 		--visual="$option_visual" \

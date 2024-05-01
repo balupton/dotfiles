@@ -28,7 +28,7 @@ function github_all() (
 			echo-element --openclose="$slug"
 		else
 			echo-element --open="$slug"
-			print_line "$sponsors"
+			__print_line "$sponsors"
 			echo-element --close="$slug"
 			open "https://github.com/$slug"
 		fi
@@ -51,7 +51,7 @@ function github_all() (
 		if test -n "$packageName" -a "$packageName" != 'templatebinding'; then
 			owners="$(npm owner ls "$packageName" 2>/dev/null || :)"
 			if test -n "$owners"; then
-				print_line "$owners"
+				__print_line "$owners"
 				if grep --quiet --fixed-strings --regexp="$whoami" <<<"$owners"; then
 					npm owner add bevryme "$packageName"
 					npm access grant read-write bevry:developers "$packageName" || :
@@ -67,7 +67,7 @@ function github_all() (
 							break
 							# npm owner rm "$owner" "$packageName"  || :
 						fi
-					done 5< <(print_line "$owners")
+					done 5< <(__print_line "$owners")
 					if test "$need_access_change" = 'yes'; then
 						open "https://www.npmjs.com/package/$package/access"
 					fi

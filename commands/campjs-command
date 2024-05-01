@@ -8,15 +8,15 @@ function campjs_command() (
 
 	local colors=()
 	mapfile -t colors < <(
-		choose-option --default=red --default=blue --multi --question='What is your favourite color?' \
+		choose --default=red --default=blue --multi --question='What is your favourite color?' \
 			-- green red blue blink jkasdjkasdjkas
 	)
 
 	local color
 	for color in "${colors[@]}"; do
 		if test "$color" = 'blink'; then
-			if ! confirm --positive --ppid=$$ -- 'Are you sure?'; then
-				echo-style --notice='good choice'
+			if ! confirm --linger --positive --ppid=$$ -- 'Are you sure?'; then
+				echo-style --notice='Good choice not to blink.'
 				return 0
 			fi
 		fi

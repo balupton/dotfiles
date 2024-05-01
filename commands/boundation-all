@@ -111,7 +111,7 @@ function boundation_all() (
 
 	# check we aren't in a package
 	if test -f package.json; then
-		echo-error "You just tried to run boundation-all in a package, you forgot to cd out of debugging a package failure."
+		echo-error 'You just tried to run boundation-all in a package, you forgot to cd out of debugging a package failure.'
 		return 22 # EINVAL 22 Invalid argument
 	fi
 
@@ -123,12 +123,12 @@ function boundation_all() (
 	local failed_repos=() success_repos=()
 	function on_finish {
 		if test "${#success_repos[@]}" -ne 0; then
-			echo-style --success="boundation success on:"
-			print_lines "${success_repos[@]}"
+			echo-style --success='boundation success on:'
+			__print_lines "${success_repos[@]}"
 		fi
 		if test "${#failed_repos[@]}" -ne 0; then
-			echo-style --error="boundation failed on:"
-			print_lines "${failed_repos[@]}"
+			echo-style --error='boundation failed on:'
+			__print_lines "${failed_repos[@]}"
 		fi
 	}
 	trap on_finish EXIT SIGINT SIGTERM

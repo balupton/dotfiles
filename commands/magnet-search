@@ -32,7 +32,7 @@
 
 function magnet_search() (
 	source "$DOROTHY/sources/bash.bash"
-	require_array 'mapfile'
+	__require_array 'mapfile'
 
 	# dependencies
 	source "$DOROTHY/sources/ripgrep.bash"
@@ -49,7 +49,7 @@ function magnet_search() (
 		if test -z "$line" || rg --quiet --regexp='ERROR|No results|btih:000000000000' <<<"$line"; then
 			continue
 		fi
-		print_line "$line"
+		__print_line "$line"
 	done
 
 	mapfile -t lines < <(magnetfinder --no-interactive --show 5 -aq "$search" 2>/dev/null | rg --invert-match --fixed-strings --regexp='No torrents found matching search query' || :)

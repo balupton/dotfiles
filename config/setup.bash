@@ -91,15 +91,16 @@ HOMEBREW_SLOW_FORMULAS=(
 HOMEBREW_CASKS=(
 	'adguard'
 	'audio-hijack'
-	'calibre'
-	'firefox'
 	'loopback'
-	'multipass'
-	'pocket-casts'
-	'raspberry-pi-imager'
 	'soundsource'
-	'spotify'
-	'zoom'
+	# 'aerial'
+	# 'calibre'
+	# 'firefox'
+	# 'multipass'
+	# 'pocket-casts'
+	# 'raspberry-pi-imager'
+	# 'spotify'
+	# 'zoom'
 )
 HOMEBREW_FONTS=(
 	'font-cantarell'

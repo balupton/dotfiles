@@ -23,8 +23,8 @@ function boundation_upgrade() (
 				say "$message"
 			fi
 		fi
-		print_line
-		print_line "$message"
+		__print_line
+		__print_line "$message"
 	}
 	trap on_finish EXIT
 
@@ -159,7 +159,7 @@ function boundation_upgrade() (
 	git add .
 	git commit -am "$v - boundation, changelog, version bump"
 	# if ! nvm-env -- npm owner add bevryme; then
-	# 	print_line 'adding npm owner failed, trying again in two minutes'
+	# 	__print_line 'adding npm owner failed, trying again in two minutes'
 	# 	sleep 2m
 	# 	nvm-env -- npm owner add bevryme
 	# fi

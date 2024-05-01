@@ -71,7 +71,7 @@ function discourse() (
 		option_ssh_ip="$(ask --required --question='What is the IP address of the server to connect to?')"
 	fi
 	if test -z "$action"; then
-		action="$(choose-option --required --question='Which action do you wish to take?' -- 'login' 'setup')"
+		action="$(choose --required --question='Which action do you wish to take?' -- 'login' 'setup')"
 	fi
 
 	# log
@@ -94,10 +94,10 @@ CONTAINER='$option_container'
 $(cat "$DOROTHY/user/commands/discourse-setup")
 "
 	(ssh -t "$option_ssh_ip" "$discourse_init" && {
-		print_line 'Successfully setup the discourse instance. 🎉'
+		__print_line 'Successfully setup the discourse instance. 🎉'
 		return 0
 	}) || {
-		print_line 'Error: Failed to setup the discourse instance. 🚨' >/dev/stderr
+		__print_line 'Error: Failed to setup the discourse instance. 🚨' >/dev/stderr
 		return 1
 	}
 )
