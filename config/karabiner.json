@@ -1,0 +1,472 @@
+{
+  "description": "@balupton",
+  "manipulators": [
+    {
+      "description": "alt space to enter",
+      "from": {
+        "key_code": "spacebar",
+        "modifiers": {
+          "mandatory": ["left_option"]
+        }
+      },
+      "to": [
+        {
+          "key_code": "return_or_enter"
+        }
+      ],
+      "type": "basic"
+    },
+    {
+      "description": "alt q to delete backward",
+      "from": {
+        "key_code": "q",
+        "modifiers": {
+          "mandatory": ["left_option"]
+        }
+      },
+      "to": [
+        {
+          "key_code": "delete_or_backspace"
+        }
+      ],
+      "type": "basic"
+    },
+    {
+      "description": "alt e to delete forward",
+      "from": {
+        "key_code": "e",
+        "modifiers": {
+          "mandatory": ["left_option"]
+        }
+      },
+      "to": [
+        {
+          "key_code": "delete_forward"
+        }
+      ],
+      "type": "basic"
+    },
+    {
+      "description": "alt backspace to delete forward",
+      "from": {
+        "key_code": "delete_or_backspace",
+        "modifiers": {
+          "mandatory": ["left_option"]
+        }
+      },
+      "to": [
+        {
+          "key_code": "delete_forward"
+        }
+      ],
+      "type": "basic"
+    },
+    {
+      "description": "alt u to (",
+      "from": {
+        "key_code": "u",
+        "modifiers": {
+          "mandatory": ["left_option"]
+        }
+      },
+      "to": [
+        {
+          "key_code": "9",
+          "modifiers": ["left_shift"]
+        }
+      ],
+      "type": "basic"
+    },
+    {
+      "description": "alt shift u to (",
+      "from": {
+        "key_code": "u",
+        "modifiers": {
+          "mandatory": ["left_option", "left_shift"]
+        }
+      },
+      "to": [
+        {
+          "key_code": "0",
+          "modifiers": ["left_shift"]
+        }
+      ],
+      "type": "basic"
+    },
+    {
+      "description": "alt i to [",
+      "from": {
+        "key_code": "i",
+        "modifiers": {
+          "mandatory": ["left_option"]
+        }
+      },
+      "to": [
+        {
+          "key_code": "open_bracket"
+        }
+      ],
+      "type": "basic"
+    },
+    {
+      "description": "alt shift i to ]",
+      "from": {
+        "key_code": "i",
+        "modifiers": {
+          "mandatory": ["left_option", "left_shift"]
+        }
+      },
+      "to": [
+        {
+          "key_code": "close_bracket"
+        }
+      ],
+      "type": "basic"
+    },
+    {
+      "description": "alt o to {",
+      "from": {
+        "key_code": "o",
+        "modifiers": {
+          "mandatory": ["left_option"]
+        }
+      },
+      "to": [
+        {
+          "key_code": "open_bracket",
+          "modifiers": ["left_shift"]
+        }
+      ],
+      "type": "basic"
+    },
+    {
+      "description": "alt shift o to {",
+      "from": {
+        "key_code": "o",
+        "modifiers": {
+          "mandatory": ["left_option", "left_shift"]
+        }
+      },
+      "to": [
+        {
+          "key_code": "close_bracket",
+          "modifiers": ["left_shift"]
+        }
+      ],
+      "type": "basic"
+    },
+    {
+      "description": "alt j to =",
+      "from": {
+        "key_code": "j",
+        "modifiers": {
+          "mandatory": ["left_option"]
+        }
+      },
+      "to": [
+        {
+          "key_code": "equal_sign"
+        }
+      ],
+      "type": "basic"
+    },
+    {
+      "description": "alt shift j to *",
+      "from": {
+        "key_code": "j",
+        "modifiers": {
+          "mandatory": ["left_option", "left_shift"]
+        }
+      },
+      "to": [
+        {
+          "key_code": "8",
+          "modifiers": ["left_shift"]
+        }
+      ],
+      "type": "basic"
+    },
+    {
+      "description": "alt k to -",
+      "from": {
+        "key_code": "k",
+        "modifiers": {
+          "mandatory": ["left_option"]
+        }
+      },
+      "to": [
+        {
+          "key_code": "hyphen"
+        }
+      ],
+      "type": "basic"
+    },
+    {
+      "description": "alt shift k to +",
+      "from": {
+        "key_code": "k",
+        "modifiers": {
+          "mandatory": ["left_option", "left_shift"]
+        }
+      },
+      "to": [
+        {
+          "key_code": "equal_sign",
+          "modifiers": ["left_shift"]
+        }
+      ],
+      "type": "basic"
+    },
+    {
+      "description": "alt l to &",
+      "from": {
+        "key_code": "l",
+        "modifiers": {
+          "mandatory": ["left_option"]
+        }
+      },
+      "to": [
+        {
+          "key_code": "7",
+          "modifiers": ["left_shift"]
+        }
+      ],
+      "type": "basic"
+    },
+    {
+      "description": "alt shift l to |",
+      "from": {
+        "key_code": "l",
+        "modifiers": {
+          "mandatory": ["left_option", "left_shift"]
+        }
+      },
+      "to": [
+        {
+          "key_code": "backslash",
+          "modifiers": ["left_shift"]
+        }
+      ],
+      "type": "basic"
+    },
+    {
+      "description": "alt semicolon to _",
+      "from": {
+        "key_code": "semicolon",
+        "modifiers": {
+          "mandatory": ["left_option"]
+        }
+      },
+      "to": [
+        {
+          "key_code": "hyphen",
+          "modifiers": ["left_shift"]
+        }
+      ],
+      "type": "basic"
+    },
+    {
+      "description": "alt a to left arrow",
+      "from": {
+        "key_code": "a",
+        "modifiers": {
+          "mandatory": ["left_option"],
+          "optional": [
+            "left_shift",
+            "left_option",
+            "left_command",
+            "right_shift",
+            "right_option",
+            "right_command"
+          ]
+        }
+      },
+      "to": [
+        {
+          "key_code": "left_arrow"
+        }
+      ],
+      "type": "basic"
+    },
+    {
+      "description": "alt s to down arrow",
+      "from": {
+        "key_code": "s",
+        "modifiers": {
+          "mandatory": ["left_option"],
+          "optional": [
+            "left_shift",
+            "left_option",
+            "left_command",
+            "right_shift",
+            "right_option",
+            "right_command"
+          ]
+        }
+      },
+      "to": [
+        {
+          "key_code": "down_arrow"
+        }
+      ],
+      "type": "basic"
+    },
+    {
+      "description": "alt d to right arrow",
+      "from": {
+        "key_code": "d",
+        "modifiers": {
+          "mandatory": ["left_option"],
+          "optional": [
+            "left_shift",
+            "left_option",
+            "left_command",
+            "right_shift",
+            "right_option",
+            "right_command"
+          ]
+        }
+      },
+      "to": [
+        {
+          "key_code": "right_arrow"
+        }
+      ],
+      "type": "basic"
+    },
+    {
+      "description": "alt w to up arrow",
+      "from": {
+        "key_code": "w",
+        "modifiers": {
+          "mandatory": ["left_option"],
+          "optional": [
+            "left_shift",
+            "left_option",
+            "left_command",
+            "right_shift",
+            "right_option",
+            "right_command"
+          ]
+        }
+      },
+      "to": [
+        {
+          "key_code": "up_arrow"
+        }
+      ],
+      "type": "basic"
+    },
+    {
+      "description": "alt z to jump left word",
+      "from": {
+        "key_code": "z",
+        "modifiers": {
+          "mandatory": ["left_option"],
+          "optional": ["left_shift", "right_shift"]
+        }
+      },
+      "to": [
+        {
+          "key_code": "left_arrow",
+          "modifiers": ["left_option"]
+        }
+      ],
+      "type": "basic"
+    },
+    {
+      "description": "alt c to jump right word",
+      "from": {
+        "key_code": "c",
+        "modifiers": {
+          "mandatory": ["left_option"],
+          "optional": ["left_shift", "right_shift"]
+        }
+      },
+      "to": [
+        {
+          "key_code": "right_arrow",
+          "modifiers": ["left_option"]
+        }
+      ],
+      "type": "basic"
+    },
+    {
+      "description": "alt backslash to forwardslash",
+      "from": {
+        "key_code": "backslash",
+        "modifiers": {
+          "mandatory": ["left_option"]
+        }
+      },
+      "to": [
+        {
+          "key_code": "slash"
+        }
+      ],
+      "type": "basic"
+    },
+    {
+      "description": "alt , to <",
+      "from": {
+        "key_code": "comma",
+        "modifiers": {
+          "mandatory": ["left_option"]
+        }
+      },
+      "to": [
+        {
+          "key_code": "comma",
+          "modifiers": ["left_shift"]
+        }
+      ],
+      "type": "basic"
+    },
+    {
+      "description": "alt , to >",
+      "from": {
+        "key_code": "comma",
+        "modifiers": {
+          "mandatory": ["left_option", "left_shift"]
+        }
+      },
+      "to": [
+        {
+          "key_code": "period",
+          "modifiers": ["left_shift"]
+        }
+      ],
+      "type": "basic"
+    },
+    {
+      "description": "alt ' to backtick",
+      "from": {
+        "key_code": "quote",
+        "modifiers": {
+          "mandatory": ["left_option"]
+        }
+      },
+      "to": [
+        {
+          "key_code": "grave_accent_and_tilde"
+        }
+      ],
+      "type": "basic"
+    },
+    {
+      "description": "alt m to 0",
+      "from": {
+        "key_code": "m",
+        "modifiers": {
+          "mandatory": ["left_option"]
+        }
+      },
+      "to": [
+        {
+          "key_code": "0"
+        }
+      ],
+      "type": "basic"
+    }
+  ]
+}
