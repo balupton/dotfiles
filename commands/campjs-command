@@ -4,18 +4,18 @@ function campjs_command() (
 	source "$DOROTHY/sources/bash.bash"
 
 	local who
-	who="$(ask --question='Who are you?' | echo-lowercase --stdin)"
+	who="$(ask --linger --question='Who are you?' --default="$(get-profile name || :)" | echo-lowercase --stdin)"
 
 	local colors=()
 	mapfile -t colors < <(
-		choose --default=red --default=blue --multi --question='What is your favourite color?' \
+		choose --linger --default=red --default=blue --multi --question='What is your favourite color?' \
 			-- green red blue blink jkasdjkasdjkas
 	)
 
 	local color
 	for color in "${colors[@]}"; do
 		if test "$color" = 'blink'; then
-			if ! confirm --linger --positive --ppid=$$ -- 'Are you sure?'; then
+			if ! confirm --linger --positive --ppid=$$ -- 'Are you sure you want to blink?'; then
 				echo-style --notice='Good choice not to blink.'
 				return 0
 			fi
