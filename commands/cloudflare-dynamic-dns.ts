@@ -1,4 +1,4 @@
-#!/usr/bin/env -S deno run --allow-net --allow-env
+#!/usr/bin/env -S deno run --allow-net --allow-env --quiet --no-config --no-lock --no-npm --no-remote --cached-only
 // trunk-ignore-all(trunk/ignore-does-nothing)
 // trunk-ignore-all(trufflehog)
 // trunk-ignore-all(eslint/camelcase)

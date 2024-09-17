@@ -94,10 +94,10 @@ CONTAINER='$option_container'
 $(cat "$DOROTHY/user/commands/discourse-setup")
 "
 	(ssh -t "$option_ssh_ip" "$discourse_init" && {
-		__print_line 'Successfully setup the discourse instance. 🎉'
+		__print_lines 'Successfully setup the discourse instance. 🎉'
 		return 0
 	}) || {
-		__print_line 'Error: Failed to setup the discourse instance. 🚨' >/dev/stderr
+		__print_lines 'Error: Failed to setup the discourse instance. 🚨' >/dev/stderr
 		return 1
 	}
 )

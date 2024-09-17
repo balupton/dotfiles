@@ -3,7 +3,7 @@
 function setup_util_bash_versions() (
 	source "$DOROTHY/sources/bash.bash"
 
-	# enable DOWNLOAD_BUILD_EVAL
+	# enable DOWNLOAD_BUILD_INSTALL
 	source "$(type -P setup-util)"
 
 	# setup
@@ -18,7 +18,12 @@ function setup_util_bash_versions() (
 		5.1
 		5.2
 	)
-	function build_bash {
+	function do_install {
+		# dependencies
+		setup-util-devel --quiet
+		source "$DOROTHY/sources/environment.sh"
+
+		# build
 		./configure
 		make
 	}
@@ -29,8 +34,8 @@ function setup_util_bash_versions() (
 			DOWNLOAD="https://ftp.gnu.org/gnu/bash/bash-${version}.tar.gz"
 			DOWNLOAD_UNZIP_FORMAT='tar'
 			DOWNLOAD_UNZIP_FILTER='bash-*/*'
-			DOWNLOAD_BUILD_EVAL='build_bash'
-			DOWNLOAD_FILENAME="bash-$version"
+			DOWNLOAD_BUILD_INSTALL='do_install'
+			DOWNLOAD_BUILD_GLOB='*/bash'
 		)
 		setup_util "${options[@]}"
 	done

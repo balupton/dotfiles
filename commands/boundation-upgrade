@@ -24,16 +24,17 @@ function boundation_upgrade() (
 			fi
 		fi
 		__print_line
-		__print_line "$message"
+		__print_lines "$message"
 	}
 	trap on_finish EXIT
 
 	# helpers
 	function get_node_engine {
-		grep --after-context=1 --fixed-strings --regexp='engines' <package.json |
-			grep --fixed-strings --regexp='node' |
-			head -n1 |
-			xargs
+		jq -r '.engines.node' package.json
+		# grep --after-context=1 --fixed-strings --regexp='engines' <package.json |
+		# 	grep --fixed-strings --regexp='node' |
+		# 	head -n1 |
+		# 	xargs
 	}
 	function get_node_license {
 		jq -r '.license' package.json
@@ -45,15 +46,15 @@ function boundation_upgrade() (
 	lo="$(get_node_license)"
 
 	# install global deps
-	if ! command-exists boundation; then
+	if ! command-exists -- boundation; then
 		echo-style --bold='installing' ' ' --code='boundation'
 		nvm-env -- npm i -g boundation
 	fi
-	if ! command-exists github-backers; then
+	if ! command-exists -- github-backers; then
 		echo-style --bold='installing' ' ' --code='github-backers'
 		nvm-env -- npm i -g '@bevry/github-api'
 	fi
-	if ! command-exists make-deno-edition; then
+	if ! command-exists -- make-deno-edition; then
 		echo-style --bold='installing' ' ' --code='make-deno-edition'
 		nvm-env -- npm i -g make-deno-edition
 	fi
@@ -159,7 +160,7 @@ function boundation_upgrade() (
 	git add .
 	git commit -am "$v - boundation, changelog, version bump"
 	# if ! nvm-env -- npm owner add bevryme; then
-	# 	__print_line 'adding npm owner failed, trying again in two minutes'
+	# 	__print_lines 'adding npm owner failed, trying again in two minutes'
 	# 	sleep 2m
 	# 	nvm-env -- npm owner add bevryme
 	# fi

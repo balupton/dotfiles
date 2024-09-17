@@ -4,7 +4,7 @@ function discourse_setup() (
 	# Load Dorothy's sensible defaults
 	eval "$(curl -fsSL 'https://raw.githubusercontent.com/bevry/dorothy/HEAD/sources/bash.bash')"
 
-	# see commands/command-missing for details
+	# see commands/command-missing -- for details
 	function __command_missing {
 		local command commands=("$@")
 		for command in "${commands[@]}"; do
@@ -33,11 +33,11 @@ function discourse_setup() (
 	# Receive arguments from caller
 	local GIT_SSH_KEY="${GIT_SSH_KEY-}" GIT_SSH_PASS="${GIT_SSH_PASS-}" GIT_REMOTE="${GIT_REMOTE-}" GIT_BRANCH="${GIT_BRANCH-}" CONTAINER="${CONTAINER-}"
 	if test -z "$GIT_SSH_KEY" -o -z "$GIT_SSH_PASS" -o -z "$GIT_REMOTE"; then
-		__print_line '[discourse-setup] is to be run via [commands/discourse]' >/dev/stderr
+		__print_lines '[discourse-setup] is to be run via [commands/discourse]' >/dev/stderr
 		return 1
 	fi
 
-	__print_line 'Configuring dependencies...'
+	__print_lines 'Configuring dependencies...'
 	# Remove old dependencies
 	sudo apt-get remove -y certbot
 	# Update existing dependencies
@@ -49,7 +49,7 @@ function discourse_setup() (
 	sudo apt-get autoremove -y
 
 	# SSH Keys
-	__print_line 'Configuring SSH keys...'
+	__print_lines 'Configuring SSH keys...'
 	# Ensure essentials
 	mkdir -p "$HOME/.ssh"
 	# Replace known hosts with GitHub's SSH keys
@@ -81,7 +81,7 @@ function discourse_setup() (
 		EOF
 		chmod +x "$ssh_stdin_pass_helper"
 
-		__print_line 'Adding the SSH keys...'
+		__print_lines 'Adding the SSH keys...'
 		DISPLAY=:0 SSH_ASKPASS="$ssh_stdin_pass_helper" ssh-add "$HOME/.ssh/$GIT_SSH_KEY" <<<"$GIT_SSH_PASS"
 	elif test -n "${GIT_SSH_KEY-}"; then
 		ssh-add "$HOME/.ssh/$GIT_SSH_KEY"
@@ -90,22 +90,22 @@ function discourse_setup() (
 	# Install certbot
 	# if __command_missing certbot; then
 	# 	# fuse necessary due to: error: system does not fully support snapd: The "fuse" filesystem is required on this system but not available. Please try to install the fuse package.
-	# 	__print_line 'Configuring snap...'
+	# 	__print_lines 'Configuring snap...'
 	# 	sudo apt-get install -y fuse snapd
 
-	# 	__print_line 'Configuring certbot...'
+	# 	__print_lines 'Configuring certbot...'
 	# 	sudo snap install --classic certbot
 	# 	sudo ln -s /snap/bin/certbot /usr/bin/certbot
 	# fi
 
 	# Install docker
 	if __command_missing docker; then
-		__print_line 'Docker is missing, install it via [setup-util-docker] by installing Dorothy [dorothy.bevry.me]...' >/dev/stderr
+		__print_lines 'Docker is missing, install it via [setup-util-docker] by installing Dorothy [dorothy.bevry.me]...' >/dev/stderr
 		return 1
 	fi
 
 	# Install discourse
-	__print_line 'Configuring discourse...'
+	__print_lines 'Configuring discourse...'
 	if test ! -e /var/discourse; then
 		sudo mkdir -p -m 'a-xrw,u+Xrw' /var/discourse
 		sudo chown "$USER:" /var/discourse
@@ -122,7 +122,7 @@ function discourse_setup() (
 	fi
 
 	# Install configuration
-	__print_line 'Configuring instance...'
+	__print_lines 'Configuring instance...'
 	if test ! -e /var/discourse/containers/.git; then
 		rm -rf /var/discourse/containers
 		mkdir -p /var/discourse/containers
@@ -157,19 +157,19 @@ function discourse_setup() (
 	fi
 
 	# Trim unused/style images to free up space
-	__print_line 'Pruning docker...'
+	__print_lines 'Pruning docker...'
 	docker ps -a
 	docker image list
 	docker image prune --force --all --filter 'until=28h'
 	docker image list
 
 	# Build the app
-	__print_line 'Building instance...'
+	__print_lines 'Building instance...'
 	sudo apt-get install -y tmux
 	tmux -c '/var/discourse/launcher rebuild app; exit $?'
 
 	# # Cron
-	# __print_line 'Configuring cron...'
+	# __print_lines 'Configuring cron...'
 	# # Always update cron job file with the latest
 	# local discourse_cron_script
 	# discourse_cron_script="$HOME/discourse_cron.bash"
