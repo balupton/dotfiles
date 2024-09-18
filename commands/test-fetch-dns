@@ -1,0 +1,55 @@
+#!/usr/bin/env bash
+
+function test_fetch_dns() (
+	source "$DOROTHY/sources/bash.bash"
+
+	local provider_id provider_url provider_about ipv4_servers ipv6_servers dot_servers doh_servers sdns_servers quic_servers dnscrypt_names
+
+	# reset shared vars
+	ipv4_servers=()
+	ipv6_servers=()
+	dot_servers=()
+	doh_servers=()
+	sdns_servers=()
+	quic_servers=()
+	dnscrypt_names=()
+
+	# load providers
+	local providers=() providers_url=() providers_about=() provider_options=()
+	mapfile -t providers < <(jq -r '.providers | to_entries[] | .key' "$DOROTHY/config/dns.json")
+	mapfile -t providers_url < <(jq -r '.providers[].url' "$DOROTHY/config/dns.json")
+	mapfile -t providers_about < <(jq -r '.providers[].about' "$DOROTHY/config/dns.json")
+	if test "${#providers[@]}" -ne "${#providers_about[@]}" -a "${#providers[@]}" -ne "${#providers_url[@]}"; then
+		help 'A DNS provider is missing an about, or an about is multiline when it should be single line.'
+	fi
+
+	local provider index url about style_options
+	for index in "${!providers[@]}"; do
+		provider="${providers[index]}"
+		url="${providers_url[index]}"
+		about="${providers_about[index]}"
+		style_options=("--bold+underline=$provider:")
+		if is-value -- "$about"; then
+			style_options+=($'\n' "$about")
+		fi
+		if is-value -- "$url"; then
+			style_options+=($'\n' "--code=$url")
+		fi
+		provider_options+=("$(echo-style "${style_options[@]}")")
+	done
+	index="$(
+		choose --required --linger --index --confirm \
+			--question='Which DNS provider to use?' \
+			-- "${provider_options[@]}"
+	)"
+	provider="${providers[index]}"
+	url="${providers_url[index]}"
+	about="${providers_about[index]}"
+
+	echo-style --bold="$provider" $'\n' --code="$url" $'\n' "$about"
+)
+
+# fire if invoked standalone
+if test "$0" = "${BASH_SOURCE[0]}"; then
+	test_fetch_dns "$@"
+fi
