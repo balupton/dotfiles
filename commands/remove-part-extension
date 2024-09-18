@@ -1,0 +1,22 @@
+#!/usr/bin/env bash
+
+function remove_part_extension() (
+	source "$DOROTHY/sources/bash.bash"
+
+	local file files=()
+	mapfile -t files < <(find-files --extension=part .)
+	if test "${#files[@]}" -eq 0; then
+		echo-style --notice='No files to process.'
+		return 0
+	fi
+	for file in "${files[@]}"; do
+		mv -v "$file" "${file%.part}"
+	done
+	echo-style --success="Removed part extension from ${#files[@]} files."
+	return 0
+)
+
+# fire if invoked standalone
+if test "$0" = "${BASH_SOURCE[0]}"; then
+	remove_part_extension "$@"
+fi
