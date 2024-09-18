@@ -189,7 +189,7 @@ function boundation_all() (
 			# log
 			failed_repos+=("$repo")
 			echo-title -- "$repo [$index/$count]" || return
-			echo-segment --h1="$repo" || return
+			echo-style --h1="$repo" || return
 			# clone the repo fresh and set the correct origin in case of fork
 			# don't use subshell as that breaks strict mode
 			# don't use gh, as it clones forks then sets the origin to not the fork
@@ -207,7 +207,7 @@ function boundation_all() (
 			# wait for the publish to propagate
 			waiter 60 || return
 			# note it succeeded
-			echo-segment --g1="$repo" || return
+			echo-style --g1="$repo" || return
 			# remove from failed repos
 			failed_repos=("${failed_repos[@]/$repo/}")
 			success_repos+=("$repo")
@@ -215,7 +215,7 @@ function boundation_all() (
 			# check status
 			local status="$?"
 			# note failure
-			echo-segment --e1="$repo" ' ' --code="$status" || return
+			echo-style --e1="$repo" ' ' --code="$status" || return
 			# keep repo (if it exists), but ensure we are correct location
 			cd "$pwd" || return
 			# if aborted, propagate

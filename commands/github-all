@@ -25,11 +25,11 @@ function github_all() (
 		local slug="$1"
 		sponsors="$(fetch_package_data "$slug" | jq -r '.backers[]' 2>/dev/null || :)"
 		if test -z "$sponsors"; then
-			echo-element --openclose="$slug"
+			echo-style --element/="$slug"
 		else
-			echo-element --open="$slug"
+			echo-style --element="$slug"
 			__print_lines "$sponsors"
-			echo-element --close="$slug"
+			echo-style --/element="$slug"
 			open "https://github.com/$slug"
 		fi
 	}

@@ -148,9 +148,9 @@ function boundation_upgrade() (
 	nvm-env -- npx prettier HISTORY.md --write
 
 	# log
-	echo-segment --h2='changelog'
+	echo-style --h2='changelog'
 	bat -P <<<"$n"
-	echo-segment --g1='changelog'
+	echo-style --g1='changelog'
 
 	# prepare
 	nvm-env -- npm run our:meta
