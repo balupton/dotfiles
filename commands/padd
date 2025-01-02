@@ -21,9 +21,9 @@ function padd() (
 	fi
 
 	# act
-	if test -f 'yarn.lock'; then
+	if [[ -f 'yarn.lock' ]]; then
 		yarn add "$@"
-	elif test -f 'package.json'; then
+	elif [[ -f 'package.json' ]]; then
 		npm install "$@"
 	else
 		help 'Could not determine the correct package manager this project.' || :
@@ -32,6 +32,6 @@ function padd() (
 )
 
 # fire if invoked standalone
-if test "$0" = "${BASH_SOURCE[0]}"; then
+if [[ "$0" = "${BASH_SOURCE[0]}" ]]; then
 	padd "$@"
 fi

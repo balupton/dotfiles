@@ -17,7 +17,7 @@
 # https://github.com/bleusakura/magnetfinder
 # env CARGO='magnetfinder' setup-util cargo
 # magnetfinder -yq "$filename" --sort size
-# ^ doesn't work well programatically
+# ^ doesn't work well programmatically
 
 # https://crates.io/crates/tpb
 # tpb -q
@@ -45,7 +45,7 @@ function magnet_search() (
 	mapfile -t lines < <(attractorr --sort=seeders "$search" 2>&1 || :)
 	for line in "${lines[@]}"; do
 		line="$(echo-trim-colors -- "$line")"
-		if test -z "$line" || echo-regexp -q --regexp='ERROR|No results|btih:000000000000' -- "$line"; then
+		if [[ -z "$line" ]] || echo-regexp -q --regexp='ERROR|No results|btih:000000000000' -- "$line"; then
 			continue
 		fi
 		__print_lines "$line"
@@ -57,6 +57,6 @@ function magnet_search() (
 )
 
 # fire if invoked standalone
-if test "$0" = "${BASH_SOURCE[0]}"; then
+if [[ "$0" = "${BASH_SOURCE[0]}" ]]; then
 	magnet_search "$@"
 fi

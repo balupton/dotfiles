@@ -19,7 +19,7 @@ function sbs_helper() (
 			--token=<token>
 			    Your bearer token.
 		EOF
-		if test "$#" -ne 0; then
+		if [[ $# -ne 0 ]]; then
 			echo-error "$@"
 		fi
 		return 22 # EINVAL 22 Invalid argument
@@ -27,7 +27,7 @@ function sbs_helper() (
 
 	# process
 	local item token=''
-	while test "$#" -ne 0; do
+	while [[ "$#" -ne 0 ]]; do
 		item="$1"
 		shift
 		case "$item" in
@@ -39,7 +39,7 @@ function sbs_helper() (
 	done
 
 	# ensure token
-	if test -z "$token"; then
+	if [[ -z "$token" ]]; then
 		question="$(echo-style --bold="What is your bearer token?" $'\n' "Fetch this by logging into SBS, and monitoring your web console for " --code="/all?context=odwebsite" ' then grabbing it from the request headers.')"
 		token="$(ask --question="$question")"
 	fi
@@ -64,6 +64,6 @@ function sbs_helper() (
 )
 
 # fire if invoked standalone
-if test "$0" = "${BASH_SOURCE[0]}"; then
+if [[ "$0" = "${BASH_SOURCE[0]}" ]]; then
 	sbs_helper "$@"
 fi

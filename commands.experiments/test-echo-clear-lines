@@ -1,0 +1,58 @@
+#!/usr/bin/env bash
+
+function test_echo_clear_lines() (
+	source "$DOROTHY/sources/bash.bash"
+
+	local lines columns
+	lines=$(tput lines)
+	columns=$(tput cols)
+	__print_lines "lines: $lines, columns: $columns"
+
+	local data i n m='0.5' l
+	n="$(echo-math --precision=0 -- "$columns * $m")"
+	l="$(echo-math --precision=0 -- "$m")"
+	__print_lines "n: $n"
+	for ((i=0; i<n; i++)); do
+		data+="$(__substr "$i" -1)"
+	done
+
+	__print_string "$data"
+	sleep 1
+	echo-clear-lines --count="$l"
+	sleep 1
+	__print_lines 'done with manual '
+	sleep 1
+
+	__print_string "$data"
+	sleep 1
+	echo-clear-lines -- "$data"
+	sleep 1
+	__print_lines 'done with argument'
+	sleep 1
+
+	__print_string "$data"
+	sleep 1
+	__print_string "$data" | echo-clear-lines --stdin
+	sleep 1
+	__print_lines 'done with pipe'
+	sleep 1
+
+	__print_string "$data"
+	sleep 1
+	echo-clear-lines --here-string <<<"$data"
+	sleep 1
+	__print_lines 'done with here-string'
+	sleep 1
+
+	__print_string "$data"$'\n'
+	sleep 1
+	echo-clear-lines --here-string <<<"$data"$'\n'
+	sleep 1
+	__print_lines 'done with here-string with trailing line'
+	sleep 1
+)
+
+# fire if invoked standalone
+if [[ "$0" = "${BASH_SOURCE[0]}" ]]; then
+	test_echo_clear_lines "$@"
+fi

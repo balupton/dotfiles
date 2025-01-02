@@ -4,7 +4,7 @@ function github_all() (
 	source "$DOROTHY/sources/bash.bash"
 
 	# if the secrets aren't provided, fetch them and reload
-	if test -z "${GITHUB_ACCESS_TOKEN-}"; then
+	if [[ -z "${GITHUB_ACCESS_TOKEN-}" ]]; then
 		github-auth -- "$0" "$@"
 		return
 	fi
@@ -24,7 +24,7 @@ function github_all() (
 	function fetch_backers {
 		local slug="$1"
 		sponsors="$(fetch_package_data "$slug" | jq -r '.backers[]' 2>/dev/null || :)"
-		if test -z "$sponsors"; then
+		if [[ -z "$sponsors" ]]; then
 			echo-style --element/="$slug"
 		else
 			echo-style --element="$slug"
@@ -44,13 +44,13 @@ function github_all() (
 	local whoami=''
 	function correct_npm_owners {
 		local slug="$1" packageName owners owner need_access_change
-		if test -z "$whoami"; then
+		if [[ -z "$whoami" ]]; then
 			whoami="$(npm whoami owners)"
 		fi
 		packageName="$(fetch_package_data "$slug" | jq -r '.name' || :)"
-		if test -n "$packageName" -a "$packageName" != 'templatebinding'; then
+		if [[ -n "$packageName" && "$packageName" != 'templatebinding' ]]; then
 			owners="$(npm owner ls "$packageName" 2>/dev/null || :)"
-			if test -n "$owners"; then
+			if [[ -n "$owners" ]]; then
 				__print_lines "$owners"
 				if grep --quiet --fixed-strings --regexp="$whoami" <<<"$owners"; then
 					npm owner add bevryme "$packageName"
@@ -62,13 +62,13 @@ function github_all() (
 					need_access_change='no'
 					while read -r owner <&5; do
 						owner="${owner%% *}" # get everything before the first space
-						if test "$owner" != 'bevryme'; then
+						if [[ "$owner" != 'bevryme' ]]; then
 							need_access_change='yes'
 							break
 							# npm owner rm "$owner" "$packageName"  || :
 						fi
 					done 5< <(__print_lines "$owners")
-					if test "$need_access_change" = 'yes'; then
+					if [[ "$need_access_change" = 'yes' ]]; then
 						open "https://www.npmjs.com/package/$package/access"
 					fi
 					# ignore error on this, as if it is already set, it returns E401
@@ -115,7 +115,7 @@ function github_all() (
 	mapfile -t new_labels < <(gh label list --repo bevry/dorothy --json=name,description,color | jq -r '.[] | .name + "\n" + .description + "\n" + .color')
 	function fix_labels {
 		local slug="$1" label i
-		if test "$slug" = 'docpad/docpad'; then
+		if [[ "$slug" = 'docpad/docpad' ]]; then
 			return 0
 		fi
 		gh label clone bevry/dorothy --repo "$slug" 2>/dev/null || return 0
@@ -133,7 +133,7 @@ function github_all() (
 
 	# defaults slugs to all our slugs
 	local slugs=()
-	if test "$#" -eq 0; then
+	if [[ "$#" -eq 0 ]]; then
 		mapfile -t slugs < <(fetch_all_repos)
 	else
 		slugs=("$@")
@@ -150,6 +150,6 @@ function github_all() (
 )
 
 # fire if invoked standalone
-if test "$0" = "${BASH_SOURCE[0]}"; then
+if [[ "$0" = "${BASH_SOURCE[0]}" ]]; then
 	github_all "$@"
 fi

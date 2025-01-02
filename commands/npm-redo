@@ -10,6 +10,6 @@ function npm_redo() (
 )
 
 # fire if invoked standalone
-if test "$0" = "${BASH_SOURCE[0]}"; then
+if [[ "$0" = "${BASH_SOURCE[0]}" ]]; then
 	npm_redo "$@"
 fi

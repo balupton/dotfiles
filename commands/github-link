@@ -7,7 +7,7 @@ function github_link() (
 	description="$(jq -r '.description' package.json)"
 	slug="$(jq -r '.badges.config.githubSlug' package.json)"
 
-	if test -z "$slug" -o "$slug" = 'null'; then
+	if [[ -z "$slug" || "$slug" = 'null' ]]; then
 		slug="bevry/$(basename "$(pwd)")"
 	fi
 
@@ -19,6 +19,6 @@ function github_link() (
 )
 
 # fire if invoked standalone
-if test "$0" = "${BASH_SOURCE[0]}"; then
+if [[ "$0" = "${BASH_SOURCE[0]}" ]]; then
 	github_link "$@"
 fi

@@ -1,0 +1,25 @@
+#!/usr/bin/env bash
+
+function s {
+	sleep 1
+}
+printf $'\e[3;3H'
+s
+printf $'\e7'
+s
+printf $'\e[?1049h'
+s
+printf $'\e[3;3H'
+s
+printf $'\e7'
+s
+printf $'\e[5;5H'
+s
+printf $'\e8'
+s
+printf $'\e[?1049l'
+s
+printf $'\e[5;5H'
+s
+printf $'\e8'
+s

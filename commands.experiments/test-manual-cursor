@@ -1,0 +1,123 @@
+#!/usr/bin/env bash
+
+function show_cursor {
+	echo-style --no-trail --show-cursor
+}
+function hide_cursor {
+	echo-style --no-trail --hide-cursor
+	trap show_cursor EXIT
+}
+
+function reset_cursor {
+	echo-style --no-trail --reset-cursor
+}
+function blink_cursor {
+	echo-style --no-trail --enable-blinking-cursor --cursor-blinking-block
+	trap reset_cursor EXIT
+}
+p="$HOME/.bashrc"
+file="$(echo-file -- "$p")"
+question="$(
+	echo-style 'Remove the file?:' --reset=' ' --code="$p"
+	#echo-style --reset --bold="Remove $p ?"
+)"
+details="$(
+	echo-style --dim="Unless you are an experienced user who has already made modifications to this shell configuration file, it can be safely removed for a lighter installation. Its contents are below:"$'\n' --reset="$file"
+)"
+
+# while :; do
+# # ⌅, ⌤ = enter key: [return enter] old macos keyboards, [return] new macos keyboards, [Enter ↵] raspberry keyboards
+# 	# echo-style --no-trail --clear-line --bold='Do you want to continue? ' 'CONFIRM [↵]'
+# 	# sleep 0.6
+# 	# echo-style --no-trail --clear-line --bold='Do you want to continue? ' --invert='CONFIRM [↵]'
+# 	# sleep 0.6
+
+
+# 	#echo-style --no-trail --clear-line --bold='Do you want to continue? ' '(CONFIRM)' ' ' --background-white=' '
+
+# 	# echo-style --no-trail --clear-line --bold='Do you want to continue? ' --background-gray='(CONFIRM)'
+# 	# sleep 0.6
+# 	# echo-style --no-trail --clear-line --bold='Do you want to continue? ' --background-intense-gray='(CONFIRM)'
+# 	# sleep 0.6
+
+# 	echo-style --no-trail --clear-screen --bold='Do you wish to proceed? ' $'\n' --legend='CONFIRM' --legend-key-spacer='' --key='ENTER' --key-key-spacer='' --key='↵' ' ' #' ' --background-gray=' '
+# 	sleep 0.6
+# 	echo-style --no-trail --clear-screen --bold='Do you wish to proceed? '  $'\n' --legend='CONFIRM' --legend-key-spacer='' --key='ENTER' --key-key-spacer='' --key='↵' ' '
+# 	sleep 0.6
+
+# done
+
+
+#echo-style --no-trail --clear-screen --bold='Do you wish to proceed? '  $'\n' --legend='CONFIRM' --legend-key-spacer='' --key='ENTER' --key-key-spacer='' --key='↵' ' '
+# echo-style --no-trail --clear-screen --underline+bold="$question" '  ' --legend+green+bold+underline='YES' --legend-key-spacer='' --key+green+bold='Y' --key-key-spacer='' --key+green+bold='ENTER' --legend-legend-spacer='' --legend+red+bold='ABORT' --legend-key-spacer='' --key+red+bold='N' --key-key-spacer='' --key+red+bold='ESC' ' '
+# sleep 5
+
+
+# positive_default="$(
+# 	echo-style --no-trail --clear-screen --underline+bold="$question" $'\n' --invert+green=' ' --invert+legend+green+bold='YES' --invert+green=' '  --legend-key-spacer='' --key+green+bold='ENTER' --key-key-spacer='' --key+green+bold='Y' ' ' --legend+red+bold=' ABORT ' --legend-key-spacer='' --key+red+bold='N' --key-key-spacer='' --key+red+bold='ESC' ' '
+# )"
+# positive_alt="$(
+# 	echo-style --no-trail --clear-screen --underline+bold="$question" $'\n' ' ' --legend+green+bold+underline='YES' ' ' --legend-key-spacer='' --key+green+bold='Y' ' ' --invert+legend+red+bold=' ABORT ' --legend-key-spacer='' --key+red+bold='ENTER' --key-key-spacer='' --key+red+bold='N' --key-key-spacer='' --key+red+bold='ESC' ' '
+# )"
+
+
+# positive_default="$(
+# 	echo-style --no-trail --clear-screen --underline+bold="$question" $'\n' --key+green+bold='ENTER' ' ' --invert+green=' ' --invert+legend+green+bold='YES' --invert+green=' '  --legend-key-spacer='' --key+green+bold='Y' ' ' --legend+red+bold=' ABORT ' --legend-key-spacer='' --key+red+bold='N' --key-key-spacer='' --key+red+bold='ESC' ' '
+# )"
+# positive_alt="$(
+# 	echo-style --no-trail --clear-screen --underline+bold="$question" $'\n'  --key+red+bold='ENTER' ' ' ' ' --legend+green+bold+underline='YES' ' ' --legend-key-spacer='' --key+green+bold='Y' ' ' --invert+legend+red+bold=' ABORT ' --legend-key-spacer='' --key+red+bold='N' --key-key-spacer='' --key+red+bold='ESC' ' '
+# )"
+
+
+# positive_default="$(
+# 	echo-style --no-trail --clear-screen --underline+bold="$question" $'\n' --invert+green=' ' --invert+legend+green+bold='YES' --invert+green=' '  --legend-key-spacer='' --key+green+bold='Y' ' ' --legend+red+bold=' ABORT ' --legend-key-spacer='' --key+red+bold='N' --key-key-spacer='' --key+red+bold='ESC' ' '
+# )"
+# positive_alt="$(
+# 	echo-style --no-trail --clear-screen --underline+bold="$question" $'\n' ' ' --legend+green+bold+underline='YES' ' ' --legend-key-spacer='' --key+green+bold='Y' ' ' --invert+legend+red+bold=' ABORT ' --legend-key-spacer='' --key+red+bold='N' --key-key-spacer='' --key+red+bold='ESC' ' '
+# )"
+
+# positive_default="$(
+# 	echo-style --no-trail --clear-screen --underline+bold="$question" $'\n' --dim="$details" $'\n' --invert+green=' ' --invert+legend+green+bold='YES' --invert+green=' '  --legend-key-spacer='' --key+green+bold='Y' ' ' --legend+red+bold=' NO ' --legend-key-spacer='' --key+red+bold='N' --legend-key-spacer='' --legend+red+bold=' ABORT ' --key+red+bold='ESC' ' '
+# )"
+# positive_alt="$(
+# 	echo-style --no-trail --clear-screen --underline+bold="$question"  $'\n' --dim="$details" $'\n' ' ' --legend+green+bold+underline='YES' ' ' --legend-key-spacer='' --key+green+bold='Y' ' ' --invert+legend+red+bold=' NO ' --legend-key-spacer='' --key+red+bold='N' --legend-key-spacer='' --legend+red+bold=' ABORT ' --key+red+bold='ESC' ' '
+# )"
+
+hide_cursor
+positive_default="$(
+	echo-style --no-trail --clear-screen --underline+bold="$question" $'\n' --dim="$details" $'\n' --invert+green=' ' --invert+legend+green+bold='YES' --invert+green=' '  --legend-key-spacer='' --key+green+bold='Y' ' ' --legend+red=' NO ' --legend-key-spacer='' --key+red='N' --legend-key-spacer='' --legend+red+dim=' ABORT ' --key+red+dim='ESC' ' '
+)"
+positive_alt="$(
+	echo-style --no-trail --clear-screen --underline+bold="$question"  $'\n' --dim="$details" $'\n' ' ' --legend+green+underline='YES' ' ' --legend-key-spacer='' --key+green='Y' ' ' --invert+legend+red+bold=' NO ' --legend-key-spacer='' --key+red+bold='N' --legend-key-spacer='' --legend+red+dim=' ABORT ' --key+red+dim='ESC' ' '
+)"
+positive_done="$(
+	echo-style --no-trail --clear-screen --underline+bold="$question" ' ' --invert+green=' ' --invert+legend+green+bold='YES' --invert+green=' ' ' '
+)"
+positive_done_notty="$(
+	echo-style --no-trail --clear-screen --underline+bold="$question" $'\n' --dim="$details" $'\n' --invert+green=' ' --invert+legend+green+bold='YES' --invert+green=' ' ' '
+)"
+negative_default="$(
+	echo-style --no-trail --clear-screen --underline+bold="$question" $'\n' ' ' --legend+green+bold='YES' ' ' --legend-key-spacer='' --key+green+bold='Y' ' ' --invert+red=' ' --invert+legend+red+bold+underline='ABORT' --invert+red=' ' --legend-key-spacer='' --key+red+bold='ENTER' --key-key-spacer='' --key+red+bold='N' --key-key-spacer='' --key+red+bold='ESC' ' '
+)"
+negative_alt="$(
+	echo-style --no-trail --clear-screen --underline+bold="$question" $'\n' --invert+green=' ' --invert+legend+green+bold='YES' --invert+green=' '  --legend-key-spacer='' --key+green+bold='Y' ' ' ' ' --legend+red+bold+underline='ABORT' ' ' --legend-key-spacer='' --key+red+bold='ENTER' --key-key-spacer='' --key+red+bold='N' --key-key-spacer='' --key+red+bold='ESC' ' '
+)"
+printf '%s' "$positive_default"
+# printf '%s' "$negative_default"
+while :; do
+	input="$(read-key)"
+	if [[ "$input" = 'left' ]]; then
+		printf '%s' "$positive_default"
+		#printf '%s' "$negative_alt"
+	elif [[ "$input" = 'right' ]]; then
+		printf '%s' "$positive_alt"
+		# printf '%s' "$negative_default"
+	elif [[ "$input" = 'enter' || "$input" = 'escape' ]]; then
+		printf '%s' "$positive_done"
+		break
+	fi
+done
+
+# echo-style --no-trail --clear-screen --underline+bold="$question" ' ' --background-gray=' ' --background-gray+legend+green+bold+underline='YES' --background-gray+legend-key-spacer='' --key+green+bold='Y' --background-gray+key-key-spacer='' --key+green+bold='ENTER' --background-gray=' ' ' ' --legend+red+bold='ABORT' --legend-key-spacer='' --key+red+bold='N' --key-key-spacer='' --key+red+bold='ESC' ' '
+# sleep 5
+# echo-style --no-trail --clear-screen --underline+bold="$question" ' ' ' ' --legend+green+bold+underline='YES' --legend-key-spacer='' --key+green+bold='Y' --key-key-spacer='' --key+green+bold='ENTER' ' ' --background-gray=' ' --legend+red+bold='ABORT' --background-gray+legend-key-spacer='' --key+red+bold='N' --background-gray+key-key-spacer='' --key+red+bold='ESC' background-gray=' '

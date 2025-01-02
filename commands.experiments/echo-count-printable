@@ -1,0 +1,82 @@
+#!/usr/bin/env bash
+
+function echo_printable_characters() (
+	source "$DOROTHY/sources/stdinargs.bash"
+
+	# =====================================
+	# Arguments
+
+	function help {
+		cat <<-EOF >/dev/stderr
+			ABOUT:
+			Process the input wrapping it to a specified width, respecting ansi escape codes / colors.
+
+			USAGE:
+			cat "$DOROTHY/README.md" | echo-wrap [...options]
+
+			OPTIONS:
+			--width=<width>
+			    The column width to wrap to. Default is the terminal width if available, otherwise 0 which disables wrapping.
+
+			$(stdinargs_options_help --)
+
+			QUIRKS:
+			Tabs are converted into 4 spaces. Broken spacing (spacing at the end or start of a segment) is trimmed. Spacing is preserved at the start and end of input lines. Backticks are trimmed as they are used internally as a delimiter.
+
+		EOF
+		return 22 # EINVAL 22 Invalid argument
+	}
+
+	# process
+	local item option_width='' option_args=()
+	while [[ "$#" -ne 0 ]]; do
+		item="$1"
+		shift
+		case "$item" in
+		'--help' | '-h') help ;;
+		'--width='*) option_width="${item#*=}" ;;
+		# forward to stdinargs, however support mixing and matching of our options, with stdinargs options
+		'--')
+			option_args+=("$item" "$@")
+			shift $#
+			break
+			;;
+		'--'*) option_args+=("$item") ;;
+		*) option_args+=("$item") ;;
+		esac
+	done
+
+	if [[ -z "$option_width" ]] && is-tty && __command_exists -- tput; then
+		option_width="$(tput cols || :)"
+	fi
+	if [[ -z "$option_width" ]]; then
+		option_width=0
+	fi
+
+	# =====================================
+	# Dependencies
+
+	local bin_gawk_or_awk awk_script
+
+	# =====================================
+	# Action
+
+	local buffer=''
+	function on_inline {
+		buffer+="$1"
+	}
+	bin_gawk_or_awk="$(echo-gnu-command --install -- gawk)"
+	awk_script="$(type -P echo-count-printable.awk)"
+	function on_line {
+		buffer+="$1\`"
+	}
+	function on_finish {
+		__print_string "$buffer" | "$bin_gawk_or_awk" -v option_wrap_width="$option_width" -f "$awk_script"
+	}
+	stdinargs "${option_args[@]}"
+)
+
+# fire if invoked standalone
+if [[ "$0" = "${BASH_SOURCE[0]}" ]]; then
+	echo_printable_characters "$@"
+fi

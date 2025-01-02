@@ -41,7 +41,7 @@ function discourse() (
 			    The name of the discourse container to setup.
 			    Defaults to 'app'.
 		EOF
-		if test "$#" -ne 0; then
+		if [[ $# -ne 0 ]]; then
 			echo-error "$@"
 		fi
 		return 22 # EINVAL 22 Invalid argument
@@ -49,7 +49,7 @@ function discourse() (
 
 	# process
 	local item action='' option_ssh_ip option_git_ssh_key option_git_ssh_pass option_git_remote option_git_branch option_container
-	while test "$#" -ne 0; do
+	while [[ "$#" -ne 0 ]]; do
 		item="$1"
 		shift
 		case "$item" in
@@ -67,10 +67,10 @@ function discourse() (
 	done
 
 	# validate
-	if test -z "$option_ssh_ip"; then
+	if [[ -z "$option_ssh_ip" ]]; then
 		option_ssh_ip="$(ask --required --question='What is the IP address of the server to connect to?')"
 	fi
-	if test -z "$action"; then
+	if [[ -z "$action" ]]; then
 		action="$(choose --required --question='Which action do you wish to take?' -- 'login' 'setup')"
 	fi
 
@@ -78,7 +78,7 @@ function discourse() (
 	echo-style --invert="Entering $option_ssh_ip"
 
 	# do login
-	if test "$action" = 'login'; then
+	if [[ "$action" = 'login' ]]; then
 		ssh "$option_ssh_ip"
 		return 0
 	fi
@@ -103,6 +103,6 @@ $(cat "$DOROTHY/user/commands/discourse-setup")
 )
 
 # fire if invoked standalone
-if test "$0" = "${BASH_SOURCE[0]}"; then
+if [[ "$0" = "${BASH_SOURCE[0]}" ]]; then
 	discourse "$@"
 fi

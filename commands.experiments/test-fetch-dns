@@ -19,7 +19,7 @@ function test_fetch_dns() (
 	mapfile -t providers < <(jq -r '.providers | to_entries[] | .key' "$DOROTHY/config/dns.json")
 	mapfile -t providers_url < <(jq -r '.providers[].url' "$DOROTHY/config/dns.json")
 	mapfile -t providers_about < <(jq -r '.providers[].about' "$DOROTHY/config/dns.json")
-	if test "${#providers[@]}" -ne "${#providers_about[@]}" -a "${#providers[@]}" -ne "${#providers_url[@]}"; then
+	if [[ "${#providers[@]}" -ne "${#providers_about[@]}" && "${#providers[@]}" -ne "${#providers_url[@]}" ]]; then
 		help 'A DNS provider is missing an about, or an about is multiline when it should be single line.'
 	fi
 
@@ -50,6 +50,6 @@ function test_fetch_dns() (
 )
 
 # fire if invoked standalone
-if test "$0" = "${BASH_SOURCE[0]}"; then
+if [[ "$0" = "${BASH_SOURCE[0]}" ]]; then
 	test_fetch_dns "$@"
 fi

@@ -78,11 +78,10 @@ HOMEBREW_UNINSTALL=(
 	'tmux'
 )
 HOMEBREW_FORMULAS=(
-	'git-extras'
-	'terminal-notifier'
-	'tmux'
-	'watch'
-	'watchman'
+	git-extras
+	terminal-notifier
+	tmux
+	watchman
 )
 HOMEBREW_SLOW_FORMULAS=(
 	'shellcheck'
@@ -222,26 +221,31 @@ CARGO_INSTALL=()
 # setup-util-*
 # 'warp' - caused too many issues, using adguard mac app instead
 SETUP_UTILS=(
-	'1password-cli'
-	'aria2'
-	'bash'
-	'bat'
-	'bottom'
-	'curl'
-	'delta'
-	'deno'
-	'fish'
-	'git'
-	'gocryptfs'
-	'jq'
-	'nu'
-	'obs'
-	'prettier'
-	'ripgrep'
-	'sd'
-	'strongbox'
-	'tealdeer'
-	'teip'
-	'tree'
-	'vim'
+	1password-cli
+	aria2
+	bash
+	bat
+	bottom
+	curl
+	delta
+	deno
+	fish
+	git
+	gocryptfs
+	jq
+	nu
+	obs
+	prettier
+	ps
+	ripgrep
+	sd
+	strongbox
+	tealdeer
+	teip
+	tree
+	vim
+)
+DOROTHY_CONFIG_TESTING_LIST=(
+	'dorothy-config-testing-value-017744'
+	'dorothy-config-testing-value-123528'
 )

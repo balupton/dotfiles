@@ -14,7 +14,7 @@ function campjs_command() (
 
 	local color
 	for color in "${colors[@]}"; do
-		if test "$color" = 'blink'; then
+		if [[ "$color" = 'blink' ]]; then
 			if ! confirm --linger --positive --ppid=$$ -- 'Are you sure you want to blink?'; then
 				echo-style --notice='Good choice not to blink.'
 				return 0
@@ -26,6 +26,6 @@ function campjs_command() (
 )
 
 # fire if invoked standalone
-if test "$0" = "${BASH_SOURCE[0]}"; then
+if [[ "$0" = "${BASH_SOURCE[0]}" ]]; then
 	campjs_command "$@"
 fi

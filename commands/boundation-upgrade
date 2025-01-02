@@ -4,7 +4,7 @@ function boundation_upgrade() (
 	source "$DOROTHY/sources/bash.bash"
 
 	# if the secrets aren't provided, fetch them and reload
-	if test -z "${GITHUB_ACCESS_TOKEN-}"; then
+	if [[ -z "${GITHUB_ACCESS_TOKEN-}" ]]; then
 		bevry-auth -- "$0" "$@"
 		return
 	fi
@@ -15,7 +15,7 @@ function boundation_upgrade() (
 	slug="$(jq -r '.badges.config.githubSlug' package.json)"
 	UPGRADE_SUCCESS='no'
 	function on_finish {
-		if test "$UPGRADE_SUCCESS" = 'yes'; then
+		if [[ "$UPGRADE_SUCCESS" = 'yes' ]]; then
 			message="boundation-upgrade completed on $name"
 		else
 			message="boundation-upgrade failed on $name"
@@ -46,15 +46,15 @@ function boundation_upgrade() (
 	lo="$(get_node_license)"
 
 	# install global deps
-	if ! command-exists -- boundation; then
+	if __command_missing -- boundation; then
 		echo-style --bold='installing' ' ' --code='boundation'
 		nvm-env -- npm i -g boundation
 	fi
-	if ! command-exists -- github-backers; then
+	if __command_missing -- github-backers; then
 		echo-style --bold='installing' ' ' --code='github-backers'
 		nvm-env -- npm i -g '@bevry/github-api'
 	fi
-	if ! command-exists -- make-deno-edition; then
+	if __command_missing -- make-deno-edition; then
 		echo-style --bold='installing' ' ' --code='make-deno-edition'
 		nvm-env -- npm i -g make-deno-edition
 	fi
@@ -109,14 +109,14 @@ function boundation_upgrade() (
 	ec=''
 	lc=''
 	change='minor'
-	if test "$lo" != "$ln"; then
-		if test "$ln" = 'RPL-1.5'; then
+	if [[ "$lo" != "$ln" ]]; then
+		if [[ "$ln" = 'RPL-1.5' ]]; then
 			change='major'
 		fi
 		lc="-   Updated license from [\`$lo\`](http://spdx.org/licenses/$lo.html) to [\`$ln\`](http://spdx.org/licenses/$ln.html)
 "
 	fi
-	if test "$eo" != "$en"; then
+	if [[ "$eo" != "$en" ]]; then
 		change='major'
 		ec="-   Minimum required Node.js version changed from \`$eo\` to \`$en\` adapting to ecosystem changes
 "
@@ -172,10 +172,10 @@ function boundation_upgrade() (
 	# wait for the publish to finish
 	local run_id_of_release
 	while read -r run_id_of_release <&172; do
-		if test -z "$run_id_of_release"; then
+		if [[ -z "$run_id_of_release" ]]; then
 			break
 		fi
-		while true; do
+		while :; do
 			timeout --foreground 10m gh run watch "$run_id_of_release" --exit-status --interval 10 --repo "$slug" && break
 			gh run rerun "$run_id_of_release" --failed --repo "$slug"
 		done
@@ -186,6 +186,6 @@ function boundation_upgrade() (
 )
 
 # fire if invoked standalone
-if test "$0" = "${BASH_SOURCE[0]}"; then
+if [[ "$0" = "${BASH_SOURCE[0]}" ]]; then
 	boundation_upgrade "$@"
 fi

@@ -4,12 +4,12 @@ function boundation_ordered() (
 	source "$DOROTHY/sources/bash.bash"
 
 	# if the secrets aren't provided, fetch them and reload
-	if test -z "${GITHUB_ACCESS_TOKEN-}"; then
+	if [[ -z "${GITHUB_ACCESS_TOKEN-}" ]]; then
 		bevry-auth -- "$0" "$@"
 		return
 	fi
 
-	if test "$#" -ne 0; then
+	if [[ $# -ne 0 ]]; then
 		echo-error 'You passed arguments. How do you expect them to work on multiple boundation-all calls. Modify this file instead.'
 		return 1
 	fi
@@ -76,6 +76,6 @@ function boundation_ordered() (
 )
 
 # fire if invoked standalone
-if test "$0" = "${BASH_SOURCE[0]}"; then
+if [[ "$0" = "${BASH_SOURCE[0]}" ]]; then
 	boundation_ordered "$@"
 fi

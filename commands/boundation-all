@@ -3,8 +3,43 @@
 function boundation_all() (
 	source "$DOROTHY/sources/bash.bash"
 
+	# remove needles from an array
+	# this is not currently used yet in Dorothy core, so do not depend on it, as it may be removed
+	function __remove_needles {
+		local option_needles=() option_elements kept_elements=()
+		while test "$#" -ne 0; do
+			if test "$1" = '--'; then
+				shift
+				break
+			fi
+			option_needles+=("$1")
+			shift
+		done
+		option_elements=("$@")
+		if test "${#option_needles[@]}" -eq 0 -o "${#option_elements[@]}" -eq 0; then
+			return 0
+		fi
+		local needle element found
+		for element in "${option_elements[@]}"; do
+			found='no'
+			for needle in "${option_needles[@]}"; do
+				if test "$needle" = "$element"; then
+					found='yes'
+					break
+				fi
+			done
+			if test "$found" = 'no'; then
+				kept_elements+=("$element")
+			fi
+		done
+		if test "${#kept_elements[@]}" -ne 0; then
+			__print_lines "${kept_elements[@]}"
+		fi
+		return 0
+	}
+
 	# if the secrets aren't provided, fetch them and reload
-	if test -z "${GITHUB_ACCESS_TOKEN-}"; then
+	if [[ -z "${GITHUB_ACCESS_TOKEN-}" ]]; then
 		bevry-auth -- "$0" "$@"
 		return
 	fi
@@ -29,7 +64,7 @@ function boundation_all() (
 			--start-after=<repo>
 			    Same as --start=<repo> --skip=<repo>
 		EOF
-		if test "$#" -ne 0; then
+		if [[ $# -ne 0 ]]; then
 			echo-error "$@"
 		fi
 		return 22 # EINVAL 22 Invalid argument
@@ -38,7 +73,7 @@ function boundation_all() (
 	# process
 	# --user=docpad --filter='-plugin-'
 	local item option_user='bevry' option_filter='' option_start='' option_deps='' option_slugs=() option_args=() option_skips=()
-	while test "$#" -ne 0; do
+	while [[ "$#" -ne 0 ]]; do
 		item="$1"
 		shift
 		case "$item" in
@@ -70,7 +105,7 @@ function boundation_all() (
 
 	# prepare option_skips
 	# if fetch "https://bevry.me/api/github/orgs" | jq -r '.[]' | grep --quiet --fixed-strings --regexp="$user"; then
-	if test "$USER" = 'balupton'; then
+	if [[ "$USER" = 'balupton' ]]; then
 		option_skips+=(
 			.github
 			base
@@ -102,7 +137,7 @@ function boundation_all() (
 	fi
 
 	# if no slugs, fetch all for the user
-	if test "${#option_slugs[@]}" -eq 0; then
+	if [[ "${#option_slugs[@]}" -eq 0 ]]; then
 		mapfile -t option_slugs < <(fetch "https://bevry.me/api/github/repos/${option_user}" | jq -r '.[]' | sort)
 	fi
 
@@ -110,7 +145,7 @@ function boundation_all() (
 	# Action
 
 	# check we aren't in a package
-	if test -f package.json; then
+	if [[ -f package.json ]]; then
 		echo-error 'You just tried to run boundation-all in a package, you forgot to cd out of debugging a package failure.'
 		return 22 # EINVAL 22 Invalid argument
 	fi
@@ -122,11 +157,11 @@ function boundation_all() (
 	# note progress
 	local failed_repos=() success_repos=()
 	function on_finish {
-		if test "${#success_repos[@]}" -ne 0; then
+		if [[ "${#success_repos[@]}" -ne 0 ]]; then
 			echo-style --success='boundation success on:'
 			__print_lines "${success_repos[@]}"
 		fi
-		if test "${#failed_repos[@]}" -ne 0; then
+		if [[ "${#failed_repos[@]}" -ne 0 ]]; then
 			echo-style --error='boundation failed on:'
 			__print_lines "${failed_repos[@]}"
 		fi
@@ -136,20 +171,20 @@ function boundation_all() (
 	# loop
 	local pwd="$PWD" ready='no' repo slug index repo_deps package
 	local -i count="${#option_slugs[@]}"
-	if test -z "$option_start"; then
+	if [[ -z "$option_start" ]]; then
 		ready='yes'
 	fi
 	for index in "${!option_slugs[@]}"; do
 		# scan
 		slug="${option_slugs[index]}"
 		repo="${slug#*/}"
-		if test "$ready" = 'no' -a "$repo" = "$option_start"; then
+		if [[ "$ready" = 'no' && "$repo" = "$option_start" ]]; then
 			echo-style --magenta="found $repo, starting"
 			ready='yes'
 		fi
 
 		# checks
-		if test "$ready" = 'no'; then
+		if [[ "$ready" = 'no' ]]; then
 			echo-style --dim="skipping $repo (not yet ready)"
 			continue
 		elif is-needle --needle="$slug" -- "${option_skips[@]}"; then
@@ -158,14 +193,14 @@ function boundation_all() (
 		elif is-needle --needle="$repo" -- "${option_skips[@]}"; then
 			echo-style --dim="skipping $repo (repo was in skips)"
 			continue
-		elif test -n "$option_filter" && [[ $repo != *"$option_filter"* ]]; then
+		elif [[ -n "$option_filter" && $repo != *"$option_filter"* ]]; then
 			echo-style --dim="skipping $repo (repo didn't match filter: $option_filter)"
 			continue
 		fi
 
 		# check package
 		package="$(fetch "https://raw.githubusercontent.com/${slug}/HEAD/package.json" 2>/dev/null)"
-		if test -z "$package"; then
+		if [[ -z "$package" ]]; then
 			echo-style --dim="skipping $repo (no package.json)"
 			continue
 		fi
@@ -175,10 +210,10 @@ function boundation_all() (
 		if jq -r '.dependencies' <<<"$package" | grep --quiet --fixed-strings --regexp='{'; then
 			repo_deps='yes'
 		fi
-		if test "$option_deps" = 'yes' -a "$repo_deps" = 'no'; then
+		if [[ "$option_deps" = 'yes' && "$repo_deps" = 'no' ]]; then
 			echo-style --dim="skipping $repo (it did not have deps)"
 			continue
-		elif test "$option_deps" = 'no' -a "$repo_deps" = 'yes'; then
+		elif [[ "$option_deps" = 'no' && "$repo_deps" = 'yes' ]]; then
 			echo-style --dim="skipping $repo (it had deps)"
 			continue
 		fi
@@ -188,7 +223,7 @@ function boundation_all() (
 		(
 			# log
 			failed_repos+=("$repo")
-			echo-title -- "$repo [$index/$count]" || return
+			echo-style --terminal-title="$repo [$index/$count]" || return
 			echo-style --h1="$repo" || return
 			# clone the repo fresh and set the correct origin in case of fork
 			# don't use subshell as that breaks strict mode
@@ -209,7 +244,7 @@ function boundation_all() (
 			# note it succeeded
 			echo-style --g1="$repo" || return
 			# remove from failed repos
-			failed_repos=("${failed_repos[@]/$repo/}")
+			mapfile -t failed_repos < <(__remove_needles "$repo" -- "${failed_repos[@]}")
 			success_repos+=("$repo")
 		) || (
 			# check status
@@ -230,6 +265,6 @@ function boundation_all() (
 )
 
 # fire if invoked standalone
-if test "$0" = "${BASH_SOURCE[0]}"; then
+if [[ "$0" = "${BASH_SOURCE[0]}" ]]; then
 	boundation_all "$@"
 fi

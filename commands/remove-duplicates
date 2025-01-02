@@ -12,7 +12,7 @@ function remove_duplicates() (
 		for alternative in "$@"; do
 			# check it also exists in alt location
 			altfile="$alternative/$filename"
-			if test ! -f "$altfile"; then
+			if [[ ! -f "$altfile" ]]; then
 				continue
 			fi
 
@@ -21,14 +21,14 @@ function remove_duplicates() (
 			altfile_hashf="$(mktemp)"
 
 			# checksum
-			echo
-			echo-style --bold="$file"
+			echo-style --newline \
+				--bold="$file"
 			checksum --untitled --algorithm=md5 -- "$file" | tee "$file_hashf"
 			echo-style --bold="$altfile"
 			checksum --untitled --algorithm=md5 -- "$altfile" | tee "$altfile_hashf"
 
 			# compare and possibly remove
-			if test "$(cat "$file_hashf")" = "$(cat "$altfile_hashf")"; then
+			if [[ "$(cat "$file_hashf")" = "$(cat "$altfile_hashf")" ]]; then
 				rm "$altfile"
 				echo-style --green='same,' --green+bold=' removed: ' --dim="$altfile"
 			else
@@ -39,6 +39,6 @@ function remove_duplicates() (
 )
 
 # fire if invoked standalone
-if test "$0" = "${BASH_SOURCE[0]}"; then
+if [[ "$0" = "${BASH_SOURCE[0]}" ]]; then
 	remove_duplicates "$@"
 fi

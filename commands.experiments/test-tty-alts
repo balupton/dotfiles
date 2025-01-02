@@ -1,0 +1,19 @@
+#!/usr/bin/env bash
+
+function test_tty_alts (
+	source "$DOROTHY/sources/bash.bash"
+
+	while :; do
+		refresh_terminal_size
+		printf 'T_W = %s  \tT_H = %s\n' "$COLUMNS" "$LINES"
+
+		refresh_terminal_cursor_position
+		printf 'C_Y = %s  \tC_X = %s\n' "$COLUMN" "$LINE"
+	done
+)
+
+
+# fire if invoked standalone
+if [[ "$0" = "${BASH_SOURCE[0]}" ]]; then
+	test_tty_alts "$@"
+fi

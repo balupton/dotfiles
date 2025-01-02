@@ -4,12 +4,12 @@ function bevry_auth() (
 	source "$DOROTHY/sources/bash.bash"
 
 	# trim
-	if test "${1-}" = '--'; then
+	if [[ "${1-}" = '--' ]]; then
 		shift
 	fi
 
 	# if the secrets aren't provided, fetch them and reload
-	if test -z "${GITHUB_ACCESS_TOKEN-}"; then
+	if [[ -z "${GITHUB_ACCESS_TOKEN-}" ]]; then
 		__print_lines 'Bevry environment variables empty, fetching them from the secret engine...' >/dev/tty
 		secret env NPM_AUTHTOKEN SURGE_LOGIN SURGE_TOKEN GITHUB_ACCESS_TOKEN GITHUB_CLIENT_ID GITHUB_CLIENT_SECRET -- "$@"
 		return
@@ -20,6 +20,6 @@ function bevry_auth() (
 )
 
 # fire if invoked standalone
-if test "$0" = "${BASH_SOURCE[0]}"; then
+if [[ "$0" = "${BASH_SOURCE[0]}" ]]; then
 	bevry_auth "$@"
 fi

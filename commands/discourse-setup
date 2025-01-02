@@ -4,35 +4,9 @@ function discourse_setup() (
 	# Load Dorothy's sensible defaults
 	eval "$(curl -fsSL 'https://raw.githubusercontent.com/bevry/dorothy/HEAD/sources/bash.bash')"
 
-	# see commands/command-missing -- for details
-	function __command_missing {
-		local command commands=("$@")
-		for command in "${commands[@]}"; do
-			if type -P "$command" &>/dev/null; then
-				continue
-			else
-				return 0 # command missing
-			fi
-		done
-		return 1 # all commands are present
-	}
-
-	# see commands/command_exists for details
-	function __command_exists {
-		local command commands=("$@")
-		for command in "${commands[@]}"; do
-			if type -P "$command" &>/dev/null; then
-				continue
-			else
-				return 1 # command missing
-			fi
-		done
-		return 0 # all commands are present
-	}
-
 	# Receive arguments from caller
 	local GIT_SSH_KEY="${GIT_SSH_KEY-}" GIT_SSH_PASS="${GIT_SSH_PASS-}" GIT_REMOTE="${GIT_REMOTE-}" GIT_BRANCH="${GIT_BRANCH-}" CONTAINER="${CONTAINER-}"
-	if test -z "$GIT_SSH_KEY" -o -z "$GIT_SSH_PASS" -o -z "$GIT_REMOTE"; then
+	if [[ -z "$GIT_SSH_KEY" || -z "$GIT_SSH_PASS" || -z "$GIT_REMOTE" ]]; then
 		__print_lines '[discourse-setup] is to be run via [commands/discourse]' >/dev/stderr
 		return 1
 	fi
@@ -51,13 +25,13 @@ function discourse_setup() (
 	# SSH Keys
 	__print_lines 'Configuring SSH keys...'
 	# Ensure essentials
-	mkdir -p "$HOME/.ssh"
+	__mkdirp "$HOME/.ssh"
 	# Replace known hosts with GitHub's SSH keys
 	ssh-keyscan -t rsa github.com >"$HOME/.ssh/known_hosts"
 	# Load our SSH Agent
 	eval "$(ssh-agent -s)"
 	# Save Configuration File
-	if test ! -e "$HOME/.ssh/config"; then
+	if [[ ! -e "$HOME/.ssh/config" ]]; then
 		cat <<-EOF >"$HOME/.ssh/config"
 			# Configuration
 			UserKnownHostsFile ~/.ssh/known_hosts
@@ -72,7 +46,7 @@ function discourse_setup() (
 	# Fix Permissions
 	chmod --recursive a-xrw,u+Xrw "$HOME/.ssh"
 	# Load our SSH Key: https://stackoverflow.com/a/52671286/130638
-	if test -n "${GIT_SSH_PASS-}"; then
+	if [[ -n "${GIT_SSH_PASS-}" ]]; then
 		ssh_stdin_pass_helper="$HOME/ssh_stdin_password.bash"
 		cat <<-EOF >"$ssh_stdin_pass_helper"
 			#!/usr/bin/env bash
@@ -83,7 +57,7 @@ function discourse_setup() (
 
 		__print_lines 'Adding the SSH keys...'
 		DISPLAY=:0 SSH_ASKPASS="$ssh_stdin_pass_helper" ssh-add "$HOME/.ssh/$GIT_SSH_KEY" <<<"$GIT_SSH_PASS"
-	elif test -n "${GIT_SSH_KEY-}"; then
+	elif [[ -n "${GIT_SSH_KEY-}" ]]; then
 		ssh-add "$HOME/.ssh/$GIT_SSH_KEY"
 	fi
 
@@ -106,7 +80,7 @@ function discourse_setup() (
 
 	# Install discourse
 	__print_lines 'Configuring discourse...'
-	if test ! -e /var/discourse; then
+	if [[ ! -e /var/discourse ]]; then
 		sudo mkdir -p -m 'a-xrw,u+Xrw' /var/discourse
 		sudo chown "$USER:" /var/discourse
 		cd /var/discourse
@@ -123,9 +97,9 @@ function discourse_setup() (
 
 	# Install configuration
 	__print_lines 'Configuring instance...'
-	if test ! -e /var/discourse/containers/.git; then
+	if [[ ! -e /var/discourse/containers/.git ]]; then
 		rm -rf /var/discourse/containers
-		mkdir -p /var/discourse/containers
+		__mkdirp /var/discourse/containers
 		cd /var/discourse/containers
 		git init
 		git config pull.ff only
@@ -139,19 +113,19 @@ function discourse_setup() (
 		git checkout "$GIT_BRANCH"
 		git pull origin "$GIT_BRANCH"
 	fi
-	if test ! -e "/var/discourse/containers/$CONTAINER.yml"; then
+	if [[ ! -e "/var/discourse/containers/$CONTAINER.yml" ]]; then
 		vim "/var/discourse/containers/app.yml"
 	fi
-	if test -e "/var/discourse/containers/$CONTAINER.yml"; then
+	if [[ -e "/var/discourse/containers/$CONTAINER.yml" ]]; then
 		ln -sfF "/var/discourse/containers/$CONTAINER.yml" '/var/discourse/containers/app.yml'
 	fi
-	if test -e "/var/discourse/containers/$CONTAINER.key"; then
-		mkdir -p /var/discourse/shared/standalone/ssl
+	if [[ -e "/var/discourse/containers/$CONTAINER.key" ]]; then
+		__mkdirp /var/discourse/shared/standalone/ssl
 		# symlink doesn't work
 		cp -f "/var/discourse/containers/$CONTAINER.key" '/var/discourse/shared/standalone/ssl/ssl.key'
 	fi
-	if test -e "/var/discourse/containers/$CONTAINER.crt"; then
-		mkdir -p /var/discourse/shared/standalone/ssl
+	if [[ -e "/var/discourse/containers/$CONTAINER.crt" ]]; then
+		__mkdirp /var/discourse/shared/standalone/ssl
 		# symlink doesn't work
 		cp -f "/var/discourse/containers/$CONTAINER.crt" '/var/discourse/shared/standalone/ssl/ssl.crt'
 	fi

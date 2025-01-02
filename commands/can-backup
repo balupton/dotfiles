@@ -4,7 +4,7 @@ function can_backup() (
 	# @todo figure out a better option for this
 	# Arq (like cron) does not inherit the shell environment.
 	# [say] does not work in this environment: Open speech channel failed: -915
-	if test -z "$DOROTHY"; then
+	if [[ -z "$DOROTHY" ]]; then
 		DOROTHY="$HOME/.local/share/.dorothy"
 	fi
 	source "$DOROTHY/sources/bash.bash"
@@ -20,6 +20,6 @@ function can_backup() (
 )
 
 # fire if invoked standalone
-if test "$0" = "${BASH_SOURCE[0]}"; then
+if [[ "$0" = "${BASH_SOURCE[0]}" ]]; then
 	can_backup "$@"
 fi

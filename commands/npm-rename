@@ -5,11 +5,11 @@ function npm_rename() (
 
 	local old="$1" new="$2" url message
 	url="https://www.npmjs.com/package/$new"
-	message="$old has been renamed to $new: npm uninstall ${old@Q} && npm install ${new@Q} && open ${url@Q}"
+	message="$old has been renamed to $new: npm uninstall $(echo-escape-command -- "$old") && npm install $(echo-escape-command -- "$new") && open $(echo-escape-command -- "$url")"
 	nvm-env npm deprecate "$old" "$message"
 )
 
 # fire if invoked standalone
-if test "$0" = "${BASH_SOURCE[0]}"; then
+if [[ "$0" = "${BASH_SOURCE[0]}" ]]; then
 	npm_rename "$@"
 fi

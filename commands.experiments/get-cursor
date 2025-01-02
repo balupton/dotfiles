@@ -1,0 +1,15 @@
+#!/usr/bin/env bash
+
+function get_cursor() (
+	source "$DOROTHY/sources/bash.bash"
+
+	local _ row column
+	#tty_target="$(is-tty --fallback)"
+	IFS='[;' read -t 2 -srd R -p $'\e[6n' _ row column </dev/tty
+	__print_lines "$column" "$row"
+)
+
+# fire if invoked standalone
+if [[ "$0" = "${BASH_SOURCE[0]}" ]]; then
+	get_cursor "$@"
+fi

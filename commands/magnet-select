@@ -10,12 +10,11 @@ function magnet_select() (
 	# fetch
 	echo-style --purple='searching' >/dev/tty
 	mapfile -t results < <(magnet-search "$search")
-	if test "${#results[@]}" -eq 0; then
+	if [[ "${#results[@]}" -eq 0 ]]; then
 		return 1
 	fi
 
 	# select
-	# trunk-ignore(shellcheck/SC2016)
 	option_visual='$(echo-magnet-hash -- "$value")    $label'
 	choose \
 		--question="Which magnet for $search?" \
@@ -25,6 +24,6 @@ function magnet_select() (
 )
 
 # fire if invoked standalone
-if test "$0" = "${BASH_SOURCE[0]}"; then
+if [[ "$0" = "${BASH_SOURCE[0]}" ]]; then
 	magnet_select "$@"
 fi

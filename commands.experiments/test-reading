@@ -1,0 +1,19 @@
+#!/usr/bin/env bash
+
+# Disable input buffering
+stty -icanon -echo
+
+while :; do
+    # Read a single character
+    char=$(dd bs=1 count=1 2>/dev/null)
+	#read -N1 char || :
+
+    # Process the character
+    case "$char" in
+        q) printf 'Quitting\n'; break ;;
+        *) printf 'You pressed: %q\n' "$char" ;;
+    esac
+done
+
+# Reset terminal
+stty icanon echo

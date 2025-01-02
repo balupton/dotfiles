@@ -1,0 +1,57 @@
+#!/usr/bin/env bash
+
+# 38 ; 2 ; <r> ; <g> ; <b>	Set foreground color to RGB value specified in <r>, <g>, <b> parameters*
+# 48 ; 2 ; <r> ; <g> ; <b>	Set background color to RGB value specified in <r>, <g>, <b> parameters*
+# 38 ; 5 ; <s>	Set foreground color to <s> index in 88 or 256 color table*
+# 48 ; 5 ; <s>
+
+# for r in {0..255}; do
+# 	for g in {0..255}; do
+# 		for b in {0..255}; do
+# 			printf "\e[38;2;${r};${g};${b}m%s\e[0m" "[$r $g $b]"
+# 		done
+# 		printf '\n'
+# 	done
+# done
+
+for n in {0..255}; do
+	# ESC[38;5;⟨n⟩m
+	printf "\e[${n}m%s\e[0m" "[$n]"
+done
+
+for n in {0..255}; do
+	# ESC[38;5;⟨n⟩m
+	printf "\e[38;5;${n}m%s\e[0m" "[$n]"
+	printf "\e[48;5;${n}m%s\e[0m" "[$n]"
+done
+
+printf '\n'
+
+# for n in {0..255}; do
+# 	# ESC[38;5;⟨n⟩m
+# 	printf "\e[F\e[J\e[48;5;${n}m\t\t\t\t\t\t\n\e[0m"
+# 	sleep 0.1
+# done
+
+
+# printf %b '\e]11;#ccffcc\a'
+# printf %b '\e[41m' '\e[8]' '\e[H\e[J'
+# \[\e[1;33;44m\]\w \$\[\e[0m\]
+
+cols="$(tput cols)"
+rows="$(tput lines)"
+function bg {
+	# ESC[38;5;⟨n⟩m
+	local n="$1"
+	# '\e[0m'
+	printf %b "\e[48;5;${n}m"'\e[H\e[J' # home, erase to end
+	sleep 0.005
+}
+while :; do
+	for n in {1..255}; do
+		bg "$n"
+	done
+	for n in {255..232}; do
+		bg "$n"
+	done
+done
