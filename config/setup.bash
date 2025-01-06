@@ -5,6 +5,10 @@
 # load the dorothy defaults
 source "$DOROTHY/config/setup.bash"
 
+# fetch hostname, without .local suffix
+hostname="$(get-hostname)"
+hostname="${hostname%.local}"
+
 # note on youtube-dl
 # brew maintains it actively, and also will assist with dependencies
 # however, ubuntu is slow to maintain, so install via pip instead
@@ -41,16 +45,17 @@ SNAP_INSTALL=()
 # Go
 GO_LINTING_INSTALL='no'
 GO_INSTALL=()
-if is-mac; then
-	GO_LINTING_INSTALL='yes'
-	GO_INSTALL+=(
-		'changkun.de/x/rmtrash'
-		# 'github.com/cloudflare/utahfs/cmd/utahfs-client'
-	)
-fi
+# if is-mac; then
+# 	GO_LINTING_INSTALL='yes'
+# 	GO_INSTALL+=(
+# 	)
+# fi
+# 'github.com/cloudflare/utahfs/cmd/utahfs-client'
 
 # macOS apps / mas
 # https://github.com/mas-cli/mas
+# '1472777122' 'Honey'
+# '1484348796' 'Endel'
 # '430798174' 'HazeOver'
 # '441258766' 'Magnet'
 # '441258766' 'Magnet'
@@ -62,21 +67,17 @@ fi
 # '937984704' 'Amphetamine'
 MAS_INSTALL=(
 	'420212497' 'Byword'
-	'1484348796' 'Endel'
-	'1472777122' 'Honey'
-	'409183694' 'Keynote'
 	'405399194' 'Kindle'
+	'409183694' 'Keynote'
 	'409203825' 'Numbers'
 	'409201541' 'Pages'
 )
 
 # Homebrew
-HOMEBREW_ENCODING_INSTALL=yes
-HOMEBREW_UNINSTALL=(
-	'imagemagick'
-	'podman'
-	'tmux'
-)
+if [[ $hostname == 'balupton-mini' ]]; then
+	HOMEBREW_ENCODING_INSTALL=yes
+fi
+HOMEBREW_UNINSTALL=()
 HOMEBREW_FORMULAS=(
 	git-extras
 	terminal-notifier
@@ -86,21 +87,30 @@ HOMEBREW_FORMULAS=(
 HOMEBREW_SLOW_FORMULAS=(
 	'shellcheck'
 )
+# 'adguard'
+# 'aerial'
+# 'calibre'
+# 'firefox'
+# 'multipass'
+# 'pocket-casts'
+# 'raspberry-pi-imager'
+# 'spotify'
 # 'twitch'
+# 'zoom'
 HOMEBREW_CASKS=(
-	'adguard'
 	'audio-hijack'
 	'loopback'
 	'soundsource'
-	# 'aerial'
-	# 'calibre'
-	# 'firefox'
-	# 'multipass'
-	# 'pocket-casts'
-	# 'raspberry-pi-imager'
-	# 'spotify'
-	# 'zoom'
 )
+# 'font-dejavu-sans-mono-nerd-font'
+# 'font-fira-code-nerd-font'
+# 'font-fira-mono-nerd-font'
+# 'font-inconsolata-go-nerd-font'
+# 'font-iosevka-nerd-font'
+# 'font-jetbrains-mono-nerd-font'
+# 'font-ubuntu-mono-nerd-font'
+# 'font-ubuntu-nerd-font'
+# 'font-victor-mono-nerd-font'
 HOMEBREW_FONTS=(
 	'font-cantarell'
 	'font-cascadia-code'
@@ -129,15 +139,6 @@ HOMEBREW_FONTS=(
 	'font-ubuntu'
 	'font-victor-mono'
 )
-# 'font-dejavu-sans-mono-nerd-font'
-# 'font-fira-code-nerd-font'
-# 'font-fira-mono-nerd-font'
-# 'font-inconsolata-go-nerd-font'
-# 'font-iosevka-nerd-font'
-# 'font-jetbrains-mono-nerd-font'
-# 'font-ubuntu-mono-nerd-font'
-# 'font-ubuntu-nerd-font'
-# 'font-victor-mono-nerd-font'
 
 # Ruby
 # compass
@@ -153,12 +154,12 @@ GEM_INSTALL=()
 # - https://github.com/pymupdf/PyMuPDF
 # - https://github.com/pikepdf/pikepdf
 # - https://github.com/pdfminer/pdfminer.six
-PIPX_INSTALL=(
-	'katcr'
-	'poetry'
-	'stig'
-	'youtube_dl'
-)
+# pipx:
+# 'youtube_dl'
+# 'katcr'
+# 'poetry'
+# 'stig'
+PIPX_INSTALL=()
 # PYTHON3_PIP_INSTALL=('bitcoinlib' 'cairosvg')
 # PYTHON2_PIP_INSTALL=('PyPDF2')
 
@@ -242,10 +243,7 @@ SETUP_UTILS=(
 	strongbox
 	tealdeer
 	teip
+	trash
 	tree
 	vim
-)
-DOROTHY_CONFIG_TESTING_LIST=(
-	'dorothy-config-testing-value-017744'
-	'dorothy-config-testing-value-123528'
 )
