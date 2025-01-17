@@ -1,0 +1,107 @@
+#!/usr/bin/env bash
+
+function fs_access() (
+	source "$DOROTHY/sources/bash.bash"
+
+	# =====================================
+	# Arguments
+
+	function help {
+		cat <<-EOF >/dev/stderr
+			ABOUT:
+			Output the absolute path of a relative path.
+
+			USAGE:
+			fs-access [...options] [--] ...<path>
+
+			OPTIONS:
+			--sudo
+			    If specified, use sudo on filesystem interactions.
+			--user=<user>
+			--group=<group>
+			    If specified use this user and/or group for filesystem interactions.
+
+			EXAMPLES:
+			fs-access -- ..
+			fs-access -- .
+			fs-access -- ./*
+			fs-access -- /
+
+			QUIRKS:
+			Use [fs-realpath] if you want symlinks resolved.
+		EOF
+		if [[ $# -ne 0 ]]; then
+			echo-error "$@"
+		fi
+		return 22 # EINVAL 22 Invalid argument
+	}
+
+	# process
+	local item option_paths=() option_sudo='no' option_user='' option_group=''
+	while [[ $# -ne 0 ]]; do
+		item="$1"
+		shift
+		case "$item" in
+		'--help' | '-h') help ;;
+		'--no-sudo'* | '--sudo'*)
+			option_sudo="$(get-flag-value --affirmative --fallback="$option_sudo" -- "$item")"
+			;;
+		'--user='*) option_user="${item#*=}" ;;
+		'--group='*) option_group="${item#*=}" ;;
+		'--')
+			option_paths+=("$@")
+			shift $#
+			break
+			;;
+		'--'*) help "An unrecognised flag was provided: $item" ;;
+		*) option_paths+=("$item") ;;
+		esac
+	done
+
+	# check
+	if [[ ${#option_paths[@]} -eq 0 ]]; then
+		help 'No <path>s provided.'
+	fi
+
+	# =====================================
+	# Act
+
+	# determine our technique
+	# perl (22), bash (42), python (51), deno (57), ruby (90), php (122), powershell (489)
+	local bin
+	if __command_exists -- perl; then
+		bin='fs-access.pl'
+	elif __command_exists -- bash; then
+		bin='fs-access.bash'
+	elif __command_exists -- python3; then
+		bin='fs-access.py'
+	elif __command_exists -- deno; then
+		bin='fs-access.ts'
+	elif __command_exists -- ruby; then
+		bin='fs-access.rb'
+	elif __command_exists -- php; then
+		bin='fs-access.php'
+	elif __command_exists -- powershell; then
+		bin='fs-access.ps1'
+	else
+		echo-error 'No suitable interpreter found.'
+		return 1
+	fi
+
+	# call this again, but inside sudo
+	if [[ $option_sudo == 'yes' || -n $option_user || -n $option_group ]]; then
+		sudo-helper --inherit --user="$option_user" --group="$option_group" \
+			-- fs-absolute -- "${option_paths[@]}"
+		return
+	fi
+
+	local path filename
+	for path in "${option_paths[@]}"; do
+		
+	done
+)
+
+# fire if invoked standalone
+if [[ $0 == "${BASH_SOURCE[0]}" ]]; then
+	fs_access "$@"
+fi
