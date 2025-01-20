@@ -3,34 +3,81 @@
 function remove_duplicates() (
 	source "$DOROTHY/sources/bash.bash"
 
-	local src="$1" file filename alternative altfile file_hashf altfile_hashf
-	shift
+	# =====================================
+	# Arguments
 
-	# cycle through src files
-	for file in "$src"/*; do
-		filename="$(basename "$file")"
-		for alternative in "$@"; do
+	function help {
+		cat <<-EOF >/dev/stderr
+			ABOUT:
+			Compare files with the same filenames from multiple directories, if they share the same checksum remove them.
+
+			USAGE:
+			remove-duplicates [...options] -- <source-path> ...<duplicate-path>
+		EOF
+		if [[ $# -ne 0 ]]; then
+			echo-error "$@"
+		fi
+		return 22 # EINVAL 22 Invalid argument
+	}
+
+	# process
+	local item option_paths=()
+	while [[ $# -ne 0 ]]; do
+		item="$1"
+		shift
+		case "$item" in
+		'--help' | '-h') help ;;
+		'--')
+			mapfile -t option_paths < <(fs-absolute -- "$@")
+			shift $#
+			break
+			;;
+		'--'*) help "An unrecognised flag was provided: $item" ;;
+		*) help "An unrecognised argument was provided: $item" ;;
+		esac
+	done
+
+	# ensure paths
+	if [[ ${#option_paths[@]} -lt 2 ]]; then
+		help 'Need at least two directories to compare files within.'
+	fi
+
+	local source_dir_path="${option_paths[0]}" alt_paths=("${option_paths[@]:1}") source_file_path filename alt_dir_path alt_file_path source_file_hash alt_file_path_hash
+
+	# =====================================
+	# Action
+
+	# cycle through source source files
+	if [[ ! -d "$source_dir_path" ]]; then
+		help "$source_dir_path was provided, but it is not a valid directory."
+	fi
+	for alt_dir_path in "${alt_paths[@]}"; do
+		if [[ ! -d "$alt_dir_path" ]]; then
+			help "$alt_dir_path was provided, but it is not a valid directory."
+		fi
+		for alt_file_path in "$alt_dir_path"/*; do
+			filename="$(basename "$alt_file_path")"
+
 			# check it also exists in alt location
-			altfile="$alternative/$filename"
-			if [[ ! -f "$altfile" ]]; then
+			source_file_path="$source_dir_path/$filename"
+			if [[ ! -f "$source_file_path" ]]; then
 				continue
 			fi
 
 			# prepare
-			file_hashf="$(mktemp)"
-			altfile_hashf="$(mktemp)"
+			source_file_hash="$(mktemp)"
+			alt_file_hash="$(mktemp)"
 
 			# checksum
-			echo-style --newline \
-				--bold="$file"
-			checksum --untitled --algorithm=md5 -- "$file" | tee "$file_hashf"
-			echo-style --bold="$altfile"
-			checksum --untitled --algorithm=md5 -- "$altfile" | tee "$altfile_hashf"
+			echo-style --newline --code="$source_file_path"
+			checksum --untitled --algorithm=md5 -- "$source_file_path" | tee "$source_file_hash"
+			echo-style --code="$alt_file_path"
+			checksum --untitled --algorithm=md5 -- "$alt_file_path" | tee "$alt_file_hash"
 
 			# compare and possibly remove
-			if [[ "$(cat "$file_hashf")" = "$(cat "$altfile_hashf")" ]]; then
-				rm "$altfile"
-				echo-style --green='same,' --green+bold=' removed: ' --dim="$altfile"
+			if [[ "$(cat "$source_file_hash")" = "$(cat "$alt_file_hash")" ]]; then
+				/usr/bin/trash "$alt_file_path"
+				echo-style --green='same,' --green+bold=' removed: ' --code="$alt_file_path"
 			else
 				echo-style --red='different,' --red+bold=' kept'
 			fi
