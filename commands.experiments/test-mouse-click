@@ -1,0 +1,46 @@
+#!/usr/bin/env bash
+
+function test_mouse_click() (
+	source "$DOROTHY/sources/bash.bash"
+
+	__print_lines $'\e[?1000h mouse reporting enabled'
+	function stop_listening_to_mouse {
+		__print_lines $'\e[?1000l mouse reporting disabled'
+		trap - EXIT SIGINT SIGTERM
+	}
+	trap stop_listening_to_mouse EXIT SIGINT SIGTERM
+	function parse_event_value_raw {
+		local character="$1"
+		printf '%d' "'$character" # for some reason, the preceding ' is necessary
+	}
+	function parse_event_value {
+		local character="$1" value
+		character="$(parse_event_value_raw "$character")"
+		value="$((character -= 32))"
+		printf '%s' "$value"
+	}
+	function parse_mouse_event {
+		local event="$1" b x y
+		b="${event:3:1}"
+		x="${event:4:1}"
+		y="${event:5:1}"
+		__print_lines "pre: button: $b, x: $x, y: $y" 
+		b="$(parse_event_value "$b")"
+		x="$(parse_event_value "$x")"
+		y="$(parse_event_value "$y")"
+		if [[ $b -ge 0 && $b -lt 3 ]]; then
+			b='pressed'
+		elif [[ $b -eq 3 ]]; then
+			b='released'
+		fi
+		__print_lines "post: button: $b, x: $x, y: $y" 
+	}
+	while IFS= read -r -n 6 event; do
+		parse_mouse_event "$event"
+	done
+)
+
+# fire if invoked standalone
+if [[ $0 == "${BASH_SOURCE[0]}" ]]; then
+	test_mouse_click "$@"
+fi
