@@ -6,23 +6,27 @@ function setup_util_bash_versions() (
 	# enable DOWNLOAD_BUILD_INSTALL
 	source "$(type -P setup-util)"
 
+	# dependencies
+	setup-util-devel --quiet
+	source "$DOROTHY/sources/environment.sh"
+
 	# setup
 	local version versions options
 	versions=(
-		# 4.0
-		# 4.1
-		# 4.2
-		# 4.3
-		# 4.4
-		# 5.0
-		5.1
-		5.2
+		# versions that fail to build on macos a64
+		3.0.16
+		3.1
+		3.2.57
+		4.0
+		4.1
+		4.2.53
+		4.3.30
+		4.4.18
+		5.0
+		5.1.16
+		5.2.37
 	)
 	function do_install {
-		# dependencies
-		setup-util-devel --quiet
-		source "$DOROTHY/sources/environment.sh"
-
 		# build
 		./configure
 		make
@@ -30,6 +34,7 @@ function setup_util_bash_versions() (
 	for version in "${versions[@]}"; do
 		options=(
 			--cli="bash-$version"
+			--order='download'
 			"$@"
 			DOWNLOAD="https://ftp.gnu.org/gnu/bash/bash-${version}.tar.gz"
 			DOWNLOAD_UNZIP_FORMAT='tar'
@@ -37,7 +42,7 @@ function setup_util_bash_versions() (
 			DOWNLOAD_BUILD_INSTALL='do_install'
 			DOWNLOAD_BUILD_GLOB='*/bash'
 		)
-		setup_util "${options[@]}"
+		setup_util --optional "${options[@]}"
 	done
 )
 
