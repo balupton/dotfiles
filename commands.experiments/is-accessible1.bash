@@ -16,12 +16,12 @@ fi
 path="$1"
 log="$(mktemp)"
 status=0
-stat -L "$path" 1>/dev/null 2>"$log" || status=$?
+stat -L -- "$path" 1>/dev/null 2>"$log" || status=$?
 if [[ $status -ne 0 ]]; then
-	if grep --quiet --regexp='stat: Permission denied$' "$log"; then
+	if grep --quiet --regexp='stat: Permission denied$' -- "$log"; then
 		# if it is a symlink, then it may or may not be broken, we need to escalate to find out
 		exit 13 # EACCES 13 Permission denied
-	elif grep --quiet --regexp='stat: No such file or directory$' "$log"; then
+	elif grep --quiet --regexp='stat: No such file or directory$' -- "$log"; then
 		# if it is a symlink, then it is accessible and broken
 		if [[ -L $path ]]; then
 			exit 9 # EBADF 9 Bad file descriptor
@@ -30,7 +30,7 @@ if [[ $status -ne 0 ]]; then
 		exit 2 # ENOENT 2 No such file or directory
 	else
 		# it is unknown, an unknown error occurred
-		cat "$log" >/dev/stderr
+		cat -- "$log" >/dev/stderr
 		exit "$status"
 	fi
 elif [[ -d "$path" ]]; then

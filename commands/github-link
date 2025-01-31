@@ -8,7 +8,7 @@ function github_link() (
 	slug="$(jq -r '.badges.config.githubSlug' package.json)"
 
 	if [[ -z "$slug" || "$slug" = 'null' ]]; then
-		slug="bevry/$(basename "$(pwd)")"
+		slug="bevry/$(basename -- "$(pwd)")"
 	fi
 
 	set -x

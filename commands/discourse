@@ -91,7 +91,7 @@ GIT_SSH_PASS='$option_git_ssh_pass'
 GIT_REMOTE='$option_git_remote'
 GIT_BRANCH='$option_git_branch'
 CONTAINER='$option_container'
-$(cat "$DOROTHY/user/commands/discourse-setup")
+$(cat -- "$DOROTHY/user/commands/discourse-setup")
 "
 	(ssh -t "$option_ssh_ip" "$discourse_init" && {
 		__print_lines 'Successfully setup the discourse instance. 🎉'

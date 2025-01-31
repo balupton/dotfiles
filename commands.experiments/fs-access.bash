@@ -15,9 +15,9 @@ status=0
 stat -L "$1" &>"$log" || status=$?
 if [[ $status -eq 0 ]]; then
 	exit 17 # EEXIST 17 File exists
-elif grep --quiet --fixed-strings --regexp='No such file or directory' "$log"; then
+elif grep --quiet --fixed-strings --regexp='No such file or directory' -- "$log"; then
 	exit 2 # ENOENT 2 No such file or directory
-elif grep --quiet --fixed-strings --regexp='Permission denied' "$log"; then
+elif grep --quiet --fixed-strings --regexp='Permission denied' -- "$log"; then
 	exit 13 # EACCES 13 Permission denied
 else
 	exit "$status"
@@ -33,10 +33,10 @@ fi
 # status=0
 # stat -L "$1" &>"$log" || status=$?
 # if [[ $status -ne 0 ]]; then
-# 	if grep --quiet --fixed-strings --regexp='No such file or directory' "$log"; then
+# 	if grep --quiet --fixed-strings --regexp='No such file or directory' -- "$log"; then
 # 		exit 2 # ENOENT 2 No such file or directory
 # 	fi
-# 	if grep --quiet --fixed-strings --regexp='Permission denied' "$log"; then
+# 	if grep --quiet --fixed-strings --regexp='Permission denied' -- "$log"; then
 # 		exit 13 # EACCES 13 Permission denied
 # 	fi
 # fi

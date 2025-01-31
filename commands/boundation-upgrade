@@ -156,8 +156,8 @@ function boundation_upgrade() (
 	nvm-env -- npm run our:meta
 
 	# release
-	git rm -rf docs || :
-	git add .
+	git rm -rf -- docs || :
+	git add -- .
 	git commit -am "$v - boundation, changelog, version bump"
 	# if ! nvm-env -- npm owner add bevryme; then
 	# 	__print_lines 'adding npm owner failed, trying again in two minutes'

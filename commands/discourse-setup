@@ -81,7 +81,7 @@ function discourse_setup() (
 	# Install discourse
 	__print_lines 'Configuring discourse...'
 	if [[ ! -e /var/discourse ]]; then
-		sudo mkdir -p -m 'a-xrw,u+Xrw' /var/discourse
+		sudo mkdir -p -m 'a-xrw,u+Xrw' -- /var/discourse
 		sudo chown "$USER:" /var/discourse
 		cd /var/discourse
 		git init
@@ -98,7 +98,7 @@ function discourse_setup() (
 	# Install configuration
 	__print_lines 'Configuring instance...'
 	if [[ ! -e /var/discourse/containers/.git ]]; then
-		rm -rf /var/discourse/containers
+		rm -rf -- /var/discourse/containers
 		__mkdirp /var/discourse/containers
 		cd /var/discourse/containers
 		git init
@@ -122,12 +122,12 @@ function discourse_setup() (
 	if [[ -e "/var/discourse/containers/$CONTAINER.key" ]]; then
 		__mkdirp /var/discourse/shared/standalone/ssl
 		# symlink doesn't work
-		cp -f "/var/discourse/containers/$CONTAINER.key" '/var/discourse/shared/standalone/ssl/ssl.key'
+		cp -f -- "/var/discourse/containers/$CONTAINER.key" '/var/discourse/shared/standalone/ssl/ssl.key'
 	fi
 	if [[ -e "/var/discourse/containers/$CONTAINER.crt" ]]; then
 		__mkdirp /var/discourse/shared/standalone/ssl
 		# symlink doesn't work
-		cp -f "/var/discourse/containers/$CONTAINER.crt" '/var/discourse/shared/standalone/ssl/ssl.crt'
+		cp -f -- "/var/discourse/containers/$CONTAINER.crt" '/var/discourse/shared/standalone/ssl/ssl.crt'
 	fi
 
 	# Trim unused/style images to free up space

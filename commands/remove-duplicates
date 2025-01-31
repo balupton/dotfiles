@@ -56,7 +56,7 @@ function remove_duplicates() (
 			help "$alt_dir_path was provided, but it is not a valid directory."
 		fi
 		for alt_file_path in "$alt_dir_path"/*; do
-			filename="$(basename "$alt_file_path")"
+			filename="$(basename -- "$alt_file_path")"
 
 			# check it also exists in alt location
 			source_file_path="$source_dir_path/$filename"
@@ -70,13 +70,13 @@ function remove_duplicates() (
 
 			# checksum
 			echo-style --newline --code="$source_file_path"
-			checksum --untitled --algorithm=md5 -- "$source_file_path" | tee "$source_file_hash"
+			checksum --untitled --algorithm=md5 -- "$source_file_path" | tee -- "$source_file_hash"
 			echo-style --code="$alt_file_path"
-			checksum --untitled --algorithm=md5 -- "$alt_file_path" | tee "$alt_file_hash"
+			checksum --untitled --algorithm=md5 -- "$alt_file_path" | tee -- "$alt_file_hash"
 
 			# compare and possibly remove
-			if [[ "$(cat "$source_file_hash")" = "$(cat "$alt_file_hash")" ]]; then
-				/usr/bin/trash "$alt_file_path"
+			if [[ "$(cat -- "$source_file_hash")" = "$(cat -- "$alt_file_hash")" ]]; then
+				/usr/bin/trash "$alt_file_path" # doesn't support -- ...<file>
 				echo-style --green='same,' --green+bold=' removed: ' --code="$alt_file_path"
 			else
 				echo-style --red='different,' --red+bold=' kept'
