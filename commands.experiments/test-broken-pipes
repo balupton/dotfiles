@@ -1,0 +1,31 @@
+#!/usr/bin/env bash
+
+function test_broken_pipe() (
+	source "$DOROTHY/sources/bash.bash"
+	# set +o pipefail
+	# rm -rf "$XDG_CACHE_HOME/dorothy/eval-capture/"*
+	local gstatus=''
+	function broken_pipe {
+		bash -c 'set -Eeuo pipefail; yes | head -n 1'
+		# yes | head -n 1
+		# find . | head -n 1
+		# curl --fail-early --head --write-out '%{http_code}' --location 'https://www.google.com' | "$@" | tail -n 1 
+	}
+	function right_side {
+		# local status='' stdout='' stderr=''
+		# eval_capture --statusvar=status --stdoutvar=stdout --stderrvar=stderr -- cat
+		# printf 'status: [%s]\n' "$status"
+		# printf 'stdout: [%s]\n' "$stdout"
+		# printf 'stderr: [%s]\n' "$stderr"
+		:
+	}
+	#broken_pipe | eval-tester --status=0 --stdout='' --stderr='' -- cat
+
+	bash -c 'set -Eeuo pipefail; yes | head -n 1' | eval-tester --name='stdin with newline' --stdout='y' -- cat
+
+	printf 'gstatus: [%s]\n' "$gstatus"
+	fs-structure -- "$XDG_CACHE_HOME/dorothy/eval-capture"
+)
+
+# fire if invoked standalone
+test_broken_pipe "$@"
