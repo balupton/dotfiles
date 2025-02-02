@@ -1,0 +1,27 @@
+#!/usr/bin/env bash
+
+function new_dev_branch() (
+	source "$DOROTHY/sources/bash.bash"
+
+	# dependencies
+	if ! is-file -- /usr/share/dict/words; then
+		if is-apt; then
+			# https://askubuntu.com/a/149128
+			# setup-util --name='American Words' APT='wamerican'
+			setup-util --name='British Words' APT='wbritish'
+		else
+			echo-error 'No dictionary found'
+			return 1
+		fi
+	fi
+
+	# action
+	local branch
+	branch="$(shuf -n 1 /usr/share/dict/words | echo-join '-' --stdin | echo-lowercase --stdin | echo-lines --prefix='dev/' --stdin)"
+	git checkout -b "$branch"
+)
+
+# fire if invoked standalone
+if [[ "$0" = "${BASH_SOURCE[0]}" ]]; then
+	new_dev_branch "$@"
+fi
