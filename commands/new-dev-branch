@@ -15,9 +15,31 @@ function new_dev_branch() (
 		fi
 	fi
 
+	# use two words, so you don't just end up with one inappropriate word like:
+	# > new-dev-branch
+	# Switched to a new branch 'dev/marijuana'
+	#
+	# okay, don't use two words either:
+	# > new-dev-branch
+	# Switched to a new branch 'dev/sleaziness-greening'
+	#
+	# instead prompt them
+
 	# action
-	local branch
-	branch="$(shuf -n 1 /usr/share/dict/words | echo-join '-' --stdin | echo-lowercase --stdin | echo-lines --prefix='dev/' --stdin)"
+	local word branch question
+	while :; do
+		#words="$(shuf -n 1 /usr/share/dict/words | echo-join '-' --stdin | echo-lowercase --stdin | echo-lines --prefix='dev/' --stdin)"
+		word="$(shuf -n 1 /usr/share/dict/words)"
+		# check it is a valid word, unlike: Olympiad, haiphong's, chancel's
+		if ! echo-regexp -qf --regexp='^[a-z]+$' -- "$word"; then
+			continue # generate another
+		fi
+		branch="dev/$word"
+		question="$(echo-style --reset --bold='use ' --invert="$branch" --bold=' as the new branch name?')"
+		if confirm --positive --ppid=$$ -- "$question"; then
+			break
+		fi
+	done
 	git checkout -b "$branch"
 )
 
