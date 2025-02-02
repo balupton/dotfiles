@@ -40,7 +40,7 @@ function setup_util_bash_versions() (
 			DOWNLOAD_UNZIP_FORMAT='tar'
 			DOWNLOAD_UNZIP_FILTER='bash-*/*'
 			DOWNLOAD_BUILD_INSTALL='do_install'
-			DOWNLOAD_BUILD_GLOB='*/bash'
+			DOWNLOAD_BUILD_GLOB='bash'
 		)
 		setup_util --optional "${options[@]}"
 	done
