@@ -44,7 +44,7 @@ function discourse_setup() (
 		EOF
 	fi
 	# Fix Permissions
-	chmod --recursive a-xrw,u+Xrw "$HOME/.ssh"
+	chmod --recursive a-xrw,u+Xrw -- "$HOME/.ssh" # non-dorothy environment, only linux
 	# Load our SSH Key: https://stackoverflow.com/a/52671286/130638
 	if [[ -n "${GIT_SSH_PASS-}" ]]; then
 		ssh_stdin_pass_helper="$HOME/ssh_stdin_password.bash"
@@ -53,7 +53,7 @@ function discourse_setup() (
 			read secret
 			echo \$secret
 		EOF
-		chmod +x "$ssh_stdin_pass_helper"
+		chmod +x -- "$ssh_stdin_pass_helper" # non-dorothy environment, only linux
 
 		__print_lines 'Adding the SSH keys...'
 		DISPLAY=:0 SSH_ASKPASS="$ssh_stdin_pass_helper" ssh-add "$HOME/.ssh/$GIT_SSH_KEY" <<<"$GIT_SSH_PASS"
@@ -82,7 +82,7 @@ function discourse_setup() (
 	__print_lines 'Configuring discourse...'
 	if [[ ! -e /var/discourse ]]; then
 		sudo mkdir -p -m 'a-xrw,u+Xrw' -- /var/discourse
-		sudo chown "$USER:" /var/discourse
+		sudo chown "$USER:" -- /var/discourse
 		cd /var/discourse
 		git init
 		git config pull.ff only
@@ -114,10 +114,10 @@ function discourse_setup() (
 		git pull origin "$GIT_BRANCH"
 	fi
 	if [[ ! -e "/var/discourse/containers/$CONTAINER.yml" ]]; then
-		vim "/var/discourse/containers/app.yml"
+		vim -- '/var/discourse/containers/app.yml'
 	fi
 	if [[ -e "/var/discourse/containers/$CONTAINER.yml" ]]; then
-		ln -sfF "/var/discourse/containers/$CONTAINER.yml" '/var/discourse/containers/app.yml'
+		ln -sfF -- "/var/discourse/containers/$CONTAINER.yml" '/var/discourse/containers/app.yml'
 	fi
 	if [[ -e "/var/discourse/containers/$CONTAINER.key" ]]; then
 		__mkdirp /var/discourse/shared/standalone/ssl
@@ -155,7 +155,7 @@ function discourse_setup() (
 	# 	git pull origin "\$(git rev-parse --abbrev-ref HEAD)"
 	# 	/var/discourse/launcher rebuild app
 	# EOF
-	# chmod +x "$discourse_cron_script"
+	# chmod +x -- "$discourse_cron_script"
 	# # Check if the cron job file is actually used
 	# while ! (crontab -l | grep --quiet --fixed-strings --regexp="$discourse_cron_script"); do
 	# 	cat <<-EOF

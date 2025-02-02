@@ -10,7 +10,7 @@ function remove_part_extension() (
 		return 0
 	fi
 	for file in "${files[@]}"; do
-		mv -v "$file" "${file%.part}"
+		mv -v -- "$file" "${file%.part}"
 	done
 	echo-style --success="Removed part extension from ${#files[@]} files."
 	return 0
