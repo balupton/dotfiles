@@ -3,14 +3,66 @@
 function gtd() (
 	source "$DOROTHY/sources/bash.bash"
 
-	local branch_or_tag="$1"
-	git branch -D "$branch_or_tag" || :
-	git tag -d "$branch_or_tag" || :
-	local remotes=() remote
-	mapfile -t remotes < <(git-helper remotes)
-	for remote in "${remotes[@]}"; do
-		git push "$remote" :"$branch_or_tag" || :
+	# =====================================
+	# Arguments
+
+	function help {
+		cat <<-EOF >/dev/stderr
+			ABOUT:
+			Delete the specified <branch/tag> locally and remotely.
+
+			USAGE:
+			gtd ...<branch/tag>
+
+			OPTIONS:
+			<branch/tag>
+			    The branch or tag to delete.
+		EOF
+		if [[ $# -ne 0 ]]; then
+			echo-error "$@"
+		fi
+		return 22 # EINVAL 22 Invalid argument
+	}
+
+	# process
+	local item option_branch_or_tags=()
+	while [[ "$#" -ne 0 ]]; do
+		item="$1"
+		shift
+		case "$item" in
+		'--help' | '-h') help ;;
+		'--branch='*) option_branch_or_tags+=("${item#*=}") ;;
+		'--'*) help "An unrecognised flag was provided: $item" ;;
+		'--')
+			option_branch_or_tags+=("$@")
+			shift $#
+			break
+			;;
+		*)
+			option_branch_or_tags+=("$item")
+			;;
+		esac
 	done
+
+	# =====================================
+	# Action
+
+	local remotes=()
+	mapfile -t remotes < <(git-helper remotes)
+
+	function do_delete {
+		local branch_or_tag="$1" remote
+		git branch -D "$branch_or_tag" || :
+		git tag -d "$branch_or_tag" || :
+		for remote in "${remotes[@]}"; do
+			git push "$remote" :"$branch_or_tag" || :
+		done
+	}
+
+	for branch_or_tag in "${option_branch_or_tags[@]}"; do
+		do_delete "$branch_or_tag"
+	done
+
 	git fetch --all --prune
 	git branch -a
 )
