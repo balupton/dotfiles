@@ -8,27 +8,34 @@ function setup_util_bash_versions() (
 
 	# dependencies
 	setup-util-devel --quiet
-	setup-util --cli='yacc' APT='byacc'
+	setup-util --cli='yacc' APT='byacc' BREW='byacc'
 	source "$DOROTHY/sources/environment.sh"
 
 	# setup
 	local version versions options
 	versions=(
-		3.0.16
-		3.1
-		3.2.57
-		4.0
-		4.1
-		4.2.53
-		4.3.30
-		4.4.18
-		5.0
-		5.1.16
-		5.2.37
+		# they all compile on ubuntu x86 without any flags, however byacc is needed for a few of them
+		3.0.16 # compiles on macos x86 with CPPFLAGS modification
+		3.1 # compiles on macos x86 with CPPFLAGS modification
+		3.2.57 # compiles on macos x86 with CPPFLAGS modification
+		4.0 # compiles on macos x86 with CPPFLAGS modification
+		4.1 # compiles on macos x86 with CPPFLAGS modification
+		4.2.53 # compiles on macos x86 with CPPFLAGS modification
+		4.3.30 # compiles on macos x86 with CPPFLAGS modification
+		4.4.18 # compiles on macos x86 with CPPFLAGS modification
+		5.0 # compiles on macos x86 with CPPFLAGS modification
+		5.1.16 # compiles on macos x86 without any flags
+		5.2.37 # compiles on macos x86 without any flags
 	)
 	function do_install {
 		# build
-		./configure
+		if is-mac; then
+			# CFLAGS for recommendation from https://github.com/Homebrew/homebrew-core/blob/8bfd3fc213ea630c9157a926f01c76def811c399/Formula/b/bash.rb#L110-L117
+			# CPPFLAGS to prevent failures on macos
+			./configure CFLAGS='-DSSH_SOURCE_BASHRC' CPPFLAGS='-Wno-return-type -Wno-deprecated-non-prototype -Wno-implicit-function-declaration -Wno-deprecated-declarations'
+		else
+			./configure
+		fi
 		make
 	}
 	for version in "${versions[@]}"; do
