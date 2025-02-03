@@ -140,7 +140,7 @@ function discourse_setup() (
 	# Build the app
 	__print_lines 'Building instance...'
 	sudo apt-get install -y tmux
-	tmux -c '/var/discourse/launcher rebuild app; exit $?'
+	tmux -c '/var/discourse/launcher rebuild app; exit'
 
 	# # Cron
 	# __print_lines 'Configuring cron...'
