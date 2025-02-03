@@ -6,7 +6,12 @@ function gtd() (
 	local branch_or_tag="$1"
 	git branch -D "$branch_or_tag" || :
 	git tag -d "$branch_or_tag" || :
-	git push origin :"$branch_or_tag" || :
+	local remotes=() remote
+	mapfile -t remotes < <(git-helper remotes)
+	for remote in "${remotes[@]}"; do
+		git push "$remote" :"$branch_or_tag" || :
+	done
+	git fetch --all --prune
 	git branch -a
 )
 
