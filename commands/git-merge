@@ -16,7 +16,7 @@ function git_merge() (
 
 			OPTIONS:
 			<branch>
-			    If not speciified, the current branch will be used.
+			    If not specified, the current branch will be used.
 		EOF
 		if [[ $# -ne 0 ]]; then
 			echo-error "$@"
@@ -34,8 +34,8 @@ function git_merge() (
 		'--branch='*) option_branch="${item#*=}" ;;
 		'--'*) help "An unrecognised flag was provided: $item" ;;
 		*)
-			if [[ -z "$branch" ]]; then
-				branch="$item"
+			if [[ -z "$option_branch" ]]; then
+				option_branch="$item"
 			else
 				help "An unrecognised argument was provided: $item"
 			fi
@@ -52,11 +52,17 @@ function git_merge() (
 	local default_branch
 	default_branch="$(get-git-default-branch)"
 
+	# ensure the two branches are different
+	if [[ "$default_branch" = "$option_branch" ]]; then
+		echo-error "The default branch and the specified branch are the same: $default_branch"
+		return 22 # EINVAL 22 Invalid argument
+	fi
+
 	# =======================================================
 	# Action
 
 	eval-helper --wrap --verbose --confirm -- git checkout "$default_branch"
-	eval-helper --wrap --verbose --confirm -- git merge "$option_branch"
+	eval-helper --wrap --verbose --confirm -- git merge --no-commit "$option_branch"
 	eval-helper --wrap --verbose --confirm -- git push
 	eval-helper --wrap --verbose --confirm -- gtd "$option_branch"
 )
