@@ -32,7 +32,18 @@ function setup_util_bash_versions() (
 		if is-mac; then
 			# CFLAGS for recommendation from https://github.com/Homebrew/homebrew-core/blob/8bfd3fc213ea630c9157a926f01c76def811c399/Formula/b/bash.rb#L110-L117
 			# CPPFLAGS to prevent failures on macos
-			./configure CFLAGS='-DSSH_SOURCE_BASHRC' CPPFLAGS='-Wno-return-type -Wno-deprecated-non-prototype -Wno-implicit-function-declaration -Wno-deprecated-declarations'
+			
+			# macos x86:
+			# ./configure CFLAGS='-DSSH_SOURCE_BASHRC' CPPFLAGS='-Wno-return-type -Wno-deprecated-non-prototype -Wno-implicit-function-declaration -Wno-deprecated-declarations'
+			# macos x86 and a64:
+			#./configure CFLAGS='-DSSH_SOURCE_BASHRC' CPPFLAGS='-Wno-return-type -Wno-deprecated-non-prototype -Wno-implicit-function-declaration -Wno-deprecated-declarations -Wno-implicit-int' CC='gcc-14'
+			#./configure CFLAGS='-DSSH_SOURCE_BASHRC' CPPFLAGS='-Wno-return-type -Wno-deprecated-non-prototype -Wno-implicit-function-declaration -Wno-deprecated-declarations -Wno-implicit-int -I/Library/Developer/CommandLineTools/SDKs/MacOSX.sdk/usr/include'
+
+			# however, this can be simplified to just [-w] to suppress all warnings, keep the -W flags that are required to avoid failures, and appending $CPPFLAGS as dorothy already detected the correct includes in [setup-environment-commands]
+			#./configure CFLAGS='-DSSH_SOURCE_BASHRC' CPPFLAGS="-w -Wno-implicit-function-declaration -Wno-implicit-int -Wno-return-type $CPPFLAGS"
+
+			# but that too can be simplified to just this:
+			./configure CFLAGS='-DSSH_SOURCE_BASHRC' CPPFLAGS="-w -Wno-error=all $CPPFLAGS"
 		else
 			./configure
 		fi
@@ -49,7 +60,8 @@ function setup_util_bash_versions() (
 			DOWNLOAD_BUILD_INSTALL='do_install'
 			DOWNLOAD_BUILD_GLOB='bash'
 		)
-		setup_util --optional "${options[@]}"
+		setup_util --optional --uninstall "${options[@]}"
+		setup_util --optional --verbose "${options[@]}"
 	done
 )
 
