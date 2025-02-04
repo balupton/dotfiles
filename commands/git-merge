@@ -61,10 +61,18 @@ function git_merge() (
 	# =======================================================
 	# Action
 
-	eval-helper --wrap --verbose --confirm -- git checkout "$default_branch"
-	eval-helper --wrap --verbose --confirm -- git merge --no-commit "$option_branch"
-	eval-helper --wrap --verbose --confirm -- git push
-	eval-helper --wrap --verbose --confirm -- gtd "$option_branch"
+	if ! confirm --positive --ppid=$$ -- "$(echo-style --reset --bold='Merge ' --invert="$option_branch" --bold=' into ' --invert="$default_branch")"; then
+		return 125 # ECANCELED 125 Operation cancelled
+	fi
+
+	set -x
+	git fetch --all
+	git-up
+	git checkout "$default_branch"
+	git-up
+	git merge "$option_branch"
+	git push
+	gtd "$option_branch"
 )
 
 # fire if invoked standalone
