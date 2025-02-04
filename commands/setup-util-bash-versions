@@ -15,38 +15,22 @@ function setup_util_bash_versions() (
 	local version versions options
 	versions=(
 		# they all compile on ubuntu x86 without any flags, however byacc is needed for a few of them
-		3.0.16 # compiles on macos x86 with CPPFLAGS modification
-		3.1 # compiles on macos x86 with CPPFLAGS modification
-		3.2.57 # compiles on macos x86 with CPPFLAGS modification
-		4.0 # compiles on macos x86 with CPPFLAGS modification
-		4.1 # compiles on macos x86 with CPPFLAGS modification
-		4.2.53 # compiles on macos x86 with CPPFLAGS modification
-		4.3.30 # compiles on macos x86 with CPPFLAGS modification
-		4.4.18 # compiles on macos x86 with CPPFLAGS modification
-		5.0 # compiles on macos x86 with CPPFLAGS modification
+		3.0.16 # compiles on macos with CPPFLAGS modification
+		3.1 # compiles on macos with CPPFLAGS modification
+		3.2.57 # compiles on macos with CPPFLAGS modification
+		4.0 # compiles on macos with CPPFLAGS modification
+		4.1 # compiles on macos with CPPFLAGS modification
+		4.2.53 # compiles on macos with CPPFLAGS modification
+		4.3.30 # compiles on macos with CPPFLAGS modification
+		4.4.18 # compiles on macos with CPPFLAGS modification
+		5.0 # compiles on macos with CPPFLAGS modification
 		5.1.16 # compiles on macos x86 without any flags
 		5.2.37 # compiles on macos x86 without any flags
 	)
 	function do_install {
-		# build
-		if is-mac; then
-			# CFLAGS for recommendation from https://github.com/Homebrew/homebrew-core/blob/8bfd3fc213ea630c9157a926f01c76def811c399/Formula/b/bash.rb#L110-L117
-			# CPPFLAGS to prevent failures on macos
-			
-			# macos x86:
-			# ./configure CFLAGS='-DSSH_SOURCE_BASHRC' CPPFLAGS='-Wno-return-type -Wno-deprecated-non-prototype -Wno-implicit-function-declaration -Wno-deprecated-declarations'
-			# macos x86 and a64:
-			#./configure CFLAGS='-DSSH_SOURCE_BASHRC' CPPFLAGS='-Wno-return-type -Wno-deprecated-non-prototype -Wno-implicit-function-declaration -Wno-deprecated-declarations -Wno-implicit-int' CC='gcc-14'
-			#./configure CFLAGS='-DSSH_SOURCE_BASHRC' CPPFLAGS='-Wno-return-type -Wno-deprecated-non-prototype -Wno-implicit-function-declaration -Wno-deprecated-declarations -Wno-implicit-int -I/Library/Developer/CommandLineTools/SDKs/MacOSX.sdk/usr/include'
-
-			# however, this can be simplified to just [-w] to suppress all warnings, keep the -W flags that are required to avoid failures, and appending $CPPFLAGS as dorothy already detected the correct includes in [setup-environment-commands]
-			#./configure CFLAGS='-DSSH_SOURCE_BASHRC' CPPFLAGS="-w -Wno-implicit-function-declaration -Wno-implicit-int -Wno-return-type $CPPFLAGS"
-
-			# but that too can be simplified to just this:
-			./configure CFLAGS='-DSSH_SOURCE_BASHRC' CPPFLAGS="-w -Wno-error=all $CPPFLAGS"
-		else
-			./configure
-		fi
+		# build, but let [setup-util] install it locally to only ourself
+		# support unbounded CPPFLAGS, as if its result from [setup-environment-commands] is empty, as it will be on ubuntu, then it will remain unbounded
+		./configure CFLAGS='-DSSH_SOURCE_BASHRC' CPPFLAGS="-w -Wno-error=all ${CPPFLAGS-}"
 		make
 	}
 	for version in "${versions[@]}"; do
