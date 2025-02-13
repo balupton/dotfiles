@@ -32,7 +32,6 @@
 
 function magnet_search() (
 	source "$DOROTHY/sources/bash.bash"
-	__require_array 'mapfile'
 
 	# dependencies
 	setup-util --quiet --cli='attractorr' \

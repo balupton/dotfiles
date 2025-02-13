@@ -51,7 +51,7 @@ function discourse_setup() (
 		cat <<-EOF >"$ssh_stdin_pass_helper"
 			#!/usr/bin/env bash
 			read secret
-			echo \$secret
+			printf '%s\n' "\$secret"
 		EOF
 		chmod +x -- "$ssh_stdin_pass_helper" # non-dorothy environment, only linux
 

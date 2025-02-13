@@ -2,7 +2,6 @@
 
 function magnet_select() (
 	source "$DOROTHY/sources/bash.bash"
-	__require_array 'mapfile'
 
 	# prepare
 	local search="$1" results option_visual
