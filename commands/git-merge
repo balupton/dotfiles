@@ -7,7 +7,7 @@ function git_merge() (
 	# Arguments
 
 	function help {
-		cat <<-EOF >/dev/stderr
+		cat <<-EOF >&2
 			ABOUT:
 			Checkout the main branch, merge the specified branch, push the changes, delete the specified branch.
 

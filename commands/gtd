@@ -7,7 +7,7 @@ function gtd() (
 	# Arguments
 
 	function help {
-		cat <<-EOF >/dev/stderr
+		cat <<-EOF >&2
 			ABOUT:
 			Delete the specified <branch/tag> locally and remotely.
 

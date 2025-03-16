@@ -9,7 +9,7 @@ function discourse() (
 	# Arguments
 
 	function help {
-		cat <<-EOF >/dev/stderr
+		cat <<-EOF >&2
 			ABOUT:
 			Setup or Login into a Discourse Instance
 
@@ -91,13 +91,13 @@ GIT_SSH_PASS='$option_git_ssh_pass'
 GIT_REMOTE='$option_git_remote'
 GIT_BRANCH='$option_git_branch'
 CONTAINER='$option_container'
-$(cat -- "$DOROTHY/user/commands/discourse-setup")
+$(<"$DOROTHY/user/commands/discourse-setup")
 "
 	(ssh -t "$option_ssh_ip" "$discourse_init" && {
-		__print_lines 'Successfully setup the discourse instance. 🎉'
+		echo-style --success='Successfully setup the discourse instance. 🎉'
 		return 0
 	}) || {
-		__print_lines 'Error: Failed to setup the discourse instance. 🚨' >/dev/stderr
+		echo-style --stderr --error='Error: Failed to setup the discourse instance. 🚨'
 		return 1
 	}
 )

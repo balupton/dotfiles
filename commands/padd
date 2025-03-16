@@ -5,7 +5,7 @@ function padd() (
 
 	# help
 	function help {
-		cat <<-EOF >/dev/stderr
+		cat <<-EOF >&2
 			ABOUT:
 			Forward to the correct package manager for your project.
 			If [yarn.lock] is present, uses [yarn].

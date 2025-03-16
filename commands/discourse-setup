@@ -7,7 +7,7 @@ function discourse_setup() (
 	# Receive arguments from caller
 	local GIT_SSH_KEY="${GIT_SSH_KEY-}" GIT_SSH_PASS="${GIT_SSH_PASS-}" GIT_REMOTE="${GIT_REMOTE-}" GIT_BRANCH="${GIT_BRANCH-}" CONTAINER="${CONTAINER-}"
 	if [[ -z "$GIT_SSH_KEY" || -z "$GIT_SSH_PASS" || -z "$GIT_REMOTE" ]]; then
-		__print_lines '[discourse-setup] is to be run via [commands/discourse]' >/dev/stderr
+		__print_lines '[discourse-setup] is to be run via [commands/discourse]' >&2
 		return 1
 	fi
 
@@ -74,7 +74,7 @@ function discourse_setup() (
 
 	# Install docker
 	if __command_missing docker; then
-		__print_lines 'Docker is missing, install it via [setup-util-docker] by installing Dorothy [dorothy.bevry.me]...' >/dev/stderr
+		__print_lines 'Docker is missing, install it via [setup-util-docker] by installing Dorothy [dorothy.bevry.me]...' >&2
 		return 1
 	fi
 

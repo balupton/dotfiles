@@ -1,0 +1,66 @@
+#!/usr/bin/env bash
+
+function one__description {
+	cat <<-EOF
+		# I **love** this.
+		# It is so *cool*.
+	EOF
+}
+function one__code {
+	echo-verbose -- "$@"
+}
+
+function two__description {
+	cat <<-EOF
+		# This commane will run echo-lowercase on the arguments.
+	EOF
+}
+function two__code {
+	echo-lowercase -- "$@"
+}
+
+function three__description {
+	cat <<-EOF
+		# This outputs the current bash version
+	EOF
+}
+function three__code {
+	printf '%s\n' "$BASH_VERSION"
+}
+
+function_names=()
+mapfile -t function_names < <(declare -F | awk '{print $3}') # [declare -f one_fn] to [one_fn]
+function_codes=()
+function_labels=()
+for function_name in "${function_names[@]}"; do
+	# check function is a __code function
+	if [[ "$function_name" != *'__code' ]]; then
+		continue
+	fi
+	# check it has a description counterpart
+	function_core_name="${function_name%__*}"
+	if [[ "$(type -t "${function_core_name}__description")" != 'function' ]]; then
+		continue
+	fi
+	function_code="$(declare -f "$function_name" | sed '1,2d; $d' | sed 's/^    //')" # declare -f converts tabs to spaces
+	function_description="$("${function_core_name}__description")"
+	function_label="$(bat --style plain --color always --language bash --paging=never <<< "$function_description"$'\n'"$function_code")"
+	function_codes+=("$function_code")
+	function_labels+=("$function_label"$'\n')
+done
+
+index=0
+while :; do
+	index="$(choose --linger 'Which code to execute?' --default="$index" --match='$INDEX' --index -- "${function_labels[@]}")"
+	args="$(ask --linger 'Arguments to pass to the code?')"
+	code="${function_codes[index]}"
+	debug-bash -- -c "$code" -- $args  # debug-bash needs to be updated to support the -c option, then this would run the code against all bash versions on this machine
+	if ! confirm --ppid=$$ --positive -- 'Prompt again?'; then
+		break
+	fi
+	if [[ $index -eq ${#function_labels[@]} ]]; then
+		index=0
+	else
+		index=$((index + 1))
+	fi
+done

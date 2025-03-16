@@ -7,7 +7,7 @@ function sbs_helper() (
 	# Arguments
 
 	function help {
-		cat <<-EOF >/dev/stderr
+		cat <<-EOF >&2
 			ABOUT:
 			Get details about your watched files.
 

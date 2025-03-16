@@ -7,7 +7,7 @@ function remove_duplicates() (
 	# Arguments
 
 	function help {
-		cat <<-EOF >/dev/stderr
+		cat <<-EOF >&2
 			ABOUT:
 			Compare files with the same filenames from multiple directories, if they share the same checksum remove them.
 
@@ -75,7 +75,7 @@ function remove_duplicates() (
 			checksum --untitled --algorithm=md5 -- "$alt_file_path" | tee -- "$alt_file_hash"
 
 			# compare and possibly remove
-			if [[ "$(cat -- "$source_file_hash")" = "$(cat -- "$alt_file_hash")" ]]; then
+			if [[ "$(<"$source_file_hash")" = "$(<"$alt_file_hash")" ]]; then
 				/usr/bin/trash "$alt_file_path" # doesn't support -- ...<file>
 				echo-style --green='same,' --green+bold=' removed: ' --code="$alt_file_path"
 			else
