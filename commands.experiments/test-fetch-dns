@@ -39,8 +39,8 @@ function test_fetch_dns() (
 	done
 	index="$(
 		choose --required --linger --index --confirm \
-			--question='Which DNS provider to use?' \
-			-- "${provider_options[@]}"
+			--question='Which DNS provider to use?' -- \
+			"${provider_options[@]}"
 	)"
 	provider="${providers[index]}"
 	url="${providers_url[index]}"

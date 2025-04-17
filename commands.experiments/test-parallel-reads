@@ -1,0 +1,14 @@
+#!/usr/bin/env bash
+
+# Start a background job that reads user input
+{
+	while :; do
+		read-key </dev/tty 2>/dev/null
+	done
+} &
+
+# Meanwhile, the script continues...
+for i in {1..5}; do
+	__print_lines "Computing: $i"
+	sleep 1
+done

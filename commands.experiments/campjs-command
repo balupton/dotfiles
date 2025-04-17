@@ -8,8 +8,8 @@ function campjs_command() (
 
 	local colors=()
 	mapfile -t colors < <(
-		choose --linger --default=red --default=blue --multi --question='What is your favourite color?' \
-			-- green red blue blink jkasdjkasdjkas
+		choose --linger --default=red --default=blue --multi --question='What is your favourite color?' -- \
+			green red blue blink jkasdjkasdjkas
 	)
 
 	local color

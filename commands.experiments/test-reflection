@@ -42,6 +42,7 @@ for function_name in "${function_names[@]}"; do
 	if [[ "$(type -t "${function_core_name}__description")" != 'function' ]]; then
 		continue
 	fi
+	# @todo replace with `echo-regexp` and `echo-write`
 	function_code="$(declare -f "$function_name" | sed '1,2d; $d' | sed 's/^    //')" # declare -f converts tabs to spaces
 	function_description="$("${function_core_name}__description")"
 	function_label="$(bat --style plain --color always --language bash --paging=never <<< "$function_description"$'\n'"$function_code")"

@@ -187,10 +187,10 @@ function boundation_all() (
 		if [[ "$ready" = 'no' ]]; then
 			echo-style --dim="skipping $repo (not yet ready)"
 			continue
-		elif is-needle --needle="$slug" -- "${option_skips[@]}"; then
+		elif __is_within "$slug" 'option_skips'; then
 			echo-style --dim="skipping $slug (slug was in skips)"
 			continue
-		elif is-needle --needle="$repo" -- "${option_skips[@]}"; then
+		elif __is_within "$repo" 'option_skips'; then
 			echo-style --dim="skipping $repo (repo was in skips)"
 			continue
 		elif [[ -n "$option_filter" && $repo != *"$option_filter"* ]]; then

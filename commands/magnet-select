@@ -18,8 +18,8 @@ function magnet_select() (
 	choose \
 		--question="Which magnet for $search?" \
 		--label=first \
-		--visual="$option_visual" \
-		-- "${results[@]}"
+		--visual="$option_visual" -- \
+		"${results[@]}"
 )
 
 # fire if invoked standalone

@@ -1,0 +1,25 @@
+#!/usr/bin/env bash
+
+function __multiply {
+	printf '%s\n' "$(($1 * $2))"
+}
+function __add {
+	printf '%s\n' "$(($1 + $2))"
+}
+__add "$@"
+
+
+# DEBUG_FORMAT='+ ${BASH_SOURCE[0]} [${LINENO}] [${FUNCNAME-}] [${BASH_SUBSHELL-}]'$'    \t'
+# 	PS4="$DEBUG_FORMAT"
+# 	DEBUG=yes
+# 	set -x
+
+# set -x
+# x="$1"
+# shift
+# while [[ $# -ne 0 ]]; do
+# 	printf '%s' "$x + $1 = "
+# 	x="$((x + $1))"
+# 	printf '%s\n' "$x"
+# 	shift
+# done

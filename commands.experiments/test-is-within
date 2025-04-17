@@ -1,0 +1,15 @@
+#!/usr/bin/env bash
+
+function test_is_within() (
+	source "$DOROTHY/sources/bash.bash"
+
+	my_array=(2 1)
+	__print_lines "${my_array[@]}"
+	__is_within 1 'my_array'
+)
+
+
+# fire if invoked standalone
+if [[ "$0" = "${BASH_SOURCE[0]}" ]]; then
+	test_is_within "$@"
+fi
