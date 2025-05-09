@@ -26,7 +26,7 @@ function git_merge() (
 
 	# process
 	local item option_branch=''
-	while [[ "$#" -ne 0 ]]; do
+	while [[ $# -ne 0 ]]; do
 		item="$1"
 		shift
 		case "$item" in
@@ -34,7 +34,7 @@ function git_merge() (
 		'--branch='*) option_branch="${item#*=}" ;;
 		'--'*) help "An unrecognised flag was provided: $item" ;;
 		*)
-			if [[ -z "$option_branch" ]]; then
+			if [[ -z $option_branch ]]; then
 				option_branch="$item"
 			else
 				help "An unrecognised argument was provided: $item"
@@ -44,7 +44,7 @@ function git_merge() (
 	done
 
 	# fetch active branch
-	if [[ -z "$option_branch" ]]; then
+	if [[ -z $option_branch ]]; then
 		option_branch="$(get-git-active-branch)"
 	fi
 
@@ -53,7 +53,7 @@ function git_merge() (
 	default_branch="$(get-git-default-branch)"
 
 	# ensure the two branches are different
-	if [[ "$default_branch" = "$option_branch" ]]; then
+	if [[ $default_branch == "$option_branch" ]]; then
 		echo-error "The default branch and the specified branch are the same: $default_branch"
 		return 22 # EINVAL 22 Invalid argument
 	fi
@@ -76,6 +76,6 @@ function git_merge() (
 )
 
 # fire if invoked standalone
-if [[ "$0" = "${BASH_SOURCE[0]}" ]]; then
+if [[ $0 == "${BASH_SOURCE[0]}" ]]; then
 	git_merge "$@"
 fi

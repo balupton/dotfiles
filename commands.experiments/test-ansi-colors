@@ -38,8 +38,8 @@ printf '\n'
 # printf %b '\e[41m' '\e[8]' '\e[H\e[J'
 # \[\e[1;33;44m\]\w \$\[\e[0m\]
 
-cols="$(tput cols)"
-rows="$(tput lines)"
+# cols="$(tput cols)"
+# rows="$(tput lines)"
 function bg {
 	# ESC[38;5;⟨n⟩m
 	local n="$1"

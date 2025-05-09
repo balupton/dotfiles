@@ -32,6 +32,6 @@ function padd() (
 )
 
 # fire if invoked standalone
-if [[ "$0" = "${BASH_SOURCE[0]}" ]]; then
+if [[ $0 == "${BASH_SOURCE[0]}" ]]; then
 	padd "$@"
 fi

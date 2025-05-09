@@ -9,7 +9,7 @@ function magnet_select() (
 	# fetch
 	echo-style --purple='searching' >/dev/tty
 	mapfile -t results < <(magnet-search "$search")
-	if [[ "${#results[@]}" -eq 0 ]]; then
+	if [[ ${#results[@]} -eq 0 ]]; then
 		return 1
 	fi
 
@@ -23,6 +23,6 @@ function magnet_select() (
 )
 
 # fire if invoked standalone
-if [[ "$0" = "${BASH_SOURCE[0]}" ]]; then
+if [[ $0 == "${BASH_SOURCE[0]}" ]]; then
 	magnet_select "$@"
 fi

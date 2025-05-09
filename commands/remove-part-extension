@@ -5,7 +5,7 @@ function remove_part_extension() (
 
 	local file files=()
 	mapfile -t files < <(find-files --extension=part .)
-	if [[ "${#files[@]}" -eq 0 ]]; then
+	if [[ ${#files[@]} -eq 0 ]]; then
 		echo-style --notice='No files to process.'
 		return 0
 	fi
@@ -17,6 +17,6 @@ function remove_part_extension() (
 )
 
 # fire if invoked standalone
-if [[ "$0" = "${BASH_SOURCE[0]}" ]]; then
+if [[ $0 == "${BASH_SOURCE[0]}" ]]; then
 	remove_part_extension "$@"
 fi

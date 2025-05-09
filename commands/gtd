@@ -26,18 +26,18 @@ function gtd() (
 
 	# process
 	local item option_branch_or_tags=()
-	while [[ "$#" -ne 0 ]]; do
+	while [[ $# -ne 0 ]]; do
 		item="$1"
 		shift
 		case "$item" in
 		'--help' | '-h') help ;;
 		'--branch='*) option_branch_or_tags+=("${item#*=}") ;;
-		'--'*) help "An unrecognised flag was provided: $item" ;;
 		'--')
 			option_branch_or_tags+=("$@")
 			shift $#
 			break
 			;;
+		'--'*) help "An unrecognised flag was provided: $item" ;;
 		*)
 			option_branch_or_tags+=("$item")
 			;;
@@ -68,6 +68,6 @@ function gtd() (
 )
 
 # fire if invoked standalone
-if [[ "$0" = "${BASH_SOURCE[0]}" ]]; then
+if [[ $0 == "${BASH_SOURCE[0]}" ]]; then
 	gtd "$@"
 fi

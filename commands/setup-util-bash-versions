@@ -16,14 +16,14 @@ function setup_util_bash_versions() (
 	versions=(
 		# they all compile on ubuntu x86 without any flags, however byacc is needed for a few of them
 		3.0.16 # compiles on macos with CPPFLAGS modification
-		3.1 # compiles on macos with CPPFLAGS modification
+		3.1    # compiles on macos with CPPFLAGS modification
 		3.2.57 # compiles on macos with CPPFLAGS modification
-		4.0 # compiles on macos with CPPFLAGS modification
-		4.1 # compiles on macos with CPPFLAGS modification
+		4.0    # compiles on macos with CPPFLAGS modification
+		4.1    # compiles on macos with CPPFLAGS modification
 		4.2.53 # compiles on macos with CPPFLAGS modification
 		4.3.30 # compiles on macos with CPPFLAGS modification
 		4.4.18 # compiles on macos with CPPFLAGS modification
-		5.0 # compiles on macos with CPPFLAGS modification
+		5.0    # compiles on macos with CPPFLAGS modification
 		5.1.16 # compiles on macos x86 without any flags
 		5.2.37 # compiles on macos x86 without any flags
 	)
@@ -50,6 +50,6 @@ function setup_util_bash_versions() (
 )
 
 # fire if invoked standalone
-if [[ "$0" = "${BASH_SOURCE[0]}" ]]; then
+if [[ $0 == "${BASH_SOURCE[0]}" ]]; then
 	setup_util_bash_versions "$@"
 fi

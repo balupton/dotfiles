@@ -3,9 +3,8 @@
 function test_fetch_dns() (
 	source "$DOROTHY/sources/bash.bash"
 
-	local provider_id provider_url provider_about ipv4_servers ipv6_servers dot_servers doh_servers sdns_servers quic_servers dnscrypt_names
-
 	# reset shared vars
+	local ipv4_servers ipv6_servers dot_servers doh_servers sdns_servers quic_servers dnscrypt_names
 	ipv4_servers=()
 	ipv6_servers=()
 	dot_servers=()

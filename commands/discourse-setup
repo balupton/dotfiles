@@ -6,7 +6,7 @@ function discourse_setup() (
 
 	# Receive arguments from caller
 	local GIT_SSH_KEY="${GIT_SSH_KEY-}" GIT_SSH_PASS="${GIT_SSH_PASS-}" GIT_REMOTE="${GIT_REMOTE-}" GIT_BRANCH="${GIT_BRANCH-}" CONTAINER="${CONTAINER-}"
-	if [[ -z "$GIT_SSH_KEY" || -z "$GIT_SSH_PASS" || -z "$GIT_REMOTE" ]]; then
+	if [[ -z $GIT_SSH_KEY || -z $GIT_SSH_PASS || -z $GIT_REMOTE ]]; then
 		__print_lines '[discourse-setup] is to be run via [commands/discourse]' >&2
 		return 1
 	fi
@@ -46,7 +46,7 @@ function discourse_setup() (
 	# Fix Permissions
 	chmod --recursive a-xrw,u+Xrw -- "$HOME/.ssh" # non-dorothy environment, only linux
 	# Load our SSH Key: https://stackoverflow.com/a/52671286/130638
-	if [[ -n "${GIT_SSH_PASS-}" ]]; then
+	if [[ -n ${GIT_SSH_PASS-} ]]; then
 		ssh_stdin_pass_helper="$HOME/ssh_stdin_password.bash"
 		cat <<-EOF >"$ssh_stdin_pass_helper"
 			#!/usr/bin/env bash
@@ -57,7 +57,7 @@ function discourse_setup() (
 
 		__print_lines 'Adding the SSH keys...'
 		DISPLAY=:0 SSH_ASKPASS="$ssh_stdin_pass_helper" ssh-add "$HOME/.ssh/$GIT_SSH_KEY" <<<"$GIT_SSH_PASS"
-	elif [[ -n "${GIT_SSH_KEY-}" ]]; then
+	elif [[ -n ${GIT_SSH_KEY-} ]]; then
 		ssh-add "$HOME/.ssh/$GIT_SSH_KEY"
 	fi
 

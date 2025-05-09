@@ -4,7 +4,7 @@ function boundation_ordered() (
 	source "$DOROTHY/sources/bash.bash"
 
 	# if the secrets aren't provided, fetch them and reload
-	if [[ -z "${GITHUB_ACCESS_TOKEN-}" ]]; then
+	if [[ -z ${GITHUB_ACCESS_TOKEN-} ]]; then
 		bevry-auth -- "$0" "$@"
 		return
 	fi
@@ -76,6 +76,6 @@ function boundation_ordered() (
 )
 
 # fire if invoked standalone
-if [[ "$0" = "${BASH_SOURCE[0]}" ]]; then
+if [[ $0 == "${BASH_SOURCE[0]}" ]]; then
 	boundation_ordered "$@"
 fi

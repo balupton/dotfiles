@@ -42,17 +42,20 @@ function remove_duplicates() (
 		help 'Need at least two directories to compare files within.'
 	fi
 
-	local source_dir_path="${option_paths[0]}" alt_paths=("${option_paths[@]:1}") source_file_path filename alt_dir_path alt_file_path source_file_hash alt_file_path_hash
+	local source_dir_path="${option_paths[0]}" filename \
+		alt_paths=("${option_paths[@]:1}") \
+		alt_dir_path alt_file_path alt_file_hash \
+		source_file_path source_file_hash
 
 	# =====================================
 	# Action
 
 	# cycle through source source files
-	if [[ ! -d "$source_dir_path" ]]; then
+	if [[ ! -d $source_dir_path ]]; then
 		help "$source_dir_path was provided, but it is not a valid directory."
 	fi
 	for alt_dir_path in "${alt_paths[@]}"; do
-		if [[ ! -d "$alt_dir_path" ]]; then
+		if [[ ! -d $alt_dir_path ]]; then
 			help "$alt_dir_path was provided, but it is not a valid directory."
 		fi
 		for alt_file_path in "$alt_dir_path"/*; do
@@ -60,7 +63,7 @@ function remove_duplicates() (
 
 			# check it also exists in alt location
 			source_file_path="$source_dir_path/$filename"
-			if [[ ! -f "$source_file_path" ]]; then
+			if [[ ! -f $source_file_path ]]; then
 				continue
 			fi
 
@@ -75,7 +78,7 @@ function remove_duplicates() (
 			checksum --untitled --algorithm=md5 -- "$alt_file_path" | tee -- "$alt_file_hash"
 
 			# compare and possibly remove
-			if [[ "$(<"$source_file_hash")" = "$(<"$alt_file_hash")" ]]; then
+			if [[ "$(<"$source_file_hash")" == "$(<"$alt_file_hash")" ]]; then
 				/usr/bin/trash "$alt_file_path" # doesn't support -- ...<file>
 				echo-style --green='same,' --green+bold=' removed: ' --code="$alt_file_path"
 			else
@@ -86,6 +89,6 @@ function remove_duplicates() (
 )
 
 # fire if invoked standalone
-if [[ "$0" = "${BASH_SOURCE[0]}" ]]; then
+if [[ $0 == "${BASH_SOURCE[0]}" ]]; then
 	remove_duplicates "$@"
 fi

@@ -44,6 +44,6 @@ function new_dev_branch() (
 )
 
 # fire if invoked standalone
-if [[ "$0" = "${BASH_SOURCE[0]}" ]]; then
+if [[ $0 == "${BASH_SOURCE[0]}" ]]; then
 	new_dev_branch "$@"
 fi

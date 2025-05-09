@@ -44,7 +44,7 @@ function magnet_search() (
 	mapfile -t lines < <(attractorr --sort=seeders "$search" 2>&1 || :)
 	for line in "${lines[@]}"; do
 		line="$(echo-trim-colors -- "$line")"
-		if [[ -z "$line" ]] || echo-regexp -q --regexp='ERROR|No results|btih:000000000000' -- "$line"; then
+		if [[ -z $line ]] || echo-regexp -q --regexp='ERROR|No results|btih:000000000000' -- "$line"; then
 			continue
 		fi
 		__print_lines "$line"
@@ -56,6 +56,6 @@ function magnet_search() (
 )
 
 # fire if invoked standalone
-if [[ "$0" = "${BASH_SOURCE[0]}" ]]; then
+if [[ $0 == "${BASH_SOURCE[0]}" ]]; then
 	magnet_search "$@"
 fi

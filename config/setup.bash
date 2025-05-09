@@ -149,7 +149,7 @@ HOMEBREW_FONTS=(
 GEM_INSTALL=()
 
 # Python
-# @todo swap PyPDF2 fro one of the following
+# @todo swap PyPDF2 for one of the following
 # > https://stackoverflow.com/a/63557138/130638
 # - https://github.com/pymupdf/PyMuPDF
 # - https://github.com/pikepdf/pikepdf

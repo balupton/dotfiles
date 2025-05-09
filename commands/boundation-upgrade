@@ -4,7 +4,7 @@ function boundation_upgrade() (
 	source "$DOROTHY/sources/bash.bash"
 
 	# if the secrets aren't provided, fetch them and reload
-	if [[ -z "${GITHUB_ACCESS_TOKEN-}" ]]; then
+	if [[ -z ${GITHUB_ACCESS_TOKEN-} ]]; then
 		bevry-auth -- "$0" "$@"
 		return
 	fi
@@ -15,7 +15,7 @@ function boundation_upgrade() (
 	slug="$(jq -r '.badges.config.githubSlug' package.json)"
 	UPGRADE_SUCCESS='no'
 	function on_finish {
-		if [[ "$UPGRADE_SUCCESS" = 'yes' ]]; then
+		if [[ $UPGRADE_SUCCESS == 'yes' ]]; then
 			message="boundation-upgrade completed on $name"
 		else
 			message="boundation-upgrade failed on $name"
@@ -109,14 +109,14 @@ function boundation_upgrade() (
 	ec=''
 	lc=''
 	change='minor'
-	if [[ "$lo" != "$ln" ]]; then
-		if [[ "$ln" = 'RPL-1.5' ]]; then
+	if [[ $lo != "$ln" ]]; then
+		if [[ $ln == 'RPL-1.5' ]]; then
 			change='major'
 		fi
 		lc="-   Updated license from [\`$lo\`](http://spdx.org/licenses/$lo.html) to [\`$ln\`](http://spdx.org/licenses/$ln.html)
 "
 	fi
-	if [[ "$eo" != "$en" ]]; then
+	if [[ $eo != "$en" ]]; then
 		change='major'
 		ec="-   Minimum required Node.js version changed from \`$eo\` to \`$en\` adapting to ecosystem changes
 "
@@ -172,7 +172,7 @@ function boundation_upgrade() (
 	# wait for the publish to finish
 	local run_id_of_release
 	while read -r run_id_of_release <&172; do
-		if [[ -z "$run_id_of_release" ]]; then
+		if [[ -z $run_id_of_release ]]; then
 			break
 		fi
 		while :; do
@@ -186,6 +186,6 @@ function boundation_upgrade() (
 )
 
 # fire if invoked standalone
-if [[ "$0" = "${BASH_SOURCE[0]}" ]]; then
+if [[ $0 == "${BASH_SOURCE[0]}" ]]; then
 	boundation_upgrade "$@"
 fi

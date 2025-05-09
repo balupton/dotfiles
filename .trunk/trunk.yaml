@@ -45,6 +45,7 @@ lint:
         - node_modules/**
         - config.local/secrets.json
         - commands/test-*
+        - commands.experiments/**
     - linters: [gitleaks, trufflehog]
       paths:
         - '*.local/**'

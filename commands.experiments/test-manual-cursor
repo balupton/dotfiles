@@ -93,7 +93,7 @@ positive_alt="$(
 positive_done="$(
 	echo-style --no-trail --clear-screen --underline+bold="$question" ' ' --invert+green=' ' --invert+legend+green+bold='YES' --invert+green=' ' ' '
 )"
-positive_done_notty="$(
+positive_done_no_tty="$(
 	echo-style --no-trail --clear-screen --underline+bold="$question" $'\n' --dim="$details" $'\n' --invert+green=' ' --invert+legend+green+bold='YES' --invert+green=' ' ' '
 )"
 negative_default="$(
