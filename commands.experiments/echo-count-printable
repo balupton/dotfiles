@@ -22,7 +22,6 @@ function echo_printable_characters() (
 
 			QUIRKS:
 			Tabs are converted into 4 spaces. Broken spacing (spacing at the end or start of a segment) is trimmed. Spacing is preserved at the start and end of input lines. Backticks are trimmed as they are used internally as a delimiter.
-
 		EOF
 		return 22 # EINVAL 22 Invalid argument
 	}

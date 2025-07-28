@@ -13,7 +13,7 @@ function test_broken_pipe() (
 	}
 	function right_side {
 		# local status='' stdout='' stderr=''
-		# eval_capture --statusvar=status --stdoutvar=stdout --stderrvar=stderr -- cat
+		# eval_capture --statusvar=status --stdoutvar=stdout --stderrvar=STDERR -- cat
 		# printf 'status: [%s]\n' "$status"
 		# printf 'stdout: [%s]\n' "$stdout"
 		# printf 'stderr: [%s]\n' "$stderr"

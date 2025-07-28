@@ -1,0 +1,24 @@
+#!/Users/balupton/.local/bin/bash-4.2.53
+
+source "$DOROTHY/sources/bash.bash"
+
+f="$(mktemp)"
+exec {fd}> >(
+	echo before
+	cat -vbn >"$f"
+	echo after
+)
+sleep 1
+# echo "sending data"
+# printf 'data' >&${fd}
+# sleep 1
+echo "sending eot"
+printf '\004' >&${fd}
+sleep 1
+echo "closing fd"
+exec {fd}>&-
+while [[ ! -s "$f" ]]; do
+	echo "waiting for data"
+	sleep 1
+done
+cat -vbn "$f"

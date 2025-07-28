@@ -3,41 +3,6 @@
 function boundation_all() (
 	source "$DOROTHY/sources/bash.bash"
 
-	# remove needles from an array
-	# this is not currently used yet in Dorothy core, so do not depend on it, as it may be removed
-	function __remove_needles {
-		local option_needles=() option_elements kept_elements=()
-		while [[ $# -ne 0 ]]; do
-			if [[ $1 == '--' ]]; then
-				shift
-				break
-			fi
-			option_needles+=("$1")
-			shift
-		done
-		option_elements=("$@")
-		if [[ ${#option_needles[@]} -eq 0 || ${#option_elements[@]} -eq 0 ]]; then
-			return 0
-		fi
-		local needle element found
-		for element in "${option_elements[@]}"; do
-			found='no'
-			for needle in "${option_needles[@]}"; do
-				if [[ $needle == "$element" ]]; then
-					found='yes'
-					break
-				fi
-			done
-			if [[ $found == 'no' ]]; then
-				kept_elements+=("$element")
-			fi
-		done
-		if [[ ${#kept_elements[@]} -ne 0 ]]; then
-			__print_lines "${kept_elements[@]}"
-		fi
-		return 0
-	}
-
 	# if the secrets aren't provided, fetch them and reload
 	if [[ -z ${GITHUB_ACCESS_TOKEN-} ]]; then
 		bevry-auth -- "$0" "$@"
@@ -81,12 +46,8 @@ function boundation_all() (
 		'--user='*) option_user="${item#*=}" ;;
 		'--filter='*) option_filter="${item#*=}" ;;
 		'--start='*) option_start="${item#*=}" ;;
-		'--zero-deps'*)
-			option_deps="$(get-flag-value --non-affirmative -- "$item")"
-			;;
-		'--has-deps'*)
-			option_deps="$(get-flag-value --affirmative -- "$item")"
-			;;
+		'--zero-deps'*) __flag --source={item} --target={option_deps} --non-affirmative ;;
+		'--has-deps'*) __flag --source={item} --target={option_deps} --affirmative ;;
 		'--skip='*) option_skips+=("${item#*=}") ;;
 		'--slug='*) option_slugs+=("${item#*=}") ;;
 		'--start-after='*)
@@ -105,7 +66,7 @@ function boundation_all() (
 
 	# prepare option_skips
 	# if fetch "https://bevry.me/api/github/orgs" | jq -r '.[]' | grep --quiet --fixed-strings --regexp="$user"; then
-	if [[ $USER == 'balupton' ]]; then
+	if [[ $option_user == 'bevry' ]]; then
 		option_skips+=(
 			.github
 			base
@@ -137,8 +98,12 @@ function boundation_all() (
 	fi
 
 	# if no slugs, fetch all for the user
+	function __get_slugs {
+		fetch "https://bevry.me/api/github/repos/${option_user}" | jq -r '.[]' | sort || return
+	}
 	if [[ ${#option_slugs[@]} -eq 0 ]]; then
-		mapfile -t option_slugs < <(fetch "https://bevry.me/api/github/repos/${option_user}" | jq -r '.[]' | sort)
+		__split --target={option_slugs} --no-zero-length --invoke -- \
+			__get_slugs
 	fi
 
 	# =====================================
@@ -187,10 +152,10 @@ function boundation_all() (
 		if [[ $ready == 'no' ]]; then
 			echo-style --dim="skipping $repo (not yet ready)"
 			continue
-		elif __is_within "$slug" 'option_skips'; then
+		elif __has --source={option_skips} -- "$slug"; then
 			echo-style --dim="skipping $slug (slug was in skips)"
 			continue
-		elif __is_within "$repo" 'option_skips'; then
+		elif __has --source={option_skips} -- "$repo"; then
 			echo-style --dim="skipping $repo (repo was in skips)"
 			continue
 		elif [[ -n $option_filter && $repo != *"$option_filter"* ]]; then
@@ -244,7 +209,7 @@ function boundation_all() (
 			# note it succeeded
 			echo-style --g1="$repo" || return
 			# remove from failed repos
-			mapfile -t failed_repos < <(__remove_needles "$repo" -- "${failed_repos[@]}")
+			__evict --source+target={failed_repos} --value="$repo" || return
 			success_repos+=("$repo")
 		) || (
 			# check status

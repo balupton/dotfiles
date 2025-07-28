@@ -95,6 +95,11 @@ function github_all() (
 		done 5< <(gh run list --status 'queued' --user dependabot --repo "$slug" --json databaseId | jq -r '.[].databaseId')
 	}
 
+	# fetch all labels
+	function fetch_labels {
+		gh label list --repo bevry/dorothy --json=name,description,color | jq -r '.[] | .name + "\n" + .description + "\n" + .color' || return
+	}
+
 	# clone labels
 	local delete_labels=(
 		'discussion'
@@ -111,8 +116,9 @@ function github_all() (
 		'type support/question'
 		'wontfix'
 	)
-	local new_labels
-	mapfile -t new_labels < <(gh label list --repo bevry/dorothy --json=name,description,color | jq -r '.[] | .name + "\n" + .description + "\n" + .color')
+	local new_labels=()
+	__split --target={new_labels} --no-zero-length --invoke -- \
+		fetch_labels
 	function fix_labels {
 		local slug="$1" label i
 		if [[ $slug == 'docpad/docpad' ]]; then
@@ -134,7 +140,8 @@ function github_all() (
 	# defaults slugs to all our slugs
 	local slugs=()
 	if [[ $# -eq 0 ]]; then
-		mapfile -t slugs < <(fetch_all_repos)
+		__split --target={slugs} --no-zero-length --invoke -- \
+			fetch_all_repos
 	else
 		slugs=("$@")
 		shift $#

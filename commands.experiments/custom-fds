@@ -1,0 +1,70 @@
+#!/opt/homebrew/bin/bash
+#!/usr/bin/env bash
+
+echo "BASH_VERSION = $BASH_VERSION"
+
+if [[ "$1" == '--ssh' ]]; then
+	# ssh -T localhost "$(type -P dorothy)" run -- "$(pwd)/custom-fds"
+	ssh -T localhost "$(pwd)/custom-fds"
+	exit
+elif [[ "$1" == '--background' ]]; then
+	"$(pwd)/custom-fds" &
+	echo now in background
+	sleep 5
+	fg
+	exit
+elif [[ "$1" == '--stdin' ]]; then
+	echo | "$(pwd)/custom-fds"
+	exit
+elif [[ "$1" == '--stdin+stdout+stderr' ]]; then
+	echo | "$(pwd)/custom-fds" 2> >(cat) > >(cat) 
+	exit
+fi
+
+if get-terminal-position-support --quiet; then
+	echo "query terminal position OK"
+else
+	echo "query terminal position FAIL"
+fi
+
+if get-terminal-size-support --quiet; then
+	echo "query terminal size OK"
+else
+	echo "query terminal size FAIL"
+fi
+
+if (: </dev/tty >/dev/tty) &>/dev/null; then
+	# exec 3<>/dev/tty
+	# exec 4<>/dev/tty
+	exec {fd_tty_out}<>/dev/tty {fd_tty_in}<>/dev/tty
+	echo "fd_tty_out = /dev/tty"
+	echo "fd_tty_in = /dev/tty"
+else
+	# exec 3>/dev/stderr
+	# exec 4</dev/stdin
+	exec {fd_tty_out}>/dev/stderr {fd_tty_in}</dev/stdin
+	echo "fd_tty_out = /dev/stderr"
+	echo "fd_tty_in = /dev/stdin"
+fi
+echo "fd_tty_out = ${fd_tty_out}"
+echo "fd_tty_in = ${fd_tty_in}"
+
+echo stdout >&1
+echo stderr >&2
+# echo tty >&3
+echo tty >&${fd_tty_out}
+
+# get-terminal-cursor-line-and-column
+
+IFS='[;' read -t 2 -srd R -p $'\e[6n' _ line column <&${fd_tty_in}
+if [[ -n ${line-} && -n ${column-} ]]; then
+	echo "line = $line"
+	echo "column = $column"
+else
+	echo "Failed to read line and column from TTY"
+fi
+
+# while read -r line <&4; do
+while read -r line <&${fd_tty_in}; do
+	echo "Read from TTY: $line"
+done

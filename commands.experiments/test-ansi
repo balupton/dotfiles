@@ -1,0 +1,5 @@
+#!/usr/bin/env bash
+
+echo before
+echo-style --bell= --=bell | echo-trim-special --stdin
+echo done

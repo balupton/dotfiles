@@ -1,0 +1,173 @@
+#!/usr/bin/env bash
+
+
+exec 99> >(
+	trap 'echo "1) SIGHUP"' SIGHUP
+	trap 'echo "2) SIGINT"' SIGINT
+	trap 'echo "3) SIGQUIT"' SIGQUIT
+	trap 'echo "4) SIGILL"' SIGILL
+	trap 'echo "5) SIGTRAP"' SIGTRAP
+	trap 'echo "6) SIGABRT"' SIGABRT
+	trap 'echo "7) SIGEMT"' SIGEMT
+	trap 'echo "8) SIGFPE"' SIGFPE
+	trap 'echo "9) SIGKILL"' SIGKILL
+	trap 'echo "10) SIGBUS"' SIGBUS
+	trap 'echo "11) SIGSEGV"' SIGSEGV
+	trap 'echo "12) SIGSYS"' SIGSYS
+	trap 'echo "13) SIGPIPE"' SIGPIPE
+	trap 'echo "14) SIGALRM"' SIGALRM
+	trap 'echo "15) SIGTERM"' SIGTERM
+	trap 'echo "16) SIGURG"' SIGURG
+	trap 'echo "17) SIGSTOP"' SIGSTOP
+	trap 'echo "18) SIGTSTP"' SIGTSTP
+	trap 'echo "19) SIGCONT"' SIGCONT
+	trap 'echo "20) SIGCHLD"' SIGCHLD
+	trap 'echo "21) SIGTTIN"' SIGTTIN
+	trap 'echo "22) SIGTTOU"' SIGTTOU
+	trap 'echo "23) SIGIO"' SIGIO
+	trap 'echo "24) SIGXCPU"' SIGXCPU
+	trap 'echo "25) SIGXFSZ"' SIGXFSZ
+	trap 'echo "26) SIGVTALRM"' SIGVTALRM
+	trap 'echo "27) SIGPROF"' SIGPROF
+	trap 'echo "28) SIGWINCH"' SIGWINCH
+	trap 'echo "29) SIGINFO"' SIGINFO
+	trap 'echo "30) SIGUSR1"' SIGUSR1
+	trap 'echo "31) SIGUSR2"' SIGUSR2
+	cat &
+	echo "cat: $!"
+	wait $!
+	echo died
+)
+echo "\$\$ = $$ ; \$! = $!"
+echo "jobs = $(jobs || :)"
+echo "ps = $(ps || :)"
+p=$!
+echo $p
+echo a >&99
+sleep 1
+# kill -SIGHUP $p
+# kill -SIGINT $p
+# kill -SIGQUIT $p
+# kill -SIGILL $p
+# kill -SIGTRAP $p
+# kill -SIGABRT $p
+# kill -SIGEMT $p
+# kill -SIGFPE $p
+# kill -SIGKILL $p
+# kill -SIGBUS $p
+# kill -SIGSEGV $p
+# kill -SIGSYS $p
+# kill -SIGPIPE $p
+# kill -SIGALRM $p
+# kill -SIGTERM $p
+# kill -SIGURG $p
+# kill -SIGSTOP $p
+# kill -SIGTSTP $p
+# kill -SIGCONT $p
+# kill -SIGCHLD $p
+# kill -SIGTTIN $p
+# kill -SIGTTOU $p
+# kill -SIGIO $p
+# kill -SIGXCPU $p
+# kill -SIGXFSZ $p
+# kill -SIGVTALRM $p
+# kill -SIGPROF $p
+# kill -SIGWINCH $p
+# kill -SIGINFO $p
+# kill -SIGUSR1 $p
+# kill -SIGUSR2 $p
+echo b >&99
+sleep 1
+exec 99>&-
+sleep 1
+
+exit 0
+
+function __is_fd_targetable {
+	if [[ $# -eq 1 ]]; then
+		local fd="$1"
+	fi
+
+	# this works fine for file descriptors opened via reference and number, but outputs error when file descriptor is not targetable
+	# if : >&${fd}; then
+	# 	echo "fd ${fd} is TARGETABLE without error suppression"
+	# else
+	# 	echo "fd ${fd} is NOT TARGETABLE without error suppression"
+	# fi
+
+	# this works fine for file descriptors opened via number, but fails for file descriptors opened via reference (always reporting targetable), note this is also the most popular recommended option online
+	# if { : >&${fd}; } 2>/dev/null; then
+	# 	echo "fd ${fd} is TARGETABLE with error suppression using { > }"
+	# else
+	# 	echo "fd ${fd} is NOT TARGETABLE with error suppression using { > }"
+	# fi
+
+	# these work fine for file descriptors opened via reference and number
+	# they both always return true, regardless of if the fd was opened with < or >
+	# the only times they differ, is when doing `>/dev/stdin` (note `>&0` does not differ) with:
+	# ssh -T localhost 'bash -c "if : >/dev/stdin; then echo yes; else echo no; fi; ls /dev/fd"'
+	# ssh localhost 'bash -c "if : >/dev/stdin; then echo yes; else echo no; fi; ls /dev/fd"'
+	# if ( : >&${fd} ) 2>/dev/null; then
+	# 	echo "fd ${fd} is TARGETABLE with error suppression using ( > )"
+	# else
+	# 	echo "fd ${fd} is NOT TARGETABLE with error suppression using ( > )"
+	# fi
+	# if ( : <&${fd} ) 2>/dev/null; then
+	# 	echo "fd ${fd} is TARGETABLE with error suppression using ( < )"
+	# else
+	# 	echo "fd ${fd} is NOT TARGETABLE with error suppression using ( < )"
+	# fi
+
+	# this works fine for file descriptors opened via reference and number, and has no error output
+	# file descriptors can be a variety of things, from character special [[ -c ... ]] to named pipes [[ -p ... ]]
+	# ls /dev/fd
+	# file /dev/fd/${fd} || : <-- outputs failure message once closed
+	if [[ -e /dev/fd/${fd} ]]; then
+		echo "fd ${fd} is TARGETABLE via -e /dev/fd"
+	else
+		echo "fd ${fd} is NOT TARGETABLE via -e /dev/fd"
+	fi
+	# if [[ -c /dev/fd/${fd} || -p /dev/fd/${fd} ]]; then
+	# 	echo "fd ${fd} is TARGETABLE via -c -p /dev/fd"
+	# else
+	# 	echo "fd ${fd} is NOT TARGETABLE via -c -p /dev/fd"
+	# fi
+
+	# benchmark
+	# local i
+	# time for (( i=0; i<1000; i++ )); do
+	# 	( : >&${fd} ) 2>/dev/null || :
+	# done
+	# time for (( i=0; i<1000; i++ )); do
+	# 	[[ -e /dev/fd/${fd} ]] || :
+	# done
+	# time for (( i=0; i<1000; i++ )); do
+	# 	[[ -c /dev/fd/${fd} || -p /dev/fd/${fd} ]] || :
+	# done
+}
+
+__is_fd_targetable 0
+__is_fd_targetable 1
+__is_fd_targetable 2
+sleep 5
+
+fd=99
+# exec {fd}< <(cat -ebn; echo "CLOSED INSIDE") || :
+# exec {fd}> >(cat -ebn; echo "CLOSED INSIDE") || :
+exec 99> >(cat -ebn; echo "CLOSED INSIDE") || :
+__is_fd_targetable
+# echo "write to {fd} while open" "second line" >&${fd} || :
+sleep 2
+__is_fd_targetable
+echo "CLOSING"
+# exec 99>&- || :
+exec {fd}>&- || :
+# eval "exec ${fd}>&-" || : # works for both reference and number
+echo "CLOSED"
+__is_fd_targetable
+sleep 0.01
+echo "CLOSED AFTER"
+__is_fd_targetable
+sleep 5
+#echo "write to {fd} while closed" "second line" >&${fd} || :
+echo "SCRIPT FINISHED"

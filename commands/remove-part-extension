@@ -3,8 +3,8 @@
 function remove_part_extension() (
 	source "$DOROTHY/sources/bash.bash"
 
-	local file files=()
-	mapfile -t files < <(find-files --extension=part .)
+	local files=() file
+	__split --target={files} --no-zero-length < <(find-files --extension=part . || :)
 	if [[ ${#files[@]} -eq 0 ]]; then
 		echo-style --notice='No files to process.'
 		return 0

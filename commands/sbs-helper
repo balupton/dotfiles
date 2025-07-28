@@ -46,20 +46,21 @@ function sbs_helper() (
 	# =====================================
 	# Arguments
 
-	function get_watched {
-		http --auth "$token" --auth-type 'bearer' 'https://www.sbs.com.au/api/v3/video_progress/all?context=odwebsite' | jq -r '.all | .response | to_entries | map ( {id: .key, completed: .value.completed} ) | .[] | select(.completed==1) | .id'
+	function __get_watched {
+		http --auth "$token" --auth-type 'bearer' 'https://www.sbs.com.au/api/v3/video_progress/all?context=odwebsite' | jq -r '.all | .response | to_entries | map ( {id: .key, completed: .value.completed} ) | .[] | select(.completed==1) | .id' || return
 	}
 
-	function fetch_title {
+	function __fetch_title {
 		local id
 		for id in "$@"; do
-			http --auth "$token" --auth-type 'bearer' "https://www.sbs.com.au/api/v3/video_search/fetchbyIds?n=${id}&context=odwebsite&range=1-10" | jq -r '.itemListElement | .[] | .name + " (" + .datePublished[0:4] + ")"'
+			http --auth "$token" --auth-type 'bearer' "https://www.sbs.com.au/api/v3/video_search/fetchbyIds?n=${id}&context=odwebsite&range=1-10" | jq -r '.itemListElement | .[] | .name + " (" + .datePublished[0:4] + ")"' || return
 		done
 	}
 
-	local ids
-	mapfile -t ids < <(get_watched)
-	fetch_title "${ids[@]}"
+	local ids=()
+	__split --target={ids} --no-zero-length --invoke -- \
+		__get_watched
+	__fetch_title "${ids[@]}"
 )
 
 # fire if invoked standalone

@@ -4,11 +4,12 @@ function magnet_select() (
 	source "$DOROTHY/sources/bash.bash"
 
 	# prepare
-	local search="$1" results option_visual
+	local search="$1" results=() option_visual
 
 	# fetch
 	echo-style --purple='searching' >/dev/tty
-	mapfile -t results < <(magnet-search "$search")
+	__split --target={results} --no-zero-length --invoke -- \
+		magnet-search "$search"
 	if [[ ${#results[@]} -eq 0 ]]; then
 		return 1
 	fi

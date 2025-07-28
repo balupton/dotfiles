@@ -28,7 +28,8 @@ function remove_duplicates() (
 		case "$item" in
 		'--help' | '-h') help ;;
 		'--')
-			mapfile -t option_paths < <(fs-absolute -- "$@")
+			__split --target={option_paths} --no-zero-length --invoke -- \
+				fs-path --absolute -- "$@"
 			shift $#
 			break
 			;;
@@ -44,8 +45,7 @@ function remove_duplicates() (
 
 	local source_dir_path="${option_paths[0]}" filename \
 		alt_paths=("${option_paths[@]:1}") \
-		alt_dir_path alt_file_path alt_file_hash \
-		source_file_path source_file_hash
+		alt_dir_path alt_file_path source_file_path
 
 	# =====================================
 	# Action
@@ -67,18 +67,8 @@ function remove_duplicates() (
 				continue
 			fi
 
-			# prepare
-			source_file_hash="$(mktemp)"
-			alt_file_hash="$(mktemp)"
-
-			# checksum
-			echo-style --newline --code="$source_file_path"
-			checksum --untitled --algorithm=md5 -- "$source_file_path" | tee -- "$source_file_hash"
-			echo-style --code="$alt_file_path"
-			checksum --untitled --algorithm=md5 -- "$alt_file_path" | tee -- "$alt_file_hash"
-
 			# compare and possibly remove
-			if [[ "$(<"$source_file_hash")" == "$(<"$alt_file_hash")" ]]; then
+			if is-same --comparisons=checksum -- "$source_file_path" "$alt_file_path"; then
 				/usr/bin/trash "$alt_file_path" # doesn't support -- ...<file>
 				echo-style --green='same,' --green+bold=' removed: ' --code="$alt_file_path"
 			else

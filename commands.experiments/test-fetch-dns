@@ -15,9 +15,9 @@ function test_fetch_dns() (
 
 	# load providers
 	local providers=() providers_url=() providers_about=() provider_options=()
-	mapfile -t providers < <(jq -r '.providers | to_entries[] | .key' "$DOROTHY/config/dns.json")
-	mapfile -t providers_url < <(jq -r '.providers[].url' "$DOROTHY/config/dns.json")
-	mapfile -t providers_about < <(jq -r '.providers[].about' "$DOROTHY/config/dns.json")
+	__split --target={providers} --no-zero-length < <(jq -r '.providers | to_entries[] | .key' "$DOROTHY/config/dns.json" || :)
+	__split --target={providers_url} --no-zero-length < <(jq -r '.providers[].url' "$DOROTHY/config/dns.json" || :)
+	__split --target={providers_about} --no-zero-length < <(jq -r '.providers[].about' "$DOROTHY/config/dns.json" || :)
 	if [[ "${#providers[@]}" -ne "${#providers_about[@]}" && "${#providers[@]}" -ne "${#providers_url[@]}" ]]; then
 		help 'A DNS provider is missing an about, or an about is multiline when it should be single line.'
 	fi

@@ -29,7 +29,7 @@ function three__code {
 }
 
 function_names=()
-mapfile -t function_names < <(declare -F | awk '{print $3}') # [declare -f one_fn] to [one_fn]
+__split --target={function_names} --no-zero-length < <(declare -F | awk '{print $3}') # [declare -f one_fn] to [one_fn]
 function_codes=()
 function_labels=()
 for function_name in "${function_names[@]}"; do
@@ -55,7 +55,7 @@ while :; do
 	index="$(choose --linger 'Which code to execute?' --default="$index" --match='$INDEX' --index -- "${function_labels[@]}")"
 	args="$(ask --linger 'Arguments to pass to the code?')"
 	code="${function_codes[index]}"
-	debug-bash -- -c "$code" -- $args  # debug-bash needs to be updated to support the -c option, then this would run the code against all bash versions on this machine
+	debug-bash --eval="$code" -- $args
 	if ! confirm --ppid=$$ --positive -- 'Prompt again?'; then
 		break
 	fi

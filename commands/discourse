@@ -93,13 +93,12 @@ GIT_BRANCH='$option_git_branch'
 CONTAINER='$option_container'
 $(<"$DOROTHY/user/commands/discourse-setup")
 "
-	(ssh -t "$option_ssh_ip" "$discourse_init" && {
-		echo-style --success='Successfully setup the discourse instance. 🎉'
+	if ssh -t "$option_ssh_ip" "$discourse_init" && echo-style --success='Successfully setup the discourse instance. 🎉'; then
 		return 0
-	}) || {
-		echo-style --stderr --error='Error: Failed to setup the discourse instance. 🚨'
+	else
+		echo-style --stderr --error='Error: Failed to setup the discourse instance. 🚨' || return
 		return 1
-	}
+	fi
 )
 
 # fire if invoked standalone

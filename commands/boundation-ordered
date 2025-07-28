@@ -66,8 +66,10 @@ function boundation_ordered() (
 	)
 
 	local slug_args=() skip_args=()
-	mapfile -t slug_args < <(echo-lines --prefix='--slug=' -- "${slugs[@]}")
-	mapfile -t skip_args < <(echo-lines --prefix='--skip=' -- "${slugs[@]}")
+	__split --target={slug_args} --no-zero-length --invoke -- \
+		echo-lines --prefix='--slug=' -- "${slugs[@]}"
+	__split --target={skip_args} --no-zero-length --invoke -- \
+		echo-lines --prefix='--skip=' -- "${slugs[@]}"
 	boundation-all "${slug_args[@]}"
 	boundation-all --zero-deps "${skip_args[@]}"
 	boundation-all --has-deps "${skip_args[@]}"

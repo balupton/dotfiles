@@ -1,0 +1,134 @@
+#!/usr/bin/env bash
+
+function generate_subtitles() (
+	source "$DOROTHY/sources/bash.bash"
+
+	# =====================================
+	# Arguments
+
+	function help {
+		cat <<-EOF >&2
+			ABOUT:
+			Download the URL to a file.
+
+			USAGE:
+			down [...options] <url>
+
+			OPTIONS:
+			--bearer-token=<token>
+			    If provided, include this in a bearer token header.
+			--attempts=<attempts>
+			    How many times to attempt the download. Certain failures will not be retried, based on [curl] and [wget] intelligence.
+			    Defaults to 2 tries, which is 1 retry. If set to 0 it will continue until successful.
+			--attempt-interval=<interval>
+			    How long to wait between attempts, in seconds. Defaults to 60 seconds.
+			    If [wget] is used, then this becomes the maximum seconds to use.
+
+			--directory=<directory>
+			    Place downloaded file(s) inside <directory>.
+			    If omitted, the current working directory will be used.
+			--file=<file>
+			    If only a single file was downloaded, rename it to <file>.
+			    If multiple files were downloaded, then fail.
+			--filepath=<filepath:<directory>/<file>>
+			    If only a single file was downloaded, rename it to <file>, and place it inside <directory>.
+			    If multiple files were downloaded, then fail.
+			--archive-<archive-argument>
+			    If these arguments are provided, the download will instead occur to a temporary location, and an extraction will occur by forwarding these arguments [unziptar]. You probably want: [--archive-format=<format>] and/or [--archive-glob=<glob>].
+
+			--[no-]quiet
+			    If quiet, do not output any messages unless failure.
+			    If empty, the default, output status messages, but clean up download output, unless failure.
+			    IF verbose, output status messages and retain download outputs.
+			    If [--progress] is used, then even in [--quiet] the progress bar will be visible temporarily.
+			--[no-]progress
+			    If enabled, the default, the download progress will be visible temporarily.
+			    If disabled or if quiet enabled, no download progress will be visible temporarily.
+
+			DEPENDENCIES:
+			curl
+		EOF
+		if [[ $# -ne 0 ]]; then
+			echo-error "$@"
+		fi
+		return 22 # EINVAL 22 Invalid argument
+	}
+
+	# process
+	local item option_quiet='' option_overwrite='' option_paths=()
+	while [[ $# -ne 0 ]]; do
+		item="$1"
+		shift
+		case "$item" in
+		'--help' | '-h') help ;;
+		'--no-verbose'* | '--verbose'*) __flag --source={item} --target={option_quiet} --non-affirmative ;;
+		'--no-quiet'* | '--quiet'*) __flag --source={item} --target={option_quiet} --affirmative ;;
+		'--no-overwrite'* | '--overwrite'*) __flag --source={item} --target={option_overwrite} --affirmative ;;
+		'--')
+			option_paths+=("$item" "$@")
+			shift $#
+			break
+			;;
+		'--'*) help "An unrecognised flag was provided: $item" ;;
+		*) option_paths+=("$item") ;;
+		esac
+	done
+
+	if [[ -z $option_overwrite ]]; then
+		option_overwrite='no'
+	fi
+
+	if [[ -z $option_quiet ]]; then
+		option_quiet='yes'
+	fi
+
+	if [[ ${#option_paths[@]} -eq 0 ]]; then
+		option_paths+=('.')
+	fi
+
+	# =====================================
+	# Helpers
+
+	# --language English
+	local whisper_cmd=(whisper --model turbo -f srt --verbose True)
+	if is-mac; then
+		whisper_cmd+=(--fp16 False)
+	fi
+
+	function __transcribe {
+		local filepath="$1" filepath_no_extension dirpath
+		filepath="$(fs-path --absolute -- "$filepath")" || return
+		if [[ $option_overwrite == 'no' ]]; then
+			# check if the subtitle file already exists, only do --no-extension, as it could have a . in its name, like [A vs. B]
+			filepath_no_extension="$(fs-path --no-extension -- "$filepath")" || return
+			if [[ -f "$filepath_no_extension.srt" ]]; then
+				return 0
+			fi
+		fi
+		dirpath="$(fs-path --parents -- "$filepath")" || return
+		(
+			cd "$dirpath" || return
+			eval-helper --wrap --quiet="$option_quiet" --revolving-max-lines=1 -- \
+				"${whisper_cmd[@]}" "$filepath" || return
+		) || return
+	}
+
+	local option_paths filepaths
+	for path in "${option_paths[@]}"; do
+		if [[ -d $path ]]; then
+			filepaths=("$path"/**/*.{mp4,mkv,webm,avi,flv,wmv,mov,mpg,mpeg,m4v,3gp,3g2,webp,mp3,m4a,ogg,wav,flac,opus})
+			for filepath in "${filepaths[@]}"; do
+				__transcribe "$filepath"
+			done
+		elif [[ -f $path ]]; then
+			__transcribe "$path"
+		else
+			echo-error "The path [$path] is not a file or directory."
+		fi
+	done
+)
+
+# fire if invoked standalone
+if [[ $0 == "${BASH_SOURCE[0]}" ]]; then
+	generate_subtitles "$@"
+fi

@@ -7,10 +7,9 @@ function campjs_command() (
 	who="$(ask --linger --question='Who are you?' --default="$(get-profile name || :)" | echo-lowercase --stdin)"
 
 	local colors=()
-	mapfile -t colors < <(
+	__split --target={colors} --no-zero-length --invoke -- \
 		choose --linger --default=red --default=blue --multi --question='What is your favourite color?' -- \
 			green red blue blink jkasdjkasdjkas
-	)
 
 	local color
 	for color in "${colors[@]}"; do

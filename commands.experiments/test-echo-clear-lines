@@ -13,7 +13,7 @@ function test_echo_clear_lines() (
 	l="$(echo-math --precision=0 -- "$m")"
 	__print_lines "n: $n"
 	for ((i=0; i<n; i++)); do
-		data+="$(__get_substring "$i" -1)"
+		__slice --source={i} --target={data} --append -- "$i" -1
 	done
 
 	__print_string "$data"

@@ -1,0 +1,158 @@
+#!/usr/bin/env bash
+#!/Users/balupton/.local/bin/bash-5.3
+
+source "$DOROTHY/sources/bash.bash"
+array=()
+array[0]=a
+array[2]=ab
+array[3]=abc
+string="${array[*]}"
+
+# __print_lines '' '' 'array:'
+# __indices --source={array} || :
+
+# __print_lines '' '' 'string:'
+# __indices --source={string} || :
+
+# __print_lines '' '' 'array:'
+# __reverse --source={array} || :
+
+# __print_lines '' '' 'string:'
+# __reverse --source={string} || :
+
+# __print_lines '' '' 'array:'
+# __indices --source={array} --reverse || :
+
+# __print_lines '' '' 'string:'
+# __indices --source={string} --reverse || :
+
+# __print_lines '' '' 'index:'
+# __index --source={array} --value=aa --prefix=a --each || :
+
+# 0 = a
+# 1 = b
+# 2 = c
+# string='abcd'
+# __index --source={string} --reverse --overlap --each --value=abc --value=abc --value=ab --value=bc  || :
+# __index --source={string} --reverse --value=ab --value=abc || :
+# __index --source={string} --reverse --each --overlap=yes --value=bc --value=abc || :
+
+# __index --first --no-overlap --value=bc --value=abc -- abcd || :
+# __index --any --no-overlap --value=bc --value=abc -- abcd || :
+
+
+# string='aaaaa'; __index --source={string} --no-overlap --multiple --verbose --value=aa --value=aaa --overlap=no # failure
+# string='aaaaa'; __index --source={string} --no-overlap --each --verbose --value=aa --value=aaa --overlap=no # 0, 2
+
+# @todo rewrite __has to use __index
+# @todo remove --keep stuff from __slice, keeping it to only indexes
+# @todo evict, replicate innovations from __index
+
+
+# __replace --to=': ' --from=' -> ' -- "<path>: <before_mode> -> <mode_after>"
+# printf '%s\n' "[exit status = $?]"
+# __evict --overlap --keep-after-first=': ' --keep-before-first=' -> ' -- "<path>: <before_mode> -> <mode_after>"
+# printf '%s\n' "[exit status = $?]"
+
+# __index --value=c -- abcde
+
+# __evict --value=abc --value=d -- 'abcde' || :
+# __evict --keep-after-first=c --keep-before-last=c --overlap -- 'abcde abcde'
+
+
+# __replace --before=cd -- 'abcdef' || :
+# printf '%s\n' "[exit status = $?]"
+# __replace --after=cd -- 'abcdef' || :
+# printf '%s\n' "[exit status = $?]"
+# __replace --to=cd -- 'abcdef' || :
+# printf '%s\n' "[exit status = $?]"
+# __replace --from=cd -- 'abcdef' || :
+# printf '%s\n' "[exit status = $?]"
+
+
+value='/home/runner/.local/share/dorothy/user/commands.local:/home/runner/.local/share/dorothy/user/commands:/home/runner/.local/share/dorothy/commands.deprecated:/home/runner/.local/share/dorothy/commands.beta:/home/runner/.local/share/dorothy/commands:/home/runner/.local/bin:/home/runner/.local/bin:/usr/local/bin:/home/runner/.local/share/go/bin:/home/runner/.cargo/bin:/home/runner/.gem/bin:/usr/lib/x86_64-linux-gnu/rubygems-integration/3.2.0/bin:/usr/share/rubygems-integration/all/bin:/usr/share/rubygems-integration/3.2.0/bin:/usr/lib/x86_64-linux-gnu/ruby/gems/3.2.0/bin:/usr/lib/ruby/gems/3.2.0/bin:/usr/local/lib/ruby/gems/3.2.0/bin:/var/lib/gems/3.2.0/bin:/home/runner/.local/share/gem/ruby/3.2.0/bin:/usr/local/bin:/usr/bin:/home/runner/.local/share/dorothy/commands:/home/runner/.local/bin:/usr/sbin:/usr/bin:/sbin:/bin:/home/runner/.local/share/dorothy/user/commands:/home/runner/.config/dorothy/commands:/home/runner/.local/share/dorothy/commands:/home/runner/.config/dorothy/commands:/home/runner' values=()
+__split --source={value} --delimiter=':' --target={values} --no-zero-length || exit
+__unique --source+target={values} || exit
+__join --source={values} --delimiter=':' --target={value} || exit
+__dump --value='== DE-DUPLICATED ==' {value}
+
+# arr=(a b c c b a z x y)
+# __unique --source+target={arr}
+# __dump {arr}
+# __join --source={arr} --delimiter=,
+
+# __replace  --keep-after=': ' --keep-before=' -> ' -- '<path>: <before_mode> -> <mode_after>'
+# printf '%s\n' "[exit status = $?]"
+# __replace  --keep-after=' -> ' -- '<path>: <before_mode> -> <mode_after>'
+# printf '%s\n' "[exit status = $?]"
+
+# echo
+# __replace --replace-everything-before-the-end-of-this=': ' --replace-everything-after-the-start-of-this=' -> ' -- '<path>: <before_mode> -> <mode_after>'
+# printf '%s\n' "[exit status = $?]"
+# __replace --replace-everything-before-the-end-of-this=' -> ' -- '<path>: <before_mode> -> <mode_after>'
+# printf '%s\n' "[exit status = $?]"
+
+# echo
+# __replace --replace-everything-before-the-start-of-this=cd -- 'abcdef'
+# printf '%s\n' "[exit status = $?]"
+# __replace --replace-everything-before-the-end-of-this=cd -- 'abcdef'
+# printf '%s\n' "[exit status = $?]"
+# __replace --replace-everything-after-the-start-of-this=cd -- 'abcdef'
+# printf '%s\n' "[exit status = $?]"
+# __replace --replace-everything-after-the-end-of-this=cd -- 'abcdef'
+# printf '%s\n' "[exit status = $?]"
+
+# echo
+# __replace --keep-everything-before-the-start-of-this=cd -- 'abcdef'
+# printf '%s\n' "[exit status = $?]"
+# __replace --keep-everything-before-the-end-of-this=cd -- 'abcdef'
+# printf '%s\n' "[exit status = $?]"
+# __replace --keep-everything-after-the-start-of-this=cd -- 'abcdef'
+# printf '%s\n' "[exit status = $?]"
+# __replace --keep-everything-after-the-end-of-this=cd -- 'abcdef'
+# printf '%s\n' "[exit status = $?]"
+
+
+# __replace --before=c -- 'abcde' >>> de
+# __replace --after=z -- 'abcde'
+# printf '%s\n' "[exit status = $?]"
+
+# __replace --to=c -- 'abcde'
+# printf '%s\n' "[exit status = $?]"
+
+# __replace --from=c -- 'abcde'
+# printf '%s\n' "[exit status = $?]"
+
+# __replace \
+# 	--value:first=1 \
+# 	--value:first=2 \
+# 	-- 'abcde edcba'
+
+# __replace \
+# 	--pattern='(b)c' --replace='{\1}' \
+# 	-- 'abcde edcba'
+
+
+
+# __evict --value='z' --value='x' -- hivazlxueworld
+# __replace --value='z' --value='x' --value='value' -- hivazlxueworld
+
+
+# __replace \
+# 	--default-replace='DEFAULT' \
+# 	--before-first=c --replace=A \
+# 	--after-last=c \
+# 	--pattern:all='[de]' --replace=X \
+# 	--pattern:first='[de]' --replace=Y \
+# 	-- 'abcde edcba'
+
+# __replace  --replacement=A --before-first=c --replacement=B --after-last=c --replacement=C --pattern='[de]' --replacement=D -- 'abcde edcba'
+
+
+# --before-first='c' --replace='A' \
+# --before-first='c' --replace='B' \
+# --before-first='c' --replace='C' \
+# 'abc abc abc'
+# 'Ac abc abc'
+# 'Bc abc'
+# 'Cc'
