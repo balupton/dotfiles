@@ -61,4 +61,4 @@ alias gai='github-copilot-cli git-assist'
 alias cai='github-copilot-cli what-the-shell'
 
 # Update Apple Shortcuts Screen Time usage of VSCode in the background
-(set-data-jar 'screentime-work' "$(screentime vscode gitfox terminal ghostty --seconds || true)" --quiet &)
+(set-data-jar 'screentime-work' "$(screentime vscode gitfox terminal ghostty github --seconds || true)" --quiet &)
