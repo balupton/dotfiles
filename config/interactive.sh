@@ -59,3 +59,6 @@ alias git-hooks='edit .git/hooks/pre-commit'
 alias git-up='git branch --set-upstream-to=origin/$(git rev-parse --abbrev-ref HEAD) $(git rev-parse --abbrev-ref HEAD); git pull --rebase --autostash'
 alias gai='github-copilot-cli git-assist'
 alias cai='github-copilot-cli what-the-shell'
+
+# Update Apple Shortcuts Screen Time usage of VSCode in the background
+(set-data-jar 'screentime-work' "$(screentime vscode gitfox terminal ghostty --seconds || true)" --quiet &)

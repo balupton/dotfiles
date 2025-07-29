@@ -1,0 +1,68 @@
+#!/usr/bin/env nu
+
+# Run Apple Shortcut with key-value data
+def main [
+    key: string     # The key for the data
+    value: string   # The value for the data
+    --help(-h)      # Show help information
+    --quiet(-q)     # Suppress success messages
+] {
+    # Show help if requested
+    if $help {
+        print "Usage: set-data-jar <key> <value> [--quiet]"
+        print ""
+        print "Run Apple Shortcut 'set-data-jar-value' with key-value data"
+        print ""
+        print "Arguments:"
+        print "  key      The key for the data entry"
+        print "  value    The value for the data entry"
+        print ""
+        print "Options:"
+        print "  --quiet, -q    Suppress success messages (errors still shown)"
+        print ""
+        print "Examples:"
+        print "  set-data-jar screentime-vscode 3664"
+        print "  set-data-jar app-usage 1234 --quiet"
+        return
+    }
+
+    # Check if shortcuts command exists
+    if not (which shortcuts | is-not-empty) {
+        print "Error: 'shortcuts' command not found. This requires macOS Monterey or later."
+        exit 1
+    }
+
+    # Create the JSON data structure
+    let json_data = {
+        key: $key,
+        value: $value
+    }
+
+    # Create a temporary file for the JSON input
+    let temp_file = (mktemp --suffix=".json")
+
+    # Write JSON data to temporary file (force overwrite if exists)
+    $json_data | to json | save --force $temp_file
+
+    # Run the Apple Shortcut with the JSON input and handle cleanup
+    let result = (try {
+        shortcuts run set-data-jar --input-path $temp_file
+        if not $quiet {
+            echo-style --success='Data Jar: ' $"--code=($key)" --bold=' is now ' $"--code=($value)"
+        }
+    } catch { |err|
+        echo-style --stderr --error='Data Jar: ' $"--code=($key)" --bold=' failed to become ' $"--code=($value)" --newline $"--=($err.msg)"
+        # Clean up temp file before exiting
+        if ($temp_file | path exists) {
+            rm $temp_file
+        }
+        exit 1
+    })
+
+    # Clean up temporary file
+    if ($temp_file | path exists) {
+        rm $temp_file
+    }
+
+    $result
+}
