@@ -29,7 +29,7 @@ function three__code {
 }
 
 function_names=()
-__split --target={function_names} --no-zero-length < <(declare -F | awk '{print $3}') # [declare -f one_fn] to [one_fn]
+__split --target={function_names} --no-zero-length --stdin < <(declare -F | awk '{print $3}') # [declare -f one_fn] to [one_fn]
 function_codes=()
 function_labels=()
 for function_name in "${function_names[@]}"; do

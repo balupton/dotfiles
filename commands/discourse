@@ -42,27 +42,27 @@ function discourse() (
 			    Defaults to 'app'.
 		EOF
 		if [[ $# -ne 0 ]]; then
-			echo-error "$@"
+			__print_error "$@"
 		fi
 		return 22 # EINVAL 22 Invalid argument
 	}
 
 	# process
-	local item action='' option_ssh_ip option_git_ssh_key option_git_ssh_pass option_git_remote option_git_branch option_container
+	local item action='' option_ssh_ip='' option_git_ssh_key='' option_git_ssh_pass='' option_git_remote='' option_git_branch='' option_container=''
 	while [[ $# -ne 0 ]]; do
 		item="$1"
 		shift
 		case "$item" in
-		'--help' | '-h') help ;;
-		'--action='*) action="${item#*=}" ;;
-		'--ssh-ip='*) option_ssh_ip="${item#*=}" ;;
-		'--git-ssh-key='*) option_git_ssh_key="${item#*=}" ;;
-		'--git-ssh-pass='*) option_git_ssh_pass="${item#*=}" ;;
-		'--git-remote='*) option_git_remote="${item#*=}" ;;
-		'--git-branch='*) option_git_branch="${item#*=}" ;;
-		'--container'*) option_container="${item#*=}" ;;
-		'--'*) help "An unrecognised flag was provided: $item" ;;
-		*) help "An unrecognised argument was provided: $item" ;;
+		--help | -h) help ;;
+		--action=*) __flag --source={item} --target={action} ;;
+		--ssh-ip=*) __flag --source={item} --target={option_ssh_ip} ;;
+		--git-ssh-key=*) __flag --source={item} --target={option_git_ssh_key} ;;
+		--git-ssh-pass=*) __flag --source={item} --target={option_git_ssh_pass} ;;
+		--git-remote=*) __flag --source={item} --target={option_git_remote} ;;
+		--git-branch=*) __flag --source={item} --target={option_git_branch} ;;
+		--container*) __flag --source={item} --target={option_container} ;;
+		--*) __unrecognised_flag "$item" || return ;;
+		*) __unrecognised_argument "$item" || return ;;
 		esac
 	done
 
@@ -79,7 +79,7 @@ function discourse() (
 
 	# do login
 	if [[ $action == 'login' ]]; then
-		ssh "$option_ssh_ip"
+		eval-helper --until=success --wrap --verbose -- ssh "$option_ssh_ip"
 		return 0
 	fi
 

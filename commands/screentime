@@ -1,4 +1,5 @@
 #!/usr/bin/env nu
+# https://github.com/copilot/c/b8a85f16-8077-4434-87bd-35c322bce51e
 
 # Apple uses a different "starting point" for counting time than Unix systems.
 # Unix counts seconds since January 1, 1970 00:00:00 UTC (called "Unix epoch")
@@ -46,7 +47,8 @@ let APP_ALIASES = {
 	"gitfox": "com.bytieful.Gitfox-setapp",
 	"ghostty": "com.mitchellh.ghostty",
 	"term": "com.apple.Terminal",
-	"terminal": "com.apple.Terminal"
+	"terminal": "com.apple.Terminal",
+	"finder": "com.apple.finder"
 }
 
 # Common website aliases for convenience
@@ -102,6 +104,7 @@ def find_apps [query: string] {
 		'/Applications/Utilities'
 		'/System/Applications'           # TextEdit
 		'/System/Applications/Utilities' # Terminal
+		'/System/Library/CoreServices' # Finder
 	]
 
 	let all_apps = ($app_dirs | each { |dir|

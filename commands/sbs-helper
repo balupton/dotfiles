@@ -19,7 +19,7 @@ function sbs_helper() (
 			    Your bearer token.
 		EOF
 		if [[ $# -ne 0 ]]; then
-			echo-error "$@"
+			__print_error "$@"
 		fi
 		return 22 # EINVAL 22 Invalid argument
 	}
@@ -32,8 +32,8 @@ function sbs_helper() (
 		case "$item" in
 		'--help' | '-h') help ;;
 		'--token='*) token="${item#*=}" ;;
-		'--'*) help "An unrecognised flag was provided: $item" ;;
-		*) help "An unrecognised argument was provided: $item" ;;
+		--*) __unrecognised_flag "$item" || return ;;
+		*) __unrecognised_argument "$item" || return ;;
 		esac
 	done
 

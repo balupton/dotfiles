@@ -7,8 +7,8 @@ function discourse_setup() (
 	# Receive arguments from caller
 	local GIT_SSH_KEY="${GIT_SSH_KEY-}" GIT_SSH_PASS="${GIT_SSH_PASS-}" GIT_REMOTE="${GIT_REMOTE-}" GIT_BRANCH="${GIT_BRANCH-}" CONTAINER="${CONTAINER-}"
 	if [[ -z $GIT_SSH_KEY || -z $GIT_SSH_PASS || -z $GIT_REMOTE ]]; then
-		__print_lines '[discourse-setup] is to be run via [commands/discourse]' >&2
-		return 1
+		__print_lines '[discourse-setup] is to be run via [commands/discourse]' >&2 || :
+		return 22 # EINVAL 22 Invalid argument
 	fi
 
 	__print_lines 'Configuring dependencies...'
@@ -74,8 +74,8 @@ function discourse_setup() (
 
 	# Install docker
 	if __command_missing docker; then
-		__print_lines 'Docker is missing, install it via [setup-util-docker] by installing Dorothy [dorothy.bevry.me]...' >&2
-		return 1
+		__print_lines 'Docker is missing, install it via [setup-util-docker] by installing Dorothy [dorothy.bevry.me]...' >&2 || :
+		return 74 # EPROGUNAVAIL 74 RPC prog. not avail
 	fi
 
 	# Install discourse
@@ -119,11 +119,13 @@ function discourse_setup() (
 	if [[ -e "/var/discourse/containers/$CONTAINER.yml" ]]; then
 		ln -sfF -- "/var/discourse/containers/$CONTAINER.yml" '/var/discourse/containers/app.yml'
 	fi
+	# Private Key (PEM)
 	if [[ -e "/var/discourse/containers/$CONTAINER.key" ]]; then
 		__mkdirp /var/discourse/shared/standalone/ssl
 		# symlink doesn't work
 		cp -f -- "/var/discourse/containers/$CONTAINER.key" '/var/discourse/shared/standalone/ssl/ssl.key'
 	fi
+	# Origin Certificate
 	if [[ -e "/var/discourse/containers/$CONTAINER.crt" ]]; then
 		__mkdirp /var/discourse/shared/standalone/ssl
 		# symlink doesn't work

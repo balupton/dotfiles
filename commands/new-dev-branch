@@ -10,7 +10,7 @@ function new_dev_branch() (
 			# setup-util --name='American Words' APT='wamerican'
 			setup-util --name='British Words' APT='wbritish'
 		else
-			echo-error 'No dictionary found'
+			__print_error 'No dictionary found'
 			return 1
 		fi
 	fi

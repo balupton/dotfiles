@@ -41,7 +41,7 @@ function magnet_search() (
 
 	# prepare
 	local search="$1" lines=() line
-	__split --target={lines} --no-zero-length < <(attractorr --sort=seeders "$search" 2>&1 || :)
+	__split --target={lines} --no-zero-length --stdin < <(attractorr --sort=seeders "$search" 2>&1 || :)
 	for line in "${lines[@]}"; do
 		line="$(echo-trim-colors -- "$line")"
 		if [[ -z $line ]] || echo-regexp -q --regexp='ERROR|No results|btih:000000000000' -- "$line"; then
@@ -51,7 +51,7 @@ function magnet_search() (
 	done
 
 	source "$DOROTHY/sources/ripgrep.bash"
-	__split --target={lines} --no-zero-length < <(magnetfinder --no-interactive --show 5 -aq "$search" 2>/dev/null | rg --invert-match --fixed-strings --regexp='No torrents found matching search query' || :)
+	__split --target={lines} --no-zero-length --stdin < <(magnetfinder --no-interactive --show 5 -aq "$search" 2>/dev/null | rg --invert-match --fixed-strings --regexp='No torrents found matching search query' || :)
 	__split --source={lines} --delimiter=$'\t'
 )
 

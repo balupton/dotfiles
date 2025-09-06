@@ -10,20 +10,20 @@ function boundation_ordered() (
 	fi
 
 	if [[ $# -ne 0 ]]; then
-		echo-error 'You passed arguments. How do you expect them to work on multiple boundation-all calls. Modify this file instead.'
+		__print_error 'You passed arguments. How do you expect them to work on multiple boundation-all calls. Modify this file instead.'
 		return 1
 	fi
 
 	local slugs=(
 		# assert-helpers
-		bevry/ansi
-		bevry/errlop
-		bevry/assert-helpers
+		# bevry/ansi
+		# bevry/errlop
+		# bevry/assert-helpers
 
 		# editions
-		bevry/version-clean
-		bevry/version-compare
-		bevry/version-range
+		# bevry/version-clean
+		# bevry/version-compare
+		# bevry/version-range
 		bevry/editions
 
 		# ambi/eachr/extendr

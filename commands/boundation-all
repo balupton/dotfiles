@@ -30,7 +30,7 @@ function boundation_all() (
 			    Same as --start=<repo> --skip=<repo>
 		EOF
 		if [[ $# -ne 0 ]]; then
-			echo-error "$@"
+			__print_error "$@"
 		fi
 		return 22 # EINVAL 22 Invalid argument
 	}
@@ -59,8 +59,8 @@ function boundation_all() (
 			shift $#
 			break
 			;;
-		'--'*) help "An unrecognised flag was provided: $item" ;;
-		*) help "An unrecognised argument was provided: $item" ;;
+		--*) __unrecognised_flag "$item" || return ;;
+		*) __unrecognised_argument "$item" || return ;;
 		esac
 	done
 
@@ -111,7 +111,7 @@ function boundation_all() (
 
 	# check we aren't in a package
 	if [[ -f package.json ]]; then
-		echo-error 'You just tried to run boundation-all in a package, you forgot to cd out of debugging a package failure.'
+		__print_error 'You just tried to run boundation-all in a package, you forgot to cd out of debugging a package failure.'
 		return 22 # EINVAL 22 Invalid argument
 	fi
 
@@ -209,7 +209,7 @@ function boundation_all() (
 			# note it succeeded
 			echo-style --g1="$repo" || return
 			# remove from failed repos
-			__evict --source+target={failed_repos} --value="$repo" || return
+			__evict --source+target={failed_repos} --first -- "$repo" || return
 			success_repos+=("$repo")
 		) || (
 			# check status

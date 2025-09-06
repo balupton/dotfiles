@@ -1,0 +1,3 @@
+#!/usr/bin/env bash
+
+screentime vscode gitfox terminal ghostty finder github vercel.com cloudflare.com bevry.me --quiet "$@"

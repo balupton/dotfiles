@@ -72,7 +72,7 @@ function boundation_upgrade() (
 	nvm-env -- boundation --auto --expandNodeVersions "$@" || {
 		message="failed to expand support on $name"
 		say "$message" || return # as || {...} is not a function, this return exits the command subshell function
-		return 1 # as || {...} is not a function, this return exits the command subshell function
+		return 1                 # as || {...} is not a function, this return exits the command subshell function
 
 		# message="failed to continue support on $name, enabling shrinking to mark failed unsupported test versions as optional"
 		# say "$message"

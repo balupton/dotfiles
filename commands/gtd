@@ -19,7 +19,7 @@ function gtd() (
 			    The branch or tag to delete.
 		EOF
 		if [[ $# -ne 0 ]]; then
-			echo-error "$@"
+			__print_error "$@"
 		fi
 		return 22 # EINVAL 22 Invalid argument
 	}
@@ -37,7 +37,7 @@ function gtd() (
 			shift $#
 			break
 			;;
-		'--'*) help "An unrecognised flag was provided: $item" ;;
+		--*) __unrecognised_flag "$item" || return ;;
 		*)
 			option_branch_or_tags+=("$item")
 			;;

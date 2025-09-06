@@ -19,7 +19,7 @@ function git_merge() (
 			    If not specified, the current branch will be used.
 		EOF
 		if [[ $# -ne 0 ]]; then
-			echo-error "$@"
+			__print_error "$@"
 		fi
 		return 22 # EINVAL 22 Invalid argument
 	}
@@ -32,7 +32,7 @@ function git_merge() (
 		case "$item" in
 		'--help' | '-h') help ;;
 		'--branch='*) option_branch="${item#*=}" ;;
-		'--'*) help "An unrecognised flag was provided: $item" ;;
+		--*) __unrecognised_flag "$item" || return ;;
 		*)
 			if [[ -z $option_branch ]]; then
 				option_branch="$item"
@@ -54,7 +54,7 @@ function git_merge() (
 
 	# ensure the two branches are different
 	if [[ $default_branch == "$option_branch" ]]; then
-		echo-error "The default branch and the specified branch are the same: $default_branch"
+		__print_error "The default branch and the specified branch are the same: $default_branch"
 		return 22 # EINVAL 22 Invalid argument
 	fi
 
