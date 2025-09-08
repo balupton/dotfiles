@@ -5,8 +5,6 @@
 # Dorothy
 alias d='dorothy'
 export DOROTHY_THEME='oz'
-AUTOCOMPLETE_GITHUB_COPILOT_CLI=no
-AUTOCOMPLETE_TEA=no
 
 # Bottom
 # alias btm='btm --color default-light'
@@ -61,9 +59,6 @@ alias git-hooks='edit .git/hooks/pre-commit'
 alias git-up='git branch --set-upstream-to=origin/$(git rev-parse --abbrev-ref HEAD) $(git rev-parse --abbrev-ref HEAD); git pull --rebase --autostash'
 alias gai='github-copilot-cli git-assist'
 alias cai='github-copilot-cli what-the-shell'
-
-# Update Apple Shortcuts Screen Time usage of VSCode in the background'
-( (set-data-jar 'screentime-work' "$(screentime-work --seconds || true)" --quiet) &)
 
 # Remove Elgato Stream Deck logs as they baloon to 100GB within a week
 rm -rf "$HOME/Library/Logs/ElgatoStreamDeck" || true
