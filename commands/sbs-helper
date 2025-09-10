@@ -39,7 +39,7 @@ function sbs_helper() (
 
 	# ensure token
 	if [[ -z $token ]]; then
-		question="$(echo-style --bold="What is your bearer token?" $'\n' "Fetch this by logging into SBS, and monitoring your web console for " --code="/all?context=odwebsite" ' then grabbing it from the request headers.')"
+		question="$(__print_style --bold="What is your bearer token?" $'\n' "Fetch this by logging into SBS, and monitoring your web console for " --code="/all?context=odwebsite" ' then grabbing it from the request headers.')"
 		token="$(ask --question="$question")"
 	fi
 

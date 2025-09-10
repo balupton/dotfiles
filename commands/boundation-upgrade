@@ -47,21 +47,21 @@ function boundation_upgrade() (
 
 	# install global deps
 	if __command_missing -- boundation; then
-		echo-style --bold='installing' ' ' --code='boundation'
+		__print_style --bold='installing' ' ' --code='boundation'
 		nvm-env -- npm i -g boundation
 	fi
 	if __command_missing -- github-backers; then
-		echo-style --bold='installing' ' ' --code='github-backers'
+		__print_style --bold='installing' ' ' --code='github-backers'
 		nvm-env -- npm i -g '@bevry/github-api'
 	fi
 	if __command_missing -- make-deno-edition; then
-		echo-style --bold='installing' ' ' --code='make-deno-edition'
+		__print_style --bold='installing' ' ' --code='make-deno-edition'
 		nvm-env -- npm i -g make-deno-edition
 	fi
 
 	# install local deps
 	# as boundation no longer tries
-	echo-style --bold='installing' ' ' --code='dependencies'
+	__print_style --bold='installing' ' ' --code='dependencies'
 	nvm-env -- npm i --force
 
 	# use global up to date version of make-deno-edition
@@ -76,7 +76,7 @@ function boundation_upgrade() (
 
 		# message="failed to continue support on $name, enabling shrinking to mark failed unsupported test versions as optional"
 		# say "$message"
-		# echo-style --notice="$banner$message$banner"
+		# __print_style --notice="$banner$message$banner"
 		# confirm --ppid=$$ -- 'Proceed?'
 
 		# git reset --hard
@@ -84,7 +84,7 @@ function boundation_upgrade() (
 		# nvm-env -- boundation --auto --expandNodeVersions --shrinkNodeVersions "$@" || {
 		# 	message="failed to conintue support on $name for existing node versions, enabling shrinking to maintained node versions"
 		# 	say "$message"
-		# 	echo-style --notice="$banner$message$banner"
+		# 	__print_style --notice="$banner$message$banner"
 		# 	confirm --ppid=$$ -- 'Proceed?'
 
 		# 	git reset --hard
@@ -92,7 +92,7 @@ function boundation_upgrade() (
 		# 	nvm-env -- boundation --auto --maintainedNodeVersions --expandNodeVersions --shrinkNodeVersions "$@" || {
 		# 		message="failed to shrink support on $name to maintained node versions"
 		# 		say "$message"
-		# 		echo-style --error="$banner$message$banner"
+		# 		__print_style --error="$banner$message$banner"
 
 		# 		return 1
 		# 	}
@@ -148,9 +148,9 @@ function boundation_upgrade() (
 	nvm-env -- npx prettier HISTORY.md --write
 
 	# log
-	echo-style --h2='changelog'
+	__print_style --h2='changelog'
 	bat -P <<<"$n"
-	echo-style --g1='changelog'
+	__print_style --g1='changelog'
 
 	# prepare
 	nvm-env -- npm run our:meta

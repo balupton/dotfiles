@@ -70,9 +70,9 @@ function remove_duplicates() (
 			# compare and possibly remove
 			if is-same --comparisons=checksum -- "$source_file_path" "$alt_file_path"; then
 				/usr/bin/trash "$alt_file_path" # doesn't support -- ...<file>
-				echo-style --green='same,' --green+bold=' removed: ' --code="$alt_file_path"
+				__print_style --green='same,' --green+bold=' removed: ' --code="$alt_file_path"
 			else
-				echo-style --red='different,' --red+bold=' kept'
+				__print_style --red='different,' --red+bold=' kept'
 			fi
 		done
 	done

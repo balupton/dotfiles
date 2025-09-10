@@ -6,13 +6,13 @@ function remove_part_extension() (
 	local files=() file
 	__split --target={files} --no-zero-length --stdin < <(find-files --extension=part . || :)
 	if [[ ${#files[@]} -eq 0 ]]; then
-		echo-style --notice='No files to process.'
+		__print_style --notice='No files to process.'
 		return 0
 	fi
 	for file in "${files[@]}"; do
 		mv -v -- "$file" "${file%.part}"
 	done
-	echo-style --success="Removed part extension from ${#files[@]} files."
+	__print_style --success="Removed part extension from ${#files[@]} files."
 	return 0
 )
 

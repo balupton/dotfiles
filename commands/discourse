@@ -75,7 +75,7 @@ function discourse() (
 	fi
 
 	# log
-	echo-style --invert="Entering $option_ssh_ip"
+	__print_style --invert="Entering $option_ssh_ip"
 
 	# do login
 	if [[ $action == 'login' ]]; then
@@ -93,10 +93,10 @@ GIT_BRANCH='$option_git_branch'
 CONTAINER='$option_container'
 $(<"$DOROTHY/user/commands/discourse-setup")
 "
-	if ssh -t "$option_ssh_ip" "$discourse_init" && echo-style --success='Successfully setup the discourse instance. 🎉'; then
+	if ssh -t "$option_ssh_ip" "$discourse_init" && __print_style --success='Successfully setup the discourse instance. 🎉'; then
 		return 0
 	else
-		echo-style --stderr --error='Error: Failed to setup the discourse instance. 🚨' || return
+		__print_style --stderr --error='Error: Failed to setup the discourse instance. 🚨' || return
 		return 1
 	fi
 )

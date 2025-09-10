@@ -7,7 +7,7 @@ function magnet_select() (
 	local search="$1" results=() option_visual
 
 	# fetch
-	echo-style --purple='searching' >/dev/tty
+	__print_style --tty --purple='searching'
 	__split --target={results} --no-zero-length --invoke -- \
 		magnet-search "$search"
 	if [[ ${#results[@]} -eq 0 ]]; then

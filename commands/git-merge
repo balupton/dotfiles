@@ -61,7 +61,7 @@ function git_merge() (
 	# =======================================================
 	# Action
 
-	if ! confirm --positive --ppid=$$ -- "$(echo-style --reset --bold='Merge ' --invert="$option_branch" --bold=' into ' --invert="$default_branch")"; then
+	if ! confirm --positive --ppid=$$ -- "$(__print_style --reset --bold='Merge ' --invert="$option_branch" --bold=' into ' --invert="$default_branch")"; then
 		return 125 # ECANCELED 125 Operation cancelled
 	fi
 

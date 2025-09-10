@@ -123,11 +123,11 @@ function boundation_all() (
 	local failed_repos=() success_repos=()
 	function on_finish {
 		if [[ ${#success_repos[@]} -ne 0 ]]; then
-			echo-style --success='boundation success on:'
+			__print_style --success='boundation success on:'
 			__print_lines "${success_repos[@]}"
 		fi
 		if [[ ${#failed_repos[@]} -ne 0 ]]; then
-			echo-style --error='boundation failed on:'
+			__print_style --error='boundation failed on:'
 			__print_lines "${failed_repos[@]}"
 		fi
 	}
@@ -144,29 +144,29 @@ function boundation_all() (
 		slug="${option_slugs[index]}"
 		repo="${slug#*/}"
 		if [[ $ready == 'no' && $repo == "$option_start" ]]; then
-			echo-style --magenta="found $repo, starting"
+			__print_style --magenta="found $repo, starting"
 			ready='yes'
 		fi
 
 		# checks
 		if [[ $ready == 'no' ]]; then
-			echo-style --dim="skipping $repo (not yet ready)"
+			__print_style --dim="skipping $repo (not yet ready)"
 			continue
 		elif __has --source={option_skips} -- "$slug"; then
-			echo-style --dim="skipping $slug (slug was in skips)"
+			__print_style --dim="skipping $slug (slug was in skips)"
 			continue
 		elif __has --source={option_skips} -- "$repo"; then
-			echo-style --dim="skipping $repo (repo was in skips)"
+			__print_style --dim="skipping $repo (repo was in skips)"
 			continue
 		elif [[ -n $option_filter && $repo != *"$option_filter"* ]]; then
-			echo-style --dim="skipping $repo (repo didn't match filter: $option_filter)"
+			__print_style --dim="skipping $repo (repo didn't match filter: $option_filter)"
 			continue
 		fi
 
 		# check package
 		package="$(fetch "https://raw.githubusercontent.com/${slug}/HEAD/package.json" 2>/dev/null)"
 		if [[ -z $package ]]; then
-			echo-style --dim="skipping $repo (no package.json)"
+			__print_style --dim="skipping $repo (no package.json)"
 			continue
 		fi
 
@@ -176,10 +176,10 @@ function boundation_all() (
 			repo_deps='yes'
 		fi
 		if [[ $option_deps == 'yes' && $repo_deps == 'no' ]]; then
-			echo-style --dim="skipping $repo (it did not have deps)"
+			__print_style --dim="skipping $repo (it did not have deps)"
 			continue
 		elif [[ $option_deps == 'no' && $repo_deps == 'yes' ]]; then
-			echo-style --dim="skipping $repo (it had deps)"
+			__print_style --dim="skipping $repo (it had deps)"
 			continue
 		fi
 
@@ -188,8 +188,8 @@ function boundation_all() (
 		(
 			# log
 			failed_repos+=("$repo")
-			echo-style --terminal-title="$repo [$index/$count]" || return
-			echo-style --h1="$repo" || return
+			__print_style --terminal-title="$repo [$index/$count]" || return
+			__print_style --h1="$repo" || return
 			# clone the repo fresh and set the correct origin in case of fork
 			# don't use subshell as that breaks strict mode
 			# don't use gh, as it clones forks then sets the origin to not the fork
@@ -207,7 +207,7 @@ function boundation_all() (
 			# wait for the publish to propagate
 			waiter 60 || return
 			# note it succeeded
-			echo-style --g1="$repo" || return
+			__print_style --g1="$repo" || return
 			# remove from failed repos
 			__evict --source+target={failed_repos} --first -- "$repo" || return
 			success_repos+=("$repo")
@@ -215,7 +215,7 @@ function boundation_all() (
 			# check status
 			local status="$?"
 			# note failure
-			echo-style --e1="$repo" ' ' --code="$status" || return
+			__print_style --e1="$repo" ' ' --code="$status" || return
 			# keep repo (if it exists), but ensure we are correct location
 			cd "$pwd" || return
 			# if aborted, propagate
