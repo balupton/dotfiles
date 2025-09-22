@@ -12,16 +12,18 @@ function generate_subtitles() (
 			Generate subtitles for media files.
 
 			USAGE:
-			generate-sbutitles [...options] [...<path> [-- ...<path>]]
+			generate-sbutitles [...options] [-- ...<path>]]
 
 			OPTIONS:
-			[...<path> [-- ...<path>]]
+			-- ...<path>]
 			    The paths to look for media files within. Looking will be deep, looking in subdirectories.
 			    If no paths are provided, the current working directory will be used.
 			--overwrite
 			    If enabled, will overwrite existing subtitle files.
 			--quiet
 			    Output less information.
+			[...options]
+			    Additional options are passed to the transcription engine.
 
 			DEPENDENCIES:
 			whisper
@@ -33,22 +35,21 @@ function generate_subtitles() (
 	}
 
 	# process
-	local item option_quiet='' option_overwrite='' option_paths=()
+	local item option_quiet='' option_overwrite='' option_paths=() options=()
 	while [[ $# -ne 0 ]]; do
 		item="$1"
 		shift
 		case "$item" in
-		'--help' | '-h') help ;;
-		'--no-verbose'* | '--verbose'*) __flag --source={item} --target={option_quiet} --non-affirmative ;;
-		'--no-quiet'* | '--quiet'*) __flag --source={item} --target={option_quiet} --affirmative ;;
-		'--no-overwrite'* | '--overwrite'*) __flag --source={item} --target={option_overwrite} --affirmative ;;
-		'--')
-			option_paths+=("$item" "$@")
+		--help | -h) help ;;
+		--no-verbose* | --verbose*) __flag --source={item} --target={option_quiet} --non-affirmative ;;
+		--no-quiet* | --quiet*) __flag --source={item} --target={option_quiet} --affirmative ;;
+		--no-overwrite* | --overwrite*) __flag --source={item} --target={option_overwrite} --affirmative ;;
+		--)
+			option_paths+=("$@")
 			shift $#
 			break
 			;;
-		--*) __unrecognised_flag "$item" || return ;;
-		*) option_paths+=("$item") ;;
+		*) options+=("$item") ;;
 		esac
 	done
 
@@ -68,42 +69,75 @@ function generate_subtitles() (
 	# Helpers
 
 	# --language English
-	local whisper_cmd=(whisper --model turbo -f srt --verbose True)
-	if is-mac; then
-		whisper_cmd+=(--fp16 False)
-	fi
+	# (whisper-cli --vad --model /Users/balupton/Downloads/whisper.cpp/models/ggml-large-v3-turbo.bin --output-srt --output-vtt --translate) # --language auto)
+	# if is-mac; then
+	# 	whisper_cmd+=(--fp16 False)
+	# fi
 
-	function __transcribe {
-		local filepath="$1" filepath_no_extension dirpath
-		filepath="$(fs-path --absolute -- "$filepath")" || return
-		if [[ $option_overwrite == 'no' ]]; then
-			# check if the subtitle file already exists, only do --no-extension, as it could have a . in its name, like [A vs. B]
-			filepath_no_extension="$(fs-path --no-extension -- "$filepath")" || return
-			if [[ -f "$filepath_no_extension.srt" ]]; then
-				return 0
-			fi
-		fi
-		dirpath="$(fs-path --parents -- "$filepath")" || return
-		(
-			cd "$dirpath" || return
-			eval-helper --wrap --quiet="$option_quiet" --revolving-max-lines=1 -- \
-				"${whisper_cmd[@]}" "$filepath" || return
-		) || return
-	}
+	# function __transcribe {
+	# 	if [[ $option_overwrite == 'no' ]]; then
+	# 		# check if the subtitle file already exists, only do --no-extension, as it could have a . in its name, like [A vs. B]
+	# 		filepath_no_extension="$(fs-path --no-extension -- "$filepath")" || return
+	# 		if [[ -f "$filepath_no_extension.srt" ]]; then
+	# 			return 0
+	# 		fi
+	# 	fi
+	# 	dirpath="$(fs-path --parents -- "$filepath")" || return
+	# 	(
+	# 		cd "$dirpath" || return
+	# 		# --revolving-max-lines=1
+	# 		# eval-helper --wrap --quiet="$option_quiet" --revolving-lines=terminal -- \
+	# 		"${whisper_cmd[@]}" "$filepath" || return
+	# 	) || return
+	# }
 
-	local option_paths filepaths
+	local cmd=(whisperkit-cli transcribe --verbose --task transcribe --report --skip-special-tokens --chunking-strategy vad --model large-v3 "${options[@]}")
+
+	local option_paths paths path
 	for path in "${option_paths[@]}"; do
 		if [[ -d $path ]]; then
-			filepaths=("$path"/**/*.{mp4,mkv,webm,avi,flv,wmv,mov,mpg,mpeg,m4v,3gp,3g2,webp,mp3,m4a,ogg,wav,flac,opus})
-			for filepath in "${filepaths[@]}"; do
-				__transcribe "$filepath"
-			done
+			# whisperkit does not support: mkv
+			# https://github.com/argmaxinc/WhisperKit/issues/356
+			paths+=("$path"/**/*.{mp4,webm,avi,flv,wmv,mov,mpg,mpeg,m4v,3gp,3g2,webp,mp3,m4a,ogg,wav,flac,opus})
 		elif [[ -f $path ]]; then
-			__transcribe "$path"
+			paths+=("$path")
 		else
-			__print_error "The path [$path] is not a file or directory."
+			__print_error 'The path ' --path="$path" ' is neither a file nor directory.'
+			return 2 # ENOENT 2 No such file or directory
 		fi
 	done
+	local root subtitle languages=(en id) language translation
+	for path in "${paths[@]}"; do
+		path="$(fs-path --absolute -- "$path")" || return
+		root="$(fs-path --no-extension -- "$path")" || return
+		subtitle="$root.srt"
+		transcribed="$root.ai.transcribed.srt"
+		__dump {path} {subtitle} {transcribed} {translation}
+		if [[ -s $transcribed && $option_overwrite == 'no' ]]; then
+			__print_style --info='Already transcribed'
+		else
+			eval-helper --wrap -- "${cmd[@]}" --audio-path "$path" || return
+			if ! [[ -s $subtitle ]]; then
+				__print_error 'Failed to generate subtitle at ' --path="$subtitle"
+				return 2 # ENOENT 2 No such file or directory
+			fi
+			mv -v -- "$subtitle" "$transcribed"
+		fi
+		for language in "${languages[@]}"; do
+			translation="$root.ai.translated.$language.srt"
+			if [[ -s $translation && $option_overwrite == 'no' ]]; then
+				__print_style --info="Already translated to $language"
+			else
+				eval-helper --wrap -- translate-subtitle.nu --language="$language" "$transcribed" "$translation" || return
+				if ! [[ -s $translation ]]; then
+					__print_error 'Failed to generate translation at ' --path="$translation"
+					return 2 # ENOENT 2 No such file or directory
+				fi
+			fi
+		done
+		__print_line
+	done
+	# doing all audio-path at in one whisperkit call seems to try to do them all at once in parallel
 )
 
 # fire if invoked standalone

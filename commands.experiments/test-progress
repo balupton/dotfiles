@@ -1,0 +1,28 @@
+#!/usr/bin/env bash
+
+counter=50
+# echo "demo: error state"
+# while [ $counter -le 25 ]; do
+#   printf "\x1b]9;4;2;${counter}\x07"
+#   ((counter++))
+#   sleep 0.1
+# done
+# echo "demo: normal state"
+# while [ $counter -le 50 ]; do
+#   printf "\x1b]9;4;1;${counter}\x07"
+#   ((counter++))
+#   sleep 0.1
+# done
+# echo "demo: pulsing"
+# while [ $counter -le 75 ]; do
+#   printf "\x1b]9;4;3\x07"
+#   ((counter++))
+#   sleep 0.1
+# done
+echo "demo: normal state"
+while [ $counter -le 100 ]; do
+  printf "\x1b]9;4;1;${counter}\x07"
+  ((counter++))
+  waiter 20
+done
+printf "\x1b]9;4;0\x07"
