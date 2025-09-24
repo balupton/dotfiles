@@ -1,3 +1,69 @@
 #!/usr/bin/env bash
 
-screentime vscode gitfox terminal ghostty finder github vercel.com cloudflare.com bevry.me --quiet "$@"
+function screentime_work() (
+	source "$DOROTHY/sources/bash.bash"
+
+	# =====================================
+	# Arguments
+
+	function __help {
+		cat <<-EOF >&2 || return
+			ABOUT:
+			Fetches the amount of time I spent working via the Screen Time feature of macOS.
+
+			USAGE:
+			screentime-work [...options]
+
+			OPTIONS:
+			--quiet
+			    If enabled, do not output any messages.
+
+			--update
+			    Update the data jar 'screentime-work' with the latest seconds.
+		EOF
+		if [[ $# -ne 0 ]]; then
+			__print_error "$@" || return
+		fi
+		return 22 # EINVAL 22 Invalid argument
+	}
+
+	# process
+	local item option_quiet='no' option_update='no' option_args=()
+	while [[ $# -ne 0 ]]; do
+		item="$1"
+		shift
+		case "$item" in
+		--help | -h) __help || return ;;
+		--no-quiet* | --quiet*) __flag --source={item} --target={option_quiet} --affirmative --coerce || return ;;
+		--no-update* | --update*) __flag --source={item} --target={option_update} --affirmative --coerce || return ;;
+		--)
+			option_args+=("$@")
+			shift $#
+			break
+			;;
+		*) option_args+=("$item") ;;
+		esac
+	done
+
+	# =====================================
+	# Action
+
+	function __fetch {
+		screentime vscode gitfox terminal ghostty finder github vercel.com cloudflare.com bevry.me --quiet="$option_quiet" "${option_args[@]}" "$@" || return
+	}
+
+	if [[ $option_update == 'yes' ]]; then
+		local result
+		result="$(__fetch --seconds)" || return
+		if [[ -n $result ]]; then
+			set-data-jar 'screentime-work' "$result" || return
+		fi
+	else
+		__fetch || return
+	fi
+)
+
+# fire if invoked standalone
+if [[ $0 == "${BASH_SOURCE[0]}" ]]; then
+	screentime_work "$@"
+fi

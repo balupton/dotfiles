@@ -37,7 +37,7 @@ function git_merge() (
 			if [[ -z $option_branch ]]; then
 				option_branch="$item"
 			else
-				help "An unrecognised argument was provided: $item"
+				help 'An unrecognised argument was provided: ' --variable-value={item}
 			fi
 			;;
 		esac
@@ -45,12 +45,12 @@ function git_merge() (
 
 	# fetch active branch
 	if [[ -z $option_branch ]]; then
-		option_branch="$(get-git-active-branch)"
+		option_branch="$(git-helper active-branch)"
 	fi
 
 	# fetch default branch to checkout
 	local default_branch
-	default_branch="$(get-git-default-branch)"
+	default_branch="$(git-helper default-branch)"
 
 	# ensure the two branches are different
 	if [[ $default_branch == "$option_branch" ]]; then

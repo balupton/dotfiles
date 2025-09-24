@@ -5,13 +5,13 @@
 cat <<-EOF
 	$(echo-style --notice2='Your Strongbox keyring on this machine is missing the Strongbox keyid for your specified Dorothy user configuration repository:')
 
-	Dorothy User Configuration Repository: $(echo-style --code='https://github.com/balupton/dotfiles')
+	Dorothy User Configuration Repository: $(echo-style --url='https://github.com/balupton/dotfiles')
 	Strongbox keyid: $(echo-style --code='QaTYmvbTQD6eD1GLWwToVW213MXdK6rETebF4LZ7qHU=')
-	Strongbox keyring: $(echo-style --code="$HOME/.strongbox_keyring")
+	Strongbox keyring: $(echo-style --path="$HOME/.strongbox_keyring")
 	User: $(echo-style --code="$(whoami)")
 	Local IP: $(echo-style --code="$local_ip")
-	Strongbox Documentation: $(echo-style --code='https://github.com/uw-labs/strongbox')
-	Dorothy's Strongbox Documentation: $(echo-style --code='https://github.com/bevry/dorothy/blob/master/docs/dorothy/private-configuration.md#strongbox')
+	Strongbox Documentation: $(echo-style --url='https://github.com/uw-labs/strongbox')
+	Dorothy's Strongbox Documentation: $(echo-style --url='https://github.com/bevry/dorothy/blob/master/docs/dorothy/private-configuration.md#strongbox')
 
 	To manually edit your Strongbox keyring entry on this machine, run the following in a new terminal window attached to this machine:
 	$(echo-style --code="$(edit --dry "$HOME/.strongbox_keyring")")

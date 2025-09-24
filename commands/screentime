@@ -293,7 +293,7 @@ def get_website_screentime [website_identifier: string, tz_offset_hours: int] {
 		| query db $"
 		SELECT
 			SUM\(o.ZENDDATE - o.ZSTARTDATE\) AS total_seconds,
-			CAST\(SUM\(o.ZENDDATE - o.ZSTARTDATE\) AS REAL\) / 60.0 AS total_minutes
+			CAST\(SUM\(o.ZENDDATE - ZSTARTDATE\) AS REAL\) / 60.0 AS total_minutes
 		FROM ZOBJECT o
 		JOIN ZSTRUCTUREDMETADATA sm ON o.ZSTRUCTUREDMETADATA = sm.Z_PK
 		WHERE
@@ -365,75 +365,27 @@ def create_total_row [results: list] {
 }
 
 # Main function that gets called when you run the script
-def main [
-	# Application/website name(s), alias(es), or bundle ID(s) - can be multiple space-separated
-	# Examples: "vscode", "chrome github", "notifications.github.com", "com.microsoft.VSCode"
-	...items: string
-	# Command line flag to show help information (use --help or -h)
-	--help(-h)
-	# Output format: table (default), json, or seconds
-	--format: string = "table"
-	# Alias for --format=seconds (use --seconds or -s)
-	--seconds(-s)
-	# Alias for --format=json (use --json or -j)
-	--json(-j)
-	# Specific apps to query (can be used with --website)
-	--app: string = ""
-	# Specific websites/domains/URLs to query (can be used with --app)
-	--website: string = ""
-	# Suppress error messages for items not found
-	--quiet(-q)
+def main [	
+	...items: string # Application/website name(s), alias(es), or bundle ID(s). Examples: "vscode", "chrome github", "notifications.github.com", "com.microsoft.VSCode"
+	--format: string = "table" # Output format: table (default), json, or seconds
+	--seconds(-s) # Alias for --format=seconds (use --seconds or -s)
+	--json(-j) # Alias for --format=json (use --json or -j)
+	--app: string = "" # Specific apps to query (can be used with --website)
+	--website: string = "" # Specific websites/domains/URLs to query (can be used with --app)
+	--quiet(-q): string # Suppress error messages for items not found (affirmative: yes/true/y, non-affirmative: no/false/n)
 ] {
-	# If user asks for help, show usage examples and exit
-	if $help {
-		print "Usage: screentime [app_or_website...] [--format=FORMAT] [--seconds] [--json] [--app=APPS] [--website=WEBSITES] [--quiet]"
-		print ""
-		print "Flags:"
-		print "  --format=FORMAT  Output format: table (default), json, or seconds"
-		print "  --seconds, -s    Alias for --format=seconds (sum total seconds for multiple items)"
-		print "  --json, -j       Alias for --format=json (JSON output for nushell processing)"
-		print "  --app=APPS       Specific apps to query (comma-separated)"
-		print "  --website=SITES  Specific websites to query (comma-separated)"
-		print "  --quiet, -q      Suppress error messages for items not found"
-		print "  --help, -h       Show this help message"
-		print ""
-		print "The script processes items in this order:"
-		print "1. Items specified with --app are treated as apps"
-		print "2. Items specified with --website are treated as websites"
-		print "3. Positional arguments are tried as apps first, then as websites if app resolution fails"
-		print ""
-		print "Examples:"
-		print "  screentime                              # VSCode (default)"
-		print "  screentime vscode                       # VSCode app"
-		print "  screentime github                       # GitHub website (alias to github.com)"
-		print "  screentime github.com                   # GitHub website (all subdomains)"
-		print "  screentime notifications.github.com     # Specific GitHub subdomain"
-		print "  screentime vscode terminal github       # Both apps and website (using aliases)"
-		print "  screentime safari chrome --seconds      # Sum of Safari + Chrome seconds"
-		print "  screentime --app=vscode --website=github  # Explicit specification with aliases"
-		print "  screentime --website='github,stackoverflow'  # Multiple websites with aliases"
-		print "  screentime nonexistent --quiet          # Suppress error for missing item"
-		print ""
-		print "Website examples:"
-		print "  screentime so youtube reddit            # Using website aliases"
-		print "  screentime stackoverflow.com youtube.com reddit.com  # Using full domains"
-		print "  screentime docs gmail aws               # Using website aliases"
-		print ""
-		print "Nushell usage examples:"
-		print "  screentime vscode --json | from json | get total_seconds"
-		print "  screentime github so --json | from json | where total_seconds > 1000"
-		print ""
-		print "Built-in app aliases:"
-		$APP_ALIASES | transpose key value | each { |row|
-			print $"  ($row.key) → ($row.value)"
-		}
-		print ""
-		print "Built-in website aliases:"
-		$WEBSITE_ALIASES | transpose key value | each { |row|
-			print $"  ($row.key) → ($row.value)"
-		}
-		# Exit the function early
-		return
+
+	# Parse quiet option - support various affirmative/non-affirmative values
+	let quiet_enabled = if $quiet == null {
+		# Not specified, default to not quiet
+		false
+	} else if $quiet == "" {
+		# --quiet specified without value -> affirmative
+		true
+	} else {
+		# --quiet=value specified, parse the value
+		let quiet_lower = ($quiet | str downcase)
+		$quiet_lower in ["yes", "true", "y"]
 	}
 
 	# Count how many format options were specified
@@ -477,7 +429,7 @@ def main [
 		if $resolved_app != null {
 			get_app_screentime $resolved_app $tz_offset_hours
 		} else {
-			if not $quiet {
+			if not $quiet_enabled {
 				print --stderr $"App not found: ($app_item)"
 			}
 			null
@@ -492,7 +444,7 @@ def main [
 		if $website_result != null {
 			$website_result
 		} else {
-			if not $quiet {
+			if not $quiet_enabled {
 				print --stderr $"Website not found: ($website_item)"
 			}
 			null
@@ -519,7 +471,7 @@ def main [
 			if $website_result != null {
 				$website_result
 			} else {
-				if not $quiet {
+				if not $quiet_enabled {
 					print --stderr $"Item not found as app or website: ($item)"
 				}
 				null

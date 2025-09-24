@@ -4,28 +4,8 @@
 def main [
     key: string     # The key for the data
     value: string   # The value for the data
-    --help(-h)      # Show help information
     --quiet(-q)     # Suppress success messages
 ] {
-    # Show help if requested
-    if $help {
-        print "Usage: set-data-jar <key> <value> [--quiet]"
-        print ""
-        print "Run Apple Shortcut 'set-data-jar-value' with key-value data"
-        print ""
-        print "Arguments:"
-        print "  key      The key for the data entry"
-        print "  value    The value for the data entry"
-        print ""
-        print "Options:"
-        print "  --quiet, -q    Suppress success messages (errors still shown)"
-        print ""
-        print "Examples:"
-        print "  set-data-jar screentime-vscode 3664"
-        print "  set-data-jar app-usage 1234 --quiet"
-        return
-    }
-
     # Check if shortcuts command exists
     if not (which shortcuts | is-not-empty) {
         print "Error: 'shortcuts' command not found. This requires macOS Monterey or later."
