@@ -1,0 +1,17 @@
+#!/usr/bin/env nu
+use ~/.local/share/dorothy/sources/nu.nu terminal_title_progress_bar
+def main [
+	--start: int = 0
+	--finish: int = 100
+	--step: int = 20
+	--delay: int = 2
+] {
+	let progress_id = (terminal_title_progress_bar)
+	mut i = $start
+	while $i <= $finish {
+		terminal_title_progress_bar --id $progress_id --progress $i
+		sleep ($delay * 1sec)
+		$i = $i + $step
+	}
+	terminal_title_progress_bar --id $progress_id --destroy 
+}

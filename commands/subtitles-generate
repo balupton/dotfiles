@@ -1,6 +1,6 @@
 #!/usr/bin/env bash
 
-function generate_subtitles() (
+function subtitles_generate() (
 	source "$DOROTHY/sources/bash.bash"
 
 	# =====================================
@@ -12,7 +12,7 @@ function generate_subtitles() (
 			Generate subtitles for media files.
 
 			USAGE:
-			generate-sbutitles [...options] [-- ...<path>]]
+			subtitles-generate [...options] [-- ...<path>]]
 
 			OPTIONS:
 			-- ...<path>]
@@ -22,6 +22,8 @@ function generate_subtitles() (
 			    If enabled, will overwrite existing subtitle files.
 			--quiet
 			    Output less information.
+			--skip-until=<needle>
+			    Skip until this needle is found.
 			[...options]
 			    Additional options are passed to the transcription engine.
 
@@ -35,7 +37,7 @@ function generate_subtitles() (
 	}
 
 	# process
-	local item option_quiet='' option_overwrite='' option_paths=() options=()
+	local item option_quiet='' option_overwrite='' option_until='' option_paths=() options=()
 	while [[ $# -ne 0 ]]; do
 		item="$1"
 		shift
@@ -44,6 +46,7 @@ function generate_subtitles() (
 		--no-verbose* | --verbose*) __flag --source={item} --target={option_quiet} --non-affirmative ;;
 		--no-quiet* | --quiet*) __flag --source={item} --target={option_quiet} --affirmative ;;
 		--no-overwrite* | --overwrite*) __flag --source={item} --target={option_overwrite} --affirmative ;;
+		--until=* | --skip-until=*) option_until="${item#*=}" ;;
 		--)
 			option_paths+=("$@")
 			shift $#
@@ -106,33 +109,55 @@ function generate_subtitles() (
 			return 2 # ENOENT 2 No such file or directory
 		fi
 	done
-	local root subtitle languages=(en id) language translation
+	local filename root subtitle transcription first_successful_translation languages=(en) language translation skipping='no'
+	if [[ -n $option_until ]]; then
+		skipping='yes'
+	fi
 	for path in "${paths[@]}"; do
 		path="$(fs-path --absolute -- "$path")" || return
+		filename="$(fs-path --no-parents -- "$path")" || return
 		root="$(fs-path --no-extension -- "$path")" || return
 		subtitle="$root.srt"
-		transcribed="$root.ai.transcribed.srt"
-		__dump {path} {subtitle} {transcribed} {translation}
-		if [[ -s $transcribed && $option_overwrite == 'no' ]]; then
+		transcription="$root.ai.transcription.srt"
+		if [[ $skipping == 'yes' ]]; then
+			if [[ $filename != *"$option_until"* ]]; then
+				continue
+			else
+				skipping='no'
+			fi
+		fi
+		__print_style --header1="$filename" --newline --variable={path} --newline --variable={subtitle}
+		if [[ -s $transcription && $option_overwrite == 'no' ]]; then
 			__print_style --info='Already transcribed'
 		else
+			__print_style --info='Transcribing...'
 			eval-helper --wrap -- "${cmd[@]}" --audio-path "$path" || return
 			if ! [[ -s $subtitle ]]; then
 				__print_error 'Failed to generate subtitle at ' --path="$subtitle"
 				return 2 # ENOENT 2 No such file or directory
 			fi
-			mv -v -- "$subtitle" "$transcribed"
+			mv -v -- "$subtitle" "$transcription"
 		fi
+		first_successful_translation=''
 		for language in "${languages[@]}"; do
-			translation="$root.ai.translated.$language.srt"
+			translation="$root.ai.translation.$language.srt"
 			if [[ -s $translation && $option_overwrite == 'no' ]]; then
 				__print_style --info="Already translated to $language"
 			else
-				eval-helper --wrap -- translate-subtitle.nu --language="$language" "$transcribed" "$translation" || return
+				__print_style --info="Translating into $language..."
+				# The transcription can contain multiple languages
+				# Apple Intelligence cannot translate multiple languages into non-english
+				# However, our translations will result into a single-language subtitle file
+				# As such, we should translate the first successful translation if it exists for subsequent rarer languages
+				eval-helper --wrap -- subtitles-translate --language="$language" "${first_successful_translation:-"$transcription"}" "$translation" || :
 				if ! [[ -s $translation ]]; then
 					__print_error 'Failed to generate translation at ' --path="$translation"
-					return 2 # ENOENT 2 No such file or directory
+					# return 2 # ENOENT 2 No such file or directory
+					continue # continue to try the next language
 				fi
+			fi
+			if [[ -z $first_successful_translation ]]; then
+				first_successful_translation="$translation"
 			fi
 		done
 		__print_line
@@ -142,5 +167,5 @@ function generate_subtitles() (
 
 # fire if invoked standalone
 if [[ $0 == "${BASH_SOURCE[0]}" ]]; then
-	generate_subtitles "$@"
+	subtitles_generate "$@"
 fi
