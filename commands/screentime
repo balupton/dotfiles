@@ -230,7 +230,7 @@ def resolve_website [input: string] {
 # Function to get screen time for a single app
 def get_app_screentime [app_bundle_id: string, tz_offset_hours: int] {
 	# Query the Screen Time database
-	let result = (
+	let result = try {
 		open $KNOWLEDGE_DB_PATH
 		| query db $"
 		SELECT
@@ -242,7 +242,10 @@ def get_app_screentime [app_bundle_id: string, tz_offset_hours: int] {
 			AND ZSTREAMNAME = '/app/usage'
 			AND date\(datetime\(ZSTARTDATE + ($CORE_DATA_EPOCH_OFFSET), 'unixepoch', '($tz_offset_hours) hours'\)\) = date\('now', '($tz_offset_hours) hours'\)
 		"
-	)
+	} catch {
+		null
+		return
+	 }
 
 	# Check if we found any usage data
 	if ($result | length) > 0 and ($result.0.total_seconds != null) {
@@ -288,7 +291,7 @@ def get_app_screentime [app_bundle_id: string, tz_offset_hours: int] {
 # Function to get screen time for a website identifier (domain, subdomain, URL, etc.)
 def get_website_screentime [website_identifier: string, tz_offset_hours: int] {
 	# Query the Screen Time database for website usage
-	let result = (
+	let result = try {
 		open $KNOWLEDGE_DB_PATH
 		| query db $"
 		SELECT
@@ -302,7 +305,10 @@ def get_website_screentime [website_identifier: string, tz_offset_hours: int] {
 			     OR sm.Z_DKDIGITALHEALTHMETADATAKEY__WEBPAGEURL LIKE '%($website_identifier)%'\)
 			AND date\(datetime\(o.ZSTARTDATE + ($CORE_DATA_EPOCH_OFFSET), 'unixepoch', '($tz_offset_hours) hours'\)\) = date\('now', '($tz_offset_hours) hours'\)
 		"
-	)
+	} catch {
+		null
+		return
+	}
 
 	# Check if we found any usage data
 	if ($result | length) > 0 and ($result.0.total_seconds != null) {
@@ -374,7 +380,6 @@ def main [
 	--website: string = "" # Specific websites/domains/URLs to query (can be used with --app)
 	--quiet(-q): string # Suppress error messages for items not found (affirmative: yes/true/y, non-affirmative: no/false/n)
 ] {
-
 	# Parse quiet option - support various affirmative/non-affirmative values
 	let quiet_enabled = if $quiet == null {
 		# Not specified, default to not quiet
@@ -397,7 +402,7 @@ def main [
 
 	# Error if multiple format options specified
 	if $format_options_count > 1 {
-		print "Error: Only one output format can be specified. Choose one of: --format, --seconds, or --json"
+		pring --stderr "Error: Only one output format can be specified. Choose one of: --format, --seconds, or --json"
 		exit 22
 	}
 
@@ -412,7 +417,7 @@ def main [
 
 	# Validate format
 	if $output_format not-in ["table", "json", "seconds"] {
-		print $"Error: Invalid format '($output_format)'. Valid formats: table, json, seconds"
+		pring --stderr $"Error: Invalid format '($output_format)'. Valid formats: table, json, seconds"
 		exit 22
 	}
 
@@ -421,6 +426,16 @@ def main [
 
 	# Process all items efficiently in a single loop
 	let results = []
+	
+	# Check if we actually have access to screentime, by checking if the database is readable
+	try {
+		open --raw ($KNOWLEDGE_DB_PATH) | ignore
+	} catch {
+		if not $quiet_enabled {
+			print --stderr $"Error: Cannot read the screentime database at ($KNOWLEDGE_DB_PATH)"
+		}
+		exit 13 # EACCES 13 Permission denied
+	}
 
 	# First, handle explicit --app items (comma-separated)
 	let app_items = if ($app | str trim | is-empty) { [] } else { $app | split row "," | each { |item| $item | str trim } }

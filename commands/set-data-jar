@@ -4,7 +4,7 @@
 def main [
     key: string     # The key for the data
     value: string   # The value for the data
-    --quiet(-q)     # Suppress success messages
+    --quiet(-q)     # Suppress messages
 ] {
     # Check if shortcuts command exists
     if not (which shortcuts | is-not-empty) {
@@ -31,7 +31,9 @@ def main [
             echo-style --success='Data Jar: ' $"--code=($key)" --bold=' is now ' $"--code=($value)"
         }
     } catch { |err|
-        echo-style --stderr --error='Data Jar: ' $"--code=($key)" --bold=' failed to become ' $"--code=($value)" --newline $"--=($err.msg)"
+        if not $quiet {
+        	echo-style --stderr --error='Data Jar: ' $"--code=($key)" --bold=' failed to become ' $"--code=($value)" --newline $"--=($err.msg)"
+		}
         # Clean up temp file before exiting
         if ($temp_file | path exists) {
             rm $temp_file

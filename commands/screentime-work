@@ -56,7 +56,7 @@ function screentime_work() (
 		local result
 		result="$(__fetch --seconds)" || return
 		if [[ -n $result ]]; then
-			set-data-jar 'screentime-work' "$result" || return
+			set-data-jar --quiet 'screentime-work' "$result" || return
 		fi
 	else
 		__fetch || return
