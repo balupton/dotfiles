@@ -1,0 +1,43 @@
+#!/usr/bin/env swift
+
+import Foundation
+
+let nativeOverrides: [String: String] = [
+    "id": "Bahasa Indonesia"
+]
+
+func usage() {
+    print("Usage: \(CommandLine.arguments[0]) <language-code> [language-code ...]")
+    print("Example: \(CommandLine.arguments[0]) en id zh")
+    exit(22)
+}
+
+if CommandLine.argc < 2 {
+    usage()
+}
+
+// Process each language code
+for i in 1..<CommandLine.argc {
+    let langCode = CommandLine.arguments[Int(i)]
+
+    // Get language name in English
+    let englishLocale = Locale(identifier: "en")
+    let englishName = englishLocale.localizedString(forLanguageCode: langCode) ?? "Unknown"
+
+    if englishName == "Unknown" {
+        fputs("Unknown Language Identifier: \(langCode)\n", stderr)
+        exit(22)
+    }
+
+    // Get language name in itself, with overrides
+    let nativeLocale = Locale(identifier: langCode)
+    let defaultNativeName = nativeLocale.localizedString(forLanguageCode: langCode) ?? "Unknown"
+    let nativeName = nativeOverrides[langCode] ?? defaultNativeName
+
+    // Output the language name in English and itself: English Name (Native Name)
+    if englishName == nativeName {
+        print(englishName)
+    } else {
+        print("\(englishName) (\(nativeName))")
+    }
+}

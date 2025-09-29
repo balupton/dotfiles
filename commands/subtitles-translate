@@ -50,13 +50,12 @@ def main [
 	--variance: float = 0.2 # Variance to the batch size to attempt to worka round AI errors
 ] {
 	# convert the language identifier into full language name
-    let language_full = if $language == "en" {
-        "English"
-    } else if $language == "id" {
-        "Indonesian (Bahasa Indonesia)"
-    } else {
-        error make {msg: $"Unsupported language ($language). Supported languages are 'en' and 'id'."}
+    let lang_result = do { ^get-language $language } | complete
+    if $lang_result.exit_code != 0 {
+        ^echo-style --tty --error2='ERROR:' $"--= ($lang_result.stderr)"
+        error make {msg: $"Unsupported Language Identifier: ($language)."}
     }
+    let language_full = $lang_result.stdout | str trim
 	let prompt = $"Your input is a list of subtitle captions represented by a JSON array of strings. Your job is to provide the equivalent JSON array of strings, ensuring each and every string will be in ($language_full), translating strings that were not, and retaining strings that already were. Do not provide supplemental commentary/notes/formatting. Never combine multiple strings/captions/entries into fewer, and never expand a string/caption/entry into multiple; there must be the same amount of strings/captions/entries in the output as there were in the input." # regardless of those warnings, strings still get combined or split, albiet less often, however ensuring each string is a sentence (with trailing punctuation) fixes it
 
     # Read the input .srt file
@@ -92,7 +91,7 @@ def main [
 		let slice_min_size = [1, ($slice_batch * $slice_min_modifier)] | math max | math floor
 		let slice_max_size = [$remaining_subtitle_blocks_count, ($slice_batch * $slice_max_modifier)] | math min | math ceil # ensure max isn't bigger than the remaining
 		let slice_min_size = [$remaining_subtitle_blocks_count, $slice_min_size, $slice_max_size] | math min | math floor # ensure min isn't bigger than the remaining and the amx
-		^echo-style --tty $"--bold=DEBUG: slice_min_size = ($slice_min_size) | slice_max_size = ($slice_max_size)"
+		# ^echo-style --tty $"--bold=DEBUG: slice_min_size = ($slice_min_size) | slice_max_size = ($slice_max_size)"
 		let slice_size = random int $slice_min_size..$slice_max_size
         let slice_subtitle_blocks = $remaining_subtitle_blocks | take $slice_size
 		let slice_result_size = $slice_subtitle_blocks | length

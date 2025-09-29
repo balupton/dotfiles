@@ -109,7 +109,7 @@ function subtitles_generate() (
 			return 2 # ENOENT 2 No such file or directory
 		fi
 	done
-	local filename root subtitle transcription first_successful_translation languages=(en) language translation skipping='no'
+	local filename root subtitle transcription first_successful_translation languages=(en id) language translation skipping='no'
 	if [[ -n $option_until ]]; then
 		skipping='yes'
 	fi
