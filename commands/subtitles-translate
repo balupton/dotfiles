@@ -1,5 +1,6 @@
 #!/usr/bin/env nu
 use ~/.local/share/dorothy/sources/nu.nu terminal_title_progress_bar
+use ./get-apple-intelligence apple_intelligence_prompt
 
 def ensure_trailing_punctuation [argument?: string] {
 	let input = if $argument != null { $argument } else { $in } | str trim
@@ -10,20 +11,6 @@ def ensure_trailing_punctuation [argument?: string] {
 		$input + '.'
 	} else {
 		$input
-	}
-}
-
-def ensure_correct_trailing_json_punctuation [argument?: string] {
-	let input = if $argument != null { $argument } else { $in } | str trim
-
-	if ($input | str starts-with "{") and not ($input | str ends-with "}") {
-	    $input + "}"
-	} else if ($input | str starts-with "[") and not ($input | str ends-with "]") {
-	    $input + "]"
-	} else if ($input | str starts-with '"') and not ($input | str ends-with '"') {
-	    $input + '"'
-	} else {
-	    $input
 	}
 }
 
@@ -43,67 +30,67 @@ def prepare_caption_line [argument?: string] {
 
 # Translate .srt subtitle file using Apple Shortcut
 def main [
-    input_file: string  # Input .srt subtitle file path
-    output_file: string  # Output .srt file path
-    --language (-l): string = "en"  # Target language for translation (en or id)
-    --batch: int = 80  # Initial number of subtitle blocks to process at once
+	input_file: string  # Input .srt subtitle file path
+	output_file: string  # Output .srt file path
+	--language (-l): string = "en"  # Target language for translation (en or id)
+	--batch: int = 80  # Initial number of subtitle blocks to process at once
 	--variance: float = 0.2 # Variance to the batch size to attempt to worka round AI errors
 ] {
 	# convert the language identifier into full language name
-    let lang_result = do { ^get-language $language } | complete
-    if $lang_result.exit_code != 0 {
-        ^echo-style --tty --error2='ERROR:' $"--= ($lang_result.stderr)"
-        error make {msg: $"Unsupported Language Identifier: ($language)."}
-    }
-    let language_full = $lang_result.stdout | str trim
+	let lang_result = do { ^get-language $language } | complete
+	if $lang_result.exit_code != 0 {
+		^echo-style --tty --error2='ERROR:' $"--= ($lang_result.stderr)"
+		error make {msg: $"Unsupported Language Identifier: ($language)."}
+	}
+	let language_full = $lang_result.stdout | str trim
 	let prompt = $"Your input is a list of subtitle captions represented by a JSON array of strings. Your job is to provide the equivalent JSON array of strings, ensuring each and every string will be in ($language_full), translating strings that were not, and retaining strings that already were. Do not provide supplemental commentary/notes/formatting. Never combine multiple strings/captions/entries into fewer, and never expand a string/caption/entry into multiple; there must be the same amount of strings/captions/entries in the output as there were in the input." # regardless of those warnings, strings still get combined or split, albiet less often, however ensuring each string is a sentence (with trailing punctuation) fixes it
 
-    # Read the input .srt file
-    let content = open $input_file | str trim
-    if ($content | is-empty) {
-        error make {msg: $"Input file ($input_file) is empty or not found"}
-    }
+	# Read the input .srt file
+	let content = open $input_file | str trim
+	if ($content | is-empty) {
+		error make {msg: $"Input file ($input_file) is empty or not found"}
+	}
 
-    # Split into subtitle blocks (separated by empty lines)
-    mut remaining_subtitle_blocks = $content | split row "\n\n" | each { |block|
-        let lines = $block | split row "\n" | each { |line| $line | str trim } | where { |line| not ($line | is-empty) }
-        if ($lines | length) > 1 {
-            # let count = $lines | get 0
-            let timestamp = $lines | get 1
-            let captions = $lines | skip 2 | each { |line| $line | prepare_caption_line } | str join " " | prepare_caption_line
-            if not ($captions | is-empty) {
-                [$timestamp, $captions]
-            }
-        }
-    } | where { |block| not ($block | is-empty) }
-    mut result_subtitle_blocks = []
-    let total_subtitle_blocks_count = $remaining_subtitle_blocks | length
+	# Split into subtitle blocks (separated by empty lines)
+	mut remaining_subtitle_blocks = $content | split row "\n\n" | each { |block|
+		let lines = $block | split row "\n" | each { |line| $line | str trim } | where { |line| not ($line | is-empty) }
+		if ($lines | length) > 1 {
+			# let count = $lines | get 0
+			let timestamp = $lines | get 1
+			let captions = $lines | skip 2 | each { |line| $line | prepare_caption_line } | str join " " | prepare_caption_line
+			if not ($captions | is-empty) {
+				[$timestamp, $captions]
+			}
+		}
+	} | where { |block| not ($block | is-empty) }
+	mut result_subtitle_blocks = []
+	let total_subtitle_blocks_count = $remaining_subtitle_blocks | length
 	mut remaining_subtitle_blocks_count = $total_subtitle_blocks_count
 	let slice_min_modifier = 1.0 - $variance
 	let slice_max_modifier = 1.0 + $variance
 	mut slice_batch = $batch
 
 	let progress_id = terminal_title_progress_bar --create
-    ^echo-style --tty --bold='Starting ' $"--value=($language_full)" --bold=' translation of ' $"--path=($input_file)" --bold=' to ' $"--path=($output_file)"
+	^echo-style --tty --bold='Starting ' $"--value=($language_full)" --bold=' translation of ' $"--path=($input_file)" --bold=' to ' $"--path=($output_file)"
 
-    while $remaining_subtitle_blocks_count > 0 {
+	while $remaining_subtitle_blocks_count > 0 {
 		# Take the slice of subtitle blocks, extract only the caption, and convert into a json array
 		let slice_min_size = [1, ($slice_batch * $slice_min_modifier)] | math max | math floor
 		let slice_max_size = [$remaining_subtitle_blocks_count, ($slice_batch * $slice_max_modifier)] | math min | math ceil # ensure max isn't bigger than the remaining
 		let slice_min_size = [$remaining_subtitle_blocks_count, $slice_min_size, $slice_max_size] | math min | math floor # ensure min isn't bigger than the remaining and the amx
 		# ^echo-style --tty $"--bold=DEBUG: slice_min_size = ($slice_min_size) | slice_max_size = ($slice_max_size)"
 		let slice_size = random int $slice_min_size..$slice_max_size
-        let slice_subtitle_blocks = $remaining_subtitle_blocks | take $slice_size
+		let slice_subtitle_blocks = $remaining_subtitle_blocks | take $slice_size
 		let slice_result_size = $slice_subtitle_blocks | length
-        let captions = $slice_subtitle_blocks | each { |block| $block | get 1 }
-        let json_input = $captions | to json
+		let captions = $slice_subtitle_blocks | each { |block| $block | get 1 }
+		let json_input = $captions | to json
 
 		# Log progress
 		terminal_title_progress_bar --id $progress_id --total $total_subtitle_blocks_count --remaining $remaining_subtitle_blocks_count
-        ^echo-style --tty --bold='Translating ' $"--value=($slice_result_size)" --bold=' subtitles of ' $"--value=($total_subtitle_blocks_count)" --bold=' total, with ' $"--value=($remaining_subtitle_blocks_count)" --bold=' remaining, in slices of ' $"--value=($slice_batch)" '--=±' $"--value=($variance)" --bold='...'
+		^echo-style --tty --bold='Translating ' $"--value=($slice_result_size)" --bold=' subtitles of ' $"--value=($total_subtitle_blocks_count)" --bold=' total, with ' $"--value=($remaining_subtitle_blocks_count)" --bold=' remaining, in slices of ' $"--value=($slice_batch)" '--=±' $"--value=($variance)" --bold='...'
 
 		# Start and process translation
-        let result = apple_intelligence_prompt $prompt $json_input
+		let result = apple_intelligence_prompt $prompt $json_input
 		let translated_captions =  if $result.error { [] } else { $result.result | from json | each { |line| $line | clean_caption_line } }
 		let translated_size = $translated_captions | length
 		mut $slice_size_modifier = 0.0
@@ -145,21 +132,21 @@ def main [
 		} else {
 			# Success, continue to next slice
 
-            # Recombine the prior subtitle blocks of the slice but with their translated captions
-            let translated_subtitle_blocks = $slice_subtitle_blocks | enumerate | each { |it|
-                let i = $it.index
-                let block = $it.item
-                let caption = $translated_captions | get $i
-                [$block.0, $caption]
-            }
+			# Recombine the prior subtitle blocks of the slice but with their translated captions
+			let translated_subtitle_blocks = $slice_subtitle_blocks | enumerate | each { |it|
+				let i = $it.index
+				let block = $it.item
+				let caption = $translated_captions | get $i
+				[$block.0, $caption]
+			}
 
-            # Join the result blocks and update remaining
-            $result_subtitle_blocks = $result_subtitle_blocks | append $translated_subtitle_blocks
-            $remaining_subtitle_blocks = $remaining_subtitle_blocks | skip $slice_result_size
+			# Join the result blocks and update remaining
+			$result_subtitle_blocks = $result_subtitle_blocks | append $translated_subtitle_blocks
+			$remaining_subtitle_blocks = $remaining_subtitle_blocks | skip $slice_result_size
 			$remaining_subtitle_blocks_count = $remaining_subtitle_blocks | length
-        }
-    }
-    terminal_title_progress_bar --id $progress_id --destroy
+		}
+	}
+	terminal_title_progress_bar --id $progress_id --destroy
 
 	# Sanity check for final result
 	let total_translated_blocks_count = $result_subtitle_blocks | length
@@ -168,8 +155,8 @@ def main [
 		error make {msg: $'Mismatched number of total translated captions.'}
 	}
 
-    # Join all translated blocks and write to the output file
-    $result_subtitle_blocks | enumerate | each { |it|
+	# Join all translated blocks and write to the output file
+	$result_subtitle_blocks | enumerate | each { |it|
 		[
 			# id
 			($it.index + 1),
@@ -182,67 +169,4 @@ def main [
 
 	# Note the translation is complete
 	^echo-style --tty --success='Translation complete. Output saved to ' $"--path=($output_file)"
-}
-
-def apple_intelligence_prompt [prompt: string, json_data: string] {
-    # Create temp input file
-    let rand = random int
-    let prompt_input_filepath = $"/tmp/apple_intelligence_prompt_($rand).txt"
-
-    let prompt_input = $"($prompt | str trim)\nJSON INPUT:\n($json_data)\nJSON RESPONSE:"
-    $prompt_input | save $prompt_input_filepath
-    let shortcut_name = "Apple Intelligence Prompt"
-
-    ^echo-style --tty --header2='PROMPT:' --newline $"--code=($prompt_input)"
-    let response = do { ^shortcuts run $shortcut_name --input-path $prompt_input_filepath } | complete
-
-	# ensure output is json, as apple shortcuts sometimes returns RTF
-    let raw_result = $response.stdout | str trim
-    mut cleaned_result = if ($raw_result | str starts-with "{\\rtf") {
-        let rtf_file = $"/tmp/rtf_($rand).rtf"
-        $raw_result | save $rtf_file
-        ^textutil -convert txt $rtf_file -output $"/tmp/txt_($rand).txt"
-        open $"/tmp/txt_($rand).txt"
-    } else {
-        $raw_result
-    }
-
-	# strip markdown code blocks if any, as sometimes Apple Intelligence includes them
-	$cleaned_result = $cleaned_result | str trim | str replace -r '^```(?:json)?\s*' '' | str replace -r '\s*```$' '' | str trim
-
-	# ensure opening and closing brackets/quotes exist, as sometimes Apple Intelligence omits them
-	$cleaned_result = $cleaned_result | ensure_correct_trailing_json_punctuation
-
-	# try to parse the JSON data, and re-assign it as cleaned up JSON
-	# if it fails to parse, then recurse in another attempt
-	$cleaned_result = try { $cleaned_result | from json | to json } catch { |err|
-		^echo-style --tty --error2='ERROR:' ' Failed to parse JSON response. Retrying...' --newline --header2='RAW RESPONSE:' ' ' $"--code=($raw_result | str trim)" --newline --error2='PARSE ERROR:' ' ' $"--code=($err.msg | str trim)"
-		sleep 1sec
-		apple_intelligence_prompt $prompt $json_data
-		return
-	}
-
-	# handle error or success
-    if ($response.exit_code != 0) or ($cleaned_result | is-empty) {
-		# error
-        {
-			result: "",
-			error: true,
-			stderr: ($response.stderr | str trim),
-			stdout: ($response.stdout | str trim),
-			exit_code: $response.exit_code,
-			prompt_input_filepath: $prompt_input_filepath
-		}
-    } else {
-		# success
-    	^echo-style --tty --header2='RESPONSE:' --newline $"--code=($cleaned_result)"
-        {
-			result: ($cleaned_result | str trim),
-			error: false,
-			stderr: "",
-			stdout: "",
-			exit_code: 0,
-			prompt_input_filepath: $prompt_input_filepath
-		}
-    }
 }
