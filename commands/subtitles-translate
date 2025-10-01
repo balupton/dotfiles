@@ -18,7 +18,7 @@ def ensure_trailing_punctuation [argument?: string] {
 def clean_caption_line [argument?: string] {
 	let input = if $argument != null { $argument } else { $in } | str trim
 
-	$input | str replace -ar '^\s+|\s+$|^.*?[ЖЯУЫ].*?$|^MUSIC$|^[-.,]+|[-.,]+$|[«»♪*"]+|^[^0-9a-zA-Z .!]+|^[(][Ss]peaking .+?[)]$|^\[.+?\]$' '' | str replace "she exhausted crack she abandons" "she's exhausted! CRACK! she abandons!" | str trim
+	$input | str replace -ar '^\s+|\s+$|^.*?[ЖЯУЫ].*?$|^.*BF-WATCH TV.*$|^MUSIC$|^[-.,]+|[-.,]+$|[«»♪*"]+|^[^0-9a-zA-Z .!]+|^[(][Ss]peaking .+?[)]$|^\[.+?\]$' '' | str replace "she exhausted crack she abandons" "she's exhausted! CRACK! she abandons!" | str trim
 }
 
 # Remove hallucinations and ensure trailing punctuation to prevent further hallucinations (however, it's not perfect, and AIs may still hallucinate)
