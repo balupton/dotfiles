@@ -1,4 +1,5 @@
 #!/usr/bin/env nu
+use ~/.local/share/dorothy/sources/nu.nu [is_affirmative, get_mode_from_options]
 # https://github.com/copilot/c/b8a85f16-8077-4434-87bd-35c322bce51e
 
 # Apple uses a different "starting point" for counting time than Unix systems.
@@ -373,53 +374,16 @@ def create_total_row [results: list] {
 # Main function that gets called when you run the script
 def main [	
 	...items: string # Application/website name(s), alias(es), or bundle ID(s). Examples: "vscode", "chrome github", "notifications.github.com", "com.microsoft.VSCode"
-	--format: string = "table" # Output format: table (default), json, or seconds
+	--format: string = "" # Output format: table (default), json, or seconds
 	--seconds(-s) # Alias for --format=seconds (use --seconds or -s)
 	--json(-j) # Alias for --format=json (use --json or -j)
+	--table(-t) # Alias for --format=table (use --table or -t)
 	--app: string = "" # Specific apps to query (can be used with --website)
 	--website: string = "" # Specific websites/domains/URLs to query (can be used with --app)
-	--quiet(-q): string # Suppress error messages for items not found (affirmative: yes/true/y, non-affirmative: no/false/n)
+	--quiet(-q) # Suppress error messages for items not found
 ] {
-	# Parse quiet option - support various affirmative/non-affirmative values
-	let quiet_enabled = if $quiet == null {
-		# Not specified, default to not quiet
-		false
-	} else if $quiet == "" {
-		# --quiet specified without value -> affirmative
-		true
-	} else {
-		# --quiet=value specified, parse the value
-		let quiet_lower = ($quiet | str downcase)
-		$quiet_lower in ["yes", "true", "y"]
-	}
-
-	# Count how many format options were specified
-	let format_options_count = (
-		($seconds | if $in { 1 } else { 0 }) +
-		($json | if $in { 1 } else { 0 }) +
-		(if $format != "table" { 1 } else { 0 })
-	)
-
-	# Error if multiple format options specified
-	if $format_options_count > 1 {
-		pring --stderr "Error: Only one output format can be specified. Choose one of: --format, --seconds, or --json"
-		exit 22
-	}
-
-	# Determine the output format (handle aliases)
-	let output_format = if $seconds {
-		"seconds"
-	} else if $json {
-		"json"
-	} else {
-		$format
-	}
-
-	# Validate format
-	if $output_format not-in ["table", "json", "seconds"] {
-		pring --stderr $"Error: Invalid format '($output_format)'. Valid formats: table, json, seconds"
-		exit 22
-	}
+	# Parse options
+	let format = get_mode_from_options --name=format --default=table {table: $table, json: $json, seconds: $seconds, format: $format}
 
 	# Get the current timezone offset in hours
 	let tz_offset_hours = (date now | format date "%z" | str substring 0..3 | into int)
@@ -431,7 +395,7 @@ def main [
 	try {
 		open --raw ($KNOWLEDGE_DB_PATH) | ignore
 	} catch {
-		if not $quiet_enabled {
+		if not $quiet {
 			print --stderr $"Error: Cannot read the screentime database at ($KNOWLEDGE_DB_PATH)"
 		}
 		exit 13 # EACCES 13 Permission denied
@@ -444,7 +408,7 @@ def main [
 		if $resolved_app != null {
 			get_app_screentime $resolved_app $tz_offset_hours
 		} else {
-			if not $quiet_enabled {
+			if not $quiet {
 				print --stderr $"App not found: ($app_item)"
 			}
 			null
@@ -459,7 +423,7 @@ def main [
 		if $website_result != null {
 			$website_result
 		} else {
-			if not $quiet_enabled {
+			if not $quiet {
 				print --stderr $"Website not found: ($website_item)"
 			}
 			null
@@ -486,7 +450,7 @@ def main [
 			if $website_result != null {
 				$website_result
 			} else {
-				if not $quiet_enabled {
+				if not $quiet {
 					print --stderr $"Item not found as app or website: ($item)"
 				}
 				null
@@ -495,7 +459,7 @@ def main [
 	} | where $it != null))
 
 	# Output based on format
-	match $output_format {
+	match $format {
 		"seconds" => {
 			# Sum all total_seconds values and output the total
 			let total_seconds = ($results | get total_seconds | math sum)

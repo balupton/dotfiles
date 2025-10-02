@@ -28,7 +28,7 @@ function screentime_work() (
 	}
 
 	# process
-	local item option_quiet='no' option_update='no' option_args=()
+	local item option_quiet='no' option_update='no' screentime_args=()
 	while [[ $# -ne 0 ]]; do
 		item="$1"
 		shift
@@ -37,26 +37,33 @@ function screentime_work() (
 		--no-quiet* | --quiet*) __flag --source={item} --target={option_quiet} --affirmative --coerce || return ;;
 		--no-update* | --update*) __flag --source={item} --target={option_update} --affirmative --coerce || return ;;
 		--)
-			option_args+=("$@")
+			screentime_args+=("$@")
 			shift $#
 			break
 			;;
-		*) option_args+=("$item") ;;
+		*) screentime_args+=("$item") ;;
 		esac
 	done
+
+	local shared_args=()
+	if [[ $option_quiet == 'yes' ]]; then
+		shared_args+=('--quiet')
+	elif [[ $option_quiet == 'no' ]]; then
+		shared_args+=('--quiet=false')
+	fi
 
 	# =====================================
 	# Action
 
 	function __fetch {
-		screentime vscode gitfox terminal ghostty finder github vercel.com cloudflare.com bevry.me --quiet="$option_quiet" "${option_args[@]}" "$@" || return
+		screentime "${shared_args[@]}" vscode gitfox terminal ghostty finder github vercel.com cloudflare.com bevry.me "${screentime_args[@]}" "$@" || return
 	}
 
 	if [[ $option_update == 'yes' ]]; then
 		local result
 		result="$(__fetch --seconds)" || return
 		if [[ -n $result ]]; then
-			set-data-jar --quiet 'screentime-work' "$result" || return
+			set-data-jar "${shared_args[@]}" 'screentime-work' "$result" || return
 		fi
 	else
 		__fetch || return

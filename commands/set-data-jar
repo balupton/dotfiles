@@ -4,10 +4,11 @@
 def main [
     key: string     # The key for the data
     value: string   # The value for the data
-    --quiet(-q)     # Suppress messages
+	--quiet(-q) # Suppress error messages when an update failed, still verbally error if shortcut was not found
 ] {
     # Check if shortcuts command exists
     if not (which shortcuts | is-not-empty) {
+
         print "Error: 'shortcuts' command not found. This requires macOS Monterey or later."
         exit 1
     }

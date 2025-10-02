@@ -14,4 +14,7 @@ AUTOCOMPLETE_GITHUB_COPILOT_CLI=no
 AUTOCOMPLETE_TEA=no
 
 # Update Apple Shortcuts Screen Time usage of VSCode in the background'
-screentime-work --quiet --update &
+(
+	set +b # disable background notifications
+	screentime-work --quiet --update &
+)
