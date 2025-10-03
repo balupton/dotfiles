@@ -57,8 +57,6 @@ alias git-optimise='rm -rf -- .git/refs/original; git reflog expire --expire=now
 alias git-wipe='git reset --hard; git clean -f'
 alias git-hooks='edit .git/hooks/pre-commit'
 alias git-up='git branch --set-upstream-to=origin/$(git rev-parse --abbrev-ref HEAD) $(git rev-parse --abbrev-ref HEAD); git pull --rebase --autostash'
-alias gai='github-copilot-cli git-assist'
-alias cai='github-copilot-cli what-the-shell'
 
 # Remove Elgato Stream Deck logs as they baloon to 100GB within a week
 rm -rf "$HOME/Library/Logs/ElgatoStreamDeck" || true

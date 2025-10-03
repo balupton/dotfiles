@@ -195,7 +195,6 @@ NPM_INSTALL=(
 	'eslint'
 	'json'
 	'typescript'
-	'@githubnext/github-copilot-cli'
 )
 NODE_VERSIONS=(
 	0.8
