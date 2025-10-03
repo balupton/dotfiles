@@ -371,16 +371,16 @@ def create_total_row [results: list] {
 	}
 }
 
-# Main function that gets called when you run the script
+# Fetch the screentime usage of various <item:app|website>s
 def main [	
 	...items: string # Application/website name(s), alias(es), or bundle ID(s). Examples: "vscode", "chrome github", "notifications.github.com", "com.microsoft.VSCode"
-	--format: string = "" # Output format: table (default), json, or seconds
-	--seconds(-s) # Alias for --format=seconds (use --seconds or -s)
-	--json(-j) # Alias for --format=json (use --json or -j)
-	--table(-t) # Alias for --format=table (use --table or -t)
 	--app: string = "" # Specific apps to query (can be used with --website)
 	--website: string = "" # Specific websites/domains/URLs to query (can be used with --app)
-	--quiet(-q) # Suppress error messages for items not found
+	--format: string = "" # Output format: table (default), json, or seconds
+	--seconds(-s) # Alias for --format=seconds
+	--json(-j) # Alias for --format=json
+	--table(-t) # Alias for --format=table
+	--quiet(-q) # Suppress error messages when items aren't found
 ] {
 	# Parse options
 	let format = get_mode_from_options --name=format --default=table {table: $table, json: $json, seconds: $seconds, format: $format}
