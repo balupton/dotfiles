@@ -129,7 +129,7 @@ function boundation_upgrade() (
 
 	# update version
 	v="$(nvm-env -- npm version "${change}" --git-tag-version=false)"
-	d="$(date +"%Y %B %-d")"
+	d="$(__get_date "%Y %B %-d")"
 	t="$(tail -n +3 HISTORY.md)"
 	n="$(
 		cat <<-EOF
