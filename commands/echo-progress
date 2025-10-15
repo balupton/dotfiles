@@ -15,7 +15,7 @@ function echo_progress() (
 			{ for (( i=0; i<=100; i+=20 )); do sleep 20; echo \$i; done; } | echo-progress
 
 			OPTIONS:
-			$(stdinargs_options_help --)
+			$(__stdinargs__help_options --)
 		EOF
 		if [[ $# -ne 0 ]]; then
 			__print_error "$@"
