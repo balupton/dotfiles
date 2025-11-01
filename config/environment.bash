@@ -3,8 +3,8 @@
 # place all export declarations (e.g. export VAR) before their definitions/assignments (VAR=...), otherwise no bash v3 compatibility
 
 # support caching the environment
-# __cache -- /opt/homebrew/bin/xxhsum -H3 || exit
-__cache || exit
+# __cache -- /opt/homebrew/bin/xxhsum -H3 || :
+__cache || :
 
 # dorothy
 export HOMEBREW_RUBY_VERSION
