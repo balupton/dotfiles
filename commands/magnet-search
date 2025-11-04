@@ -23,21 +23,15 @@
 # tpb -q
 # ^ doesn't work
 
-# https://github.com/rnestler/attractorr aka torrent-search
-# https://github.com/rnestler/attractorr/issues/55
-# CARGO='--git https://github.com/rnestler/attractorr --tag v0.2.0'
-
-# magnetfinder
+# https://github.com/rnestler/attractorr
 # https://github.com/bleusakura/magnetfinder
 
 function magnet_search() (
 	source "$DOROTHY/sources/bash.bash"
 
 	# dependencies
-	setup-util --quiet --cli='attractorr' \
-		CARGO='--git https://github.com/rnestler/attractorr'
-	setup-util --quiet --cli='magnetfinder' \
-		CARGO='magnetfinder'
+	setup-util --quiet --cli='attractorr' CARGO='attractorr'
+	setup-util --quiet --cli='magnetfinder' CARGO='magnetfinder'
 
 	# prepare
 	local search="$1" lines=() line
