@@ -70,7 +70,7 @@ function echo_printable_characters() (
 		buffer+="$1\`"
 	}
 	function __on_finish {
-		__print_string "$buffer" | "$bin_gawk_or_awk" -v option_wrap_width="$option_width" -f "$awk_script" || return
+		__print_string "$buffer" | "$bin_gawk_or_awk" -v option_wrap_width="$option_width" -f "$awk_script" || return $?
 	}
 	stdinargs "${option_args[@]}"
 )

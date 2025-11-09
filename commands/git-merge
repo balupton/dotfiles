@@ -32,7 +32,7 @@ function git_merge() (
 		case "$item" in
 		'--help' | '-h') help ;;
 		'--branch='*) option_branch="${item#*=}" ;;
-		--*) __unrecognised_flag "$item" || return ;;
+		--*) __unrecognised_flag "$item" || return $? ;;
 		*)
 			if [[ -z $option_branch ]]; then
 				option_branch="$item"

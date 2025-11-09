@@ -71,9 +71,9 @@ string="${array[*]}"
 
 
 value='/home/runner/.local/share/dorothy/user/commands.local:/home/runner/.local/share/dorothy/user/commands:/home/runner/.local/share/dorothy/commands.deprecated:/home/runner/.local/share/dorothy/commands.beta:/home/runner/.local/share/dorothy/commands:/home/runner/.local/bin:/home/runner/.local/bin:/usr/local/bin:/home/runner/.local/share/go/bin:/home/runner/.cargo/bin:/home/runner/.gem/bin:/usr/lib/x86_64-linux-gnu/rubygems-integration/3.2.0/bin:/usr/share/rubygems-integration/all/bin:/usr/share/rubygems-integration/3.2.0/bin:/usr/lib/x86_64-linux-gnu/ruby/gems/3.2.0/bin:/usr/lib/ruby/gems/3.2.0/bin:/usr/local/lib/ruby/gems/3.2.0/bin:/var/lib/gems/3.2.0/bin:/home/runner/.local/share/gem/ruby/3.2.0/bin:/usr/local/bin:/usr/bin:/home/runner/.local/share/dorothy/commands:/home/runner/.local/bin:/usr/sbin:/usr/bin:/sbin:/bin:/home/runner/.local/share/dorothy/user/commands:/home/runner/.config/dorothy/commands:/home/runner/.local/share/dorothy/commands:/home/runner/.config/dorothy/commands:/home/runner' values=()
-__split --source={value} --delimiter=':' --target={values} --no-zero-length || exit
-__unique --source+target={values} || exit
-__join --source={values} --delimiter=':' --target={value} || exit
+__split --source={value} --delimiter=':' --target={values} --no-zero-length || exit $?
+__unique --source+target={values} || exit $?
+__join --source={values} --delimiter=':' --target={value} || exit $?
 __dump --value='== DE-DUPLICATED ==' {value}
 
 # arr=(a b c c b a z x y)

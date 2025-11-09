@@ -80,18 +80,18 @@ function subtitles_generate() (
 	# function __transcribe {
 	# 	if [[ $option_overwrite == 'no' ]]; then
 	# 		# check if the subtitle file already exists, only do --no-extension, as it could have a . in its name, like [A vs. B]
-	# 		filepath_no_extension="$(fs-path --no-extension -- "$filepath")" || return
+	# 		filepath_no_extension="$(fs-path --no-extension -- "$filepath")" || return $?
 	# 		if [[ -f "$filepath_no_extension.srt" ]]; then
 	# 			return 0
 	# 		fi
 	# 	fi
-	# 	dirpath="$(fs-path --parents -- "$filepath")" || return
+	# 	dirpath="$(fs-path --parents -- "$filepath")" || return $?
 	# 	(
-	# 		cd "$dirpath" || return
+	# 		cd "$dirpath" || return $?
 	# 		# --revolving-max-lines=1
 	# 		# eval-helper --wrap --quiet="$option_quiet" --revolving-lines=terminal -- \
-	# 		"${whisper_cmd[@]}" "$filepath" || return
-	# 	) || return
+	# 		"${whisper_cmd[@]}" "$filepath" || return $?
+	# 	) || return $?
 	# }
 
 	local cmd=(whisperkit-cli transcribe --verbose --task transcribe --report --skip-special-tokens --chunking-strategy vad --model large-v3 "${options[@]}")
@@ -114,9 +114,9 @@ function subtitles_generate() (
 		skipping='yes'
 	fi
 	for path in "${paths[@]}"; do
-		path="$(fs-path --absolute -- "$path")" || return
-		filename="$(fs-path --no-parents -- "$path")" || return
-		root="$(fs-path --no-extension -- "$path")" || return
+		path="$(fs-path --absolute -- "$path")" || return $?
+		filename="$(fs-path --no-parents -- "$path")" || return $?
+		root="$(fs-path --no-extension -- "$path")" || return $?
 		subtitle="$root.srt"
 		transcription="$root.ai.transcription.srt"
 		if [[ $skipping == 'yes' ]]; then
@@ -131,7 +131,7 @@ function subtitles_generate() (
 			__print_style --info='Already transcribed'
 		else
 			__print_style --info='Transcribing...'
-			eval-helper --wrap -- "${cmd[@]}" --audio-path "$path" || return
+			eval-helper --wrap -- "${cmd[@]}" --audio-path "$path" || return $?
 			if ! [[ -s $subtitle ]]; then
 				__print_error 'Failed to generate subtitle at ' --path="$subtitle"
 				return 2 # ENOENT 2 No such file or directory

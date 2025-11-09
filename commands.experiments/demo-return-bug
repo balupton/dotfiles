@@ -1,0 +1,6 @@
+#!/usr/bin/env bash
+
+function a { [[ 1 -eq 2 ]] || return; }
+function b { if a; then echo ok; else echo fail; fi; }
+b
+trap b EXIT

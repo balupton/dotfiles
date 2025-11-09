@@ -29,10 +29,10 @@ function echo_progress() (
 	__terminal_title_progress_bar --create
 	__terminal_title_progress_bar --progress=0
 	function __on_line {
-		__terminal_title_progress_bar --progress="$1" || return
+		__terminal_title_progress_bar --progress="$1" || return $?
 	}
 	function __on_finish {
-		__terminal_title_progress_bar --destroy || return
+		__terminal_title_progress_bar --destroy || return $?
 	}
 
 	stdinargs --no-timeout "${option_args[@]}"

@@ -33,8 +33,8 @@ function remove_duplicates() (
 			shift $#
 			break
 			;;
-		--*) __unrecognised_flag "$item" || return ;;
-		*) __unrecognised_argument "$item" || return ;;
+		--*) __unrecognised_flag "$item" || return $? ;;
+		*) __unrecognised_argument "$item" || return $? ;;
 		esac
 	done
 

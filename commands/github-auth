@@ -12,10 +12,10 @@ function github_auth() (
 	if [[ -z ${GITHUB_ACCESS_TOKEN-} ]]; then
 		__print_style 'Environment variable ' --code='GITHUB_ACCESS_TOKEN' ' is empty, fetching it from the secret engine...' >/dev/tty
 		secret env GITHUB_ACCESS_TOKEN -- "$@"
-		return
+		return $?
 	else
 		"$@"
-		return
+		return $?
 	fi
 )
 

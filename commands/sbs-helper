@@ -32,8 +32,8 @@ function sbs_helper() (
 		case "$item" in
 		'--help' | '-h') help ;;
 		'--token='*) token="${item#*=}" ;;
-		--*) __unrecognised_flag "$item" || return ;;
-		*) __unrecognised_argument "$item" || return ;;
+		--*) __unrecognised_flag "$item" || return $? ;;
+		*) __unrecognised_argument "$item" || return $? ;;
 		esac
 	done
 
@@ -47,13 +47,13 @@ function sbs_helper() (
 	# Arguments
 
 	function __get_watched {
-		http --auth "$token" --auth-type 'bearer' 'https://www.sbs.com.au/api/v3/video_progress/all?context=odwebsite' | jq -r '.all | .response | to_entries | map ( {id: .key, completed: .value.completed} ) | .[] | select(.completed==1) | .id' || return
+		http --auth "$token" --auth-type 'bearer' 'https://www.sbs.com.au/api/v3/video_progress/all?context=odwebsite' | jq -r '.all | .response | to_entries | map ( {id: .key, completed: .value.completed} ) | .[] | select(.completed==1) | .id' || return $?
 	}
 
 	function __fetch_title {
 		local id
 		for id in "$@"; do
-			http --auth "$token" --auth-type 'bearer' "https://www.sbs.com.au/api/v3/video_search/fetchbyIds?n=${id}&context=odwebsite&range=1-10" | jq -r '.itemListElement | .[] | .name + " (" + .datePublished[0:4] + ")"' || return
+			http --auth "$token" --auth-type 'bearer' "https://www.sbs.com.au/api/v3/video_search/fetchbyIds?n=${id}&context=odwebsite&range=1-10" | jq -r '.itemListElement | .[] | .name + " (" + .datePublished[0:4] + ")"' || return $?
 		done
 	}
 

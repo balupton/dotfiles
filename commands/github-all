@@ -6,7 +6,7 @@ function github_all() (
 	# if the secrets aren't provided, fetch them and reload
 	if [[ -z ${GITHUB_ACCESS_TOKEN-} ]]; then
 		github-auth -- "$0" "$@"
-		return
+		return $?
 	fi
 
 	# =====================================
@@ -98,7 +98,7 @@ function github_all() (
 
 	# fetch all labels
 	function fetch_labels {
-		gh label list --repo bevry/dorothy --json=name,description,color | jq -r '.[] | .name + "\n" + .description + "\n" + .color' || return
+		gh label list --repo bevry/dorothy --json=name,description,color | jq -r '.[] | .name + "\n" + .description + "\n" + .color' || return $?
 	}
 
 	# clone labels

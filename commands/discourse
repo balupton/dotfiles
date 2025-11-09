@@ -61,8 +61,8 @@ function discourse() (
 		--git-remote=*) __flag --source={item} --target={option_git_remote} ;;
 		--git-branch=*) __flag --source={item} --target={option_git_branch} ;;
 		--container*) __flag --source={item} --target={option_container} ;;
-		--*) __unrecognised_flag "$item" || return ;;
-		*) __unrecognised_argument "$item" || return ;;
+		--*) __unrecognised_flag "$item" || return $? ;;
+		*) __unrecognised_argument "$item" || return $? ;;
 		esac
 	done
 
@@ -96,7 +96,7 @@ $(<"$DOROTHY/user/commands/discourse-setup")
 	if ssh -t "$option_ssh_ip" "$discourse_init" && __print_style --success='Successfully setup the discourse instance. 🎉'; then
 		return 0
 	else
-		__print_style --stderr --error='Error: Failed to setup the discourse instance. 🚨' || return
+		__print_style --stderr --error='Error: Failed to setup the discourse instance. 🚨' || return $?
 		return 1
 	fi
 )

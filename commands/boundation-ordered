@@ -6,7 +6,7 @@ function boundation_ordered() (
 	# if the secrets aren't provided, fetch them and reload
 	if [[ -z ${GITHUB_ACCESS_TOKEN-} ]]; then
 		bevry-auth -- "$0" "$@"
-		return
+		return $?
 	fi
 
 	if [[ $# -ne 0 ]]; then

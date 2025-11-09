@@ -6,7 +6,7 @@ function boundation_all() (
 	# if the secrets aren't provided, fetch them and reload
 	if [[ -z ${GITHUB_ACCESS_TOKEN-} ]]; then
 		bevry-auth -- "$0" "$@"
-		return
+		return $?
 	fi
 
 	# =====================================
@@ -59,8 +59,8 @@ function boundation_all() (
 			shift $#
 			break
 			;;
-		--*) __unrecognised_flag "$item" || return ;;
-		*) __unrecognised_argument "$item" || return ;;
+		--*) __unrecognised_flag "$item" || return $? ;;
+		*) __unrecognised_argument "$item" || return $? ;;
 		esac
 	done
 
@@ -99,7 +99,7 @@ function boundation_all() (
 
 	# if no slugs, fetch all for the user
 	function __get_slugs {
-		fetch "https://bevry.me/api/github/repos/${option_user}" | jq -r '.[]' | sort || return
+		fetch "https://bevry.me/api/github/repos/${option_user}" | jq -r '.[]' | sort || return $?
 	}
 	if [[ ${#option_slugs[@]} -eq 0 ]]; then
 		__split --target={option_slugs} --no-zero-length --invoke -- \
@@ -188,36 +188,36 @@ function boundation_all() (
 		(
 			# log
 			failed_repos+=("$repo")
-			__print_style --terminal-title="$repo [$index/$count]" || return
-			__print_style --h1="$repo" || return
+			__print_style --terminal-title="$repo [$index/$count]" || return $?
+			__print_style --h1="$repo" || return $?
 			# clone the repo fresh and set the correct origin in case of fork
 			# don't use subshell as that breaks strict mode
 			# don't use gh, as it clones forks then sets the origin to not the fork
-			cd "$pwd" || return
-			fs-remove --quiet --no-confirm -- "$repo" || return
-			git clone "git@github.com:$slug.git" || return
-			cd "$repo" || return
-			gh repo set-default "$slug" >/dev/null || return
+			cd "$pwd" || return $?
+			fs-remove --quiet --no-confirm -- "$repo" || return $?
+			git clone "git@github.com:$slug.git" || return $?
+			cd "$repo" || return $?
+			gh repo set-default "$slug" >/dev/null || return $?
 			# run the upgrade
-			boundation-upgrade "${option_args[@]}" || return
+			boundation-upgrade "${option_args[@]}" || return $?
 			# get out of the directory, so it can be removed
-			cd "$pwd" || return
+			cd "$pwd" || return $?
 			# remove the directory
-			fs-remove --quiet --no-confirm -- "$repo" || return
+			fs-remove --quiet --no-confirm -- "$repo" || return $?
 			# wait for the publish to propagate
-			waiter 60 || return
+			waiter 60 || return $?
 			# note it succeeded
-			__print_style --g1="$repo" || return
+			__print_style --g1="$repo" || return $?
 			# remove from failed repos
-			__evict --source+target={failed_repos} --first -- "$repo" || return
+			__evict --source+target={failed_repos} --first -- "$repo" || return $?
 			success_repos+=("$repo")
 		) || (
 			# check status
 			local status="$?"
 			# note failure
-			__print_style --e1="$repo" ' ' --code="$status" || return
+			__print_style --e1="$repo" ' ' --code="$status" || return $?
 			# keep repo (if it exists), but ensure we are correct location
-			cd "$pwd" || return
+			cd "$pwd" || return $?
 			# if aborted, propagate
 			if is-abort -- "$status"; then
 				return "$status"

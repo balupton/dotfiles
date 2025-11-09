@@ -37,7 +37,7 @@ function gtd() (
 			shift $#
 			break
 			;;
-		--*) __unrecognised_flag "$item" || return ;;
+		--*) __unrecognised_flag "$item" || return $? ;;
 		*)
 			option_branch_or_tags+=("$item")
 			;;

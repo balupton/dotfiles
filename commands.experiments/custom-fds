@@ -6,19 +6,19 @@ echo "BASH_VERSION = $BASH_VERSION"
 if [[ "$1" == '--ssh' ]]; then
 	# ssh -T localhost "$(type -P dorothy)" run -- "$(pwd)/custom-fds"
 	ssh -T localhost "$(pwd)/custom-fds"
-	exit
+	exit $?
 elif [[ "$1" == '--background' ]]; then
 	"$(pwd)/custom-fds" &
 	echo now in background
 	sleep 5
 	fg
-	exit
+	exit $?
 elif [[ "$1" == '--stdin' ]]; then
 	echo | "$(pwd)/custom-fds"
-	exit
+	exit $?
 elif [[ "$1" == '--stdin+stdout+stderr' ]]; then
-	echo | "$(pwd)/custom-fds" 2> >(cat) > >(cat) 
-	exit
+	echo | "$(pwd)/custom-fds" 2> >(cat) > >(cat)
+	exit $?
 fi
 
 if get-terminal-position-support --quiet; then

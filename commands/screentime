@@ -149,14 +149,14 @@ def find_apps [query: string] {
 def resolve_app [input: string] {
 	# Check app aliases FIRST (case-insensitive) - fast lookup
 	let input_lower = ($input | str downcase)
-	let alias_result = ($APP_ALIASES | get -o $input_lower)
+	let alias_result = ($APP_ALIASES | get -i $input_lower)
 	if $alias_result != null {
 		return $alias_result
 	}
 
 	# Check website aliases SECOND (case-insensitive) - fast lookup
 	let input_lower = ($input | str downcase)
-	let alias_result = ($WEBSITE_ALIASES | get -o $input_lower)
+	let alias_result = ($WEBSITE_ALIASES | get -i $input_lower)
 	if $alias_result != null {
 		# This is a website, not an app
 		return null
@@ -219,7 +219,7 @@ def resolve_app [input: string] {
 def resolve_website [input: string] {
 	# Check website aliases FIRST (case-insensitive) - fastest lookup
 	let input_lower = ($input | str downcase)
-	let alias_result = ($WEBSITE_ALIASES | get -o $input_lower)
+	let alias_result = ($WEBSITE_ALIASES | get -i $input_lower)
 	if $alias_result != null {
 		return $alias_result
 	}
@@ -372,7 +372,7 @@ def create_total_row [results: list] {
 }
 
 # Fetch the screentime usage of various <item:app|website>s
-def main [	
+def main [
 	...items: string # Application/website name(s), alias(es), or bundle ID(s). Examples: "vscode", "chrome github", "notifications.github.com", "com.microsoft.VSCode"
 	--app: string = "" # Specific apps to query (can be used with --website)
 	--website: string = "" # Specific websites/domains/URLs to query (can be used with --app)
@@ -390,7 +390,7 @@ def main [
 
 	# Process all items efficiently in a single loop
 	let results = []
-	
+
 	# Check if we actually have access to screentime, by checking if the database is readable
 	try {
 		open --raw ($KNOWLEDGE_DB_PATH) | ignore

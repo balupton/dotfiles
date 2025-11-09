@@ -12,10 +12,10 @@ function bevry_auth() (
 	if [[ -z ${GITHUB_ACCESS_TOKEN-} ]]; then
 		__print_lines 'Bevry environment variables empty, fetching them from the secret engine...' >/dev/tty
 		secret env NPM_AUTHTOKEN SURGE_LOGIN SURGE_TOKEN GITHUB_ACCESS_TOKEN GITHUB_CLIENT_ID GITHUB_CLIENT_SECRET -- "$@"
-		return
+		return $?
 	else
 		"$@"
-		return
+		return $?
 	fi
 )
 

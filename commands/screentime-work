@@ -7,7 +7,7 @@ function screentime_work() (
 	# Arguments
 
 	function __help {
-		cat <<-EOF >&2 || return
+		cat <<-EOF >&2 || return $?
 			ABOUT:
 			Fetches the amount of time I spent working via the Screen Time feature of macOS.
 
@@ -22,7 +22,7 @@ function screentime_work() (
 			    Update the data jar 'screentime-work' with the latest seconds.
 		EOF
 		if [[ $# -ne 0 ]]; then
-			__print_error "$@" || return
+			__print_error "$@" || return $?
 		fi
 		return 22 # EINVAL 22 Invalid argument
 	}
@@ -33,9 +33,9 @@ function screentime_work() (
 		item="$1"
 		shift
 		case "$item" in
-		--help | -h) __help || return ;;
-		--no-quiet* | --quiet*) __flag --source={item} --target={option_quiet} --affirmative --coerce || return ;;
-		--no-update* | --update*) __flag --source={item} --target={option_update} --affirmative --coerce || return ;;
+		--help | -h) __help || return $? ;;
+		--no-quiet* | --quiet*) __flag --source={item} --target={option_quiet} --affirmative --coerce || return $? ;;
+		--no-update* | --update*) __flag --source={item} --target={option_update} --affirmative --coerce || return $? ;;
 		--)
 			screentime_args+=("$@")
 			shift $#
@@ -56,17 +56,17 @@ function screentime_work() (
 	# Action
 
 	function __fetch {
-		screentime "${shared_args[@]}" vscode gitfox terminal ghostty finder github vercel.com cloudflare.com bevry.me "${screentime_args[@]}" "$@" || return
+		screentime "${shared_args[@]}" vscode gitfox terminal ghostty finder github vercel.com cloudflare.com bevry.me "${screentime_args[@]}" "$@" || return $?
 	}
 
 	if [[ $option_update == 'yes' ]]; then
 		local result
-		result="$(__fetch --seconds)" || return
+		result="$(__fetch --seconds)" || return $?
 		if [[ -n $result ]]; then
-			set-data-jar "${shared_args[@]}" 'screentime-work' "$result" || return
+			set-data-jar "${shared_args[@]}" 'screentime-work' "$result" || return $?
 		fi
 	else
-		__fetch || return
+		__fetch || return $?
 	fi
 )
 
