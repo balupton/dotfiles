@@ -149,14 +149,14 @@ def find_apps [query: string] {
 def resolve_app [input: string] {
 	# Check app aliases FIRST (case-insensitive) - fast lookup
 	let input_lower = ($input | str downcase)
-	let alias_result = ($APP_ALIASES | get -i $input_lower)
+	let alias_result = ($APP_ALIASES | get -o $input_lower)
 	if $alias_result != null {
 		return $alias_result
 	}
 
 	# Check website aliases SECOND (case-insensitive) - fast lookup
 	let input_lower = ($input | str downcase)
-	let alias_result = ($WEBSITE_ALIASES | get -i $input_lower)
+	let alias_result = ($WEBSITE_ALIASES | get -o $input_lower)
 	if $alias_result != null {
 		# This is a website, not an app
 		return null
@@ -219,7 +219,7 @@ def resolve_app [input: string] {
 def resolve_website [input: string] {
 	# Check website aliases FIRST (case-insensitive) - fastest lookup
 	let input_lower = ($input | str downcase)
-	let alias_result = ($WEBSITE_ALIASES | get -i $input_lower)
+	let alias_result = ($WEBSITE_ALIASES | get -o $input_lower)
 	if $alias_result != null {
 		return $alias_result
 	}
