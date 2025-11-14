@@ -10,7 +10,6 @@ __cache || :
 export HOMEBREW_RUBY_VERSION
 HOMEBREW_RUBY_VERSION='default'
 
-# general
-export SHELLCHECK_OPTS CARGO_NET_GIT_FETCH_WITH_CLI
-SHELLCHECK_OPTS='-e SC2096 -e SC1090 -e SC1091 -e SC1071'
+# https://doc.rust-lang.org/cargo/reference/config.html#netgit-fetch-with-cli
+export CARGO_NET_GIT_FETCH_WITH_CLI
 CARGO_NET_GIT_FETCH_WITH_CLI='true'
