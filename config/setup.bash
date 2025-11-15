@@ -179,6 +179,7 @@ NPM_INSTALL=(
 	'json'
 	'typescript'
 )
+# https://nodejs.org/en/about/previous-releases
 NODE_VERSIONS=(
 	0.8
 	0.10
@@ -192,7 +193,9 @@ NODE_VERSIONS=(
 	16
 	18
 	20
-	21
+	22
+	24
+	25
 )
 
 # Rust / Cargo / Crates.io
