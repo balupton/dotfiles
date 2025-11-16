@@ -6,8 +6,7 @@
 source "$DOROTHY/config/setup.bash"
 
 # fetch hostname, without .local suffix
-hostname="$(get-hostname)"
-hostname="${hostname%.local}"
+hostname="${HOSTNAME%.local}"
 
 APK_INSTALL=()
 
@@ -61,6 +60,7 @@ MAS_INSTALL=(
 # Homebrew
 if [[ $hostname == 'balupton-mini' ]]; then
 	HOMEBREW_ENCODING_INSTALL=yes
+	HOMEBREW_ENCODING_REINSTALL=no
 fi
 HOMEBREW_UNINSTALL=()
 HOMEBREW_FORMULAS=(
@@ -180,23 +180,8 @@ NPM_INSTALL=(
 	'typescript'
 )
 # https://nodejs.org/en/about/previous-releases
-NODE_VERSIONS=(
-	0.8
-	0.10
-	0.12
-	4
-	6
-	8
-	10
-	12
-	14
-	16
-	18
-	20
-	22
-	24
-	25
-)
+# As of 2025 November 16, on macOS Tahoe 26.1 (25B78), Node.js 14 fails to install, others are fine.
+# NODE_VERSIONS=(0.8 0.10 0.12 4 6 8 10 12 16 18 20 22 24 25)
 
 # Rust / Cargo / Crates.io
 # --locked: Require Cargo.lock is up to date
