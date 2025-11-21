@@ -5,7 +5,7 @@ function new_dev_branch() (
 
 	# dependencies
 	if ! is-file -- /usr/share/dict/words; then
-		if is-apt; then
+		if is-system --apt; then
 			# https://askubuntu.com/a/149128
 			# setup-util --name='American Words' APT='wamerican'
 			setup-util --name='British Words' APT='wbritish' || return $?

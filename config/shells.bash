@@ -2,7 +2,7 @@
 # shellcheck disable=SC2034
 # do not use `export` keyword in this file
 
-if is-mac; then
+if is-system --macos; then
 	USER_SHELLS=(
 		fish
 		bash
