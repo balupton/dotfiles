@@ -7,20 +7,17 @@ function sbs_helper() (
 	# Arguments
 
 	function help {
-		cat <<-EOF >&2
+		__print_help "$@" <<-EOF || return $?
 			ABOUT:
 			Get details about your watched files.
 
 			USAGE:
-			sbs-helper [...options]
+			\`sbs-helper [...options]\`
 
 			OPTIONS:
 			--token=<token>
 			    Your bearer token.
 		EOF
-		if [[ $# -ne 0 ]]; then
-			__print_error "$@"
-		fi
 		return 22 # EINVAL 22 Invalid argument
 	}
 

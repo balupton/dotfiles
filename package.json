@@ -1,10 +1,18 @@
 {
   "name": "@balupton/dorothy",
-  "private": true,
   "version": "0.0.1",
-  "description": "Benjamin Lupton's user configuration for Dorothy",
-  "homepage": "https://github.com/balupton/dorothy",
+  "private": true,
   "license": "RPL-1.5",
+  "description": "Benjamin Lupton's user configuration for Dorothy",
+  "homepage": "https://github.com/balupton/dotfiles",
+  "funding": "https://bevry.me/fund",
+  "bugs": {
+    "url": "https://github.com/balupton/dotfiles/issues"
+  },
+  "repository": {
+    "type": "git",
+    "url": "git+https://github.com/balupton/dotfiles.git"
+  },
   "keywords": [
     "automation",
     "bash",
@@ -29,7 +37,6 @@
     "wsl2",
     "zsh"
   ],
-  "funding": "https://bevry.me/fund",
   "author": "2013+ Benjamin Lupton <b@lupton.cc> (https://balupton.com)",
   "maintainers": [
     "Benjamin Lupton <b@lupton.cc> (https://github.com/balupton)"
@@ -37,20 +44,14 @@
   "contributors": [
     "Benjamin Lupton <b@lupton.cc> (https://github.com/balupton)"
   ],
-  "bugs": {
-    "url": "https://github.com/balupton/dorothy/issues"
-  },
-  "repository": {
-    "type": "git",
-    "url": "https://github.com/balupton/dorothy.git"
-  },
   "engines": {
-    "node": ">=18"
+    "node": ">=24"
   },
   "editions": [
     {
       "description": "Source Code",
       "directory": ".",
+      "entry": "init.sh",
       "tags": [
         "source",
         "shell",
@@ -60,37 +61,32 @@
         "typescript"
       ],
       "engines": {
-        "node": "18"
+        "node": "24"
       }
     }
   ],
   "devDependencies": {
-    "@bevry/update-contributors": "^1.23.0",
-    "@typescript-eslint/eslint-plugin": "^8.46.3",
-    "@typescript-eslint/parser": "^8.46.3",
+    "@bevry/github-api": "^11.4.0",
+    "assert-helpers": "^11.13.0",
+    "eslint": "^9.39.2",
     "eslint-config-bevry": "^6.1.6",
-    "eslint-config-prettier": "^10.1.8",
-    "eslint-plugin-prettier": "^5.5.4",
-    "eslint": "^9.39.1",
-    "prettier": "^3.6.2",
+    "prettier": "^3.7.4",
     "projectz": "^4.2.0",
-    "valid-directory": "^4.9.0"
+    "typescript": "^5.9.3"
   },
   "scripts": {
-    "our:meta": "npm run our:meta:contributors && npm run our:meta:projectz",
-    "our:meta:contributors": "update-contributors",
-    "our:meta:projectz": "projectz compile",
-    "our:setup": "npm run our:setup:install",
-    "our:setup:install": "npm install",
-    "our:test": "./commands/dorothy test",
-    "our:verify": "npm run our:verify:directory && npm run our:verify:dorothy",
-    "our:verify:directory": "valid-directory",
-    "our:verify:dorothy": "./commands/dorothy lint"
+    "my:meta:backers": "github-backers --write -- --write=sources/shoutouts.txt",
+    "my:setup": "./commands/dorothy lint --upgrade",
+    "my:verify": "./commands/dorothy lint",
+    "our:meta": "npm run our:meta:backers && npm run our:meta:projectz",
+    "our:meta:backers": "npm run my:meta:backers",
+    "our:meta:projectz": "projectz --offline",
+    "our:setup": "npm run my:setup",
+    "our:test": "npm run our:verify && npm test",
+    "our:verify": "npm run my:verify",
+    "test": "./commands/dorothy test"
   },
   "eslintConfig": {
-    "extends": [
-      "bevry"
-    ],
     "rules": {
       "require-atomic-updates": 0,
       "no-console": 0,
@@ -100,6 +96,8 @@
   },
   "prettier": {
     "semi": false,
-    "singleQuote": true
+    "singleQuote": true,
+    "trailingComma": "all",
+    "endOfLine": "lf"
   }
 }

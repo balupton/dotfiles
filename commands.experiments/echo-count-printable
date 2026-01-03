@@ -7,12 +7,12 @@ function echo_printable_characters() (
 	# Arguments
 
 	function help {
-		cat <<-EOF >&2
+		__print_help "$@" <<-EOF || return $?
 			ABOUT:
 			Process the input wrapping it to a specified width, respecting ansi escape codes / colors.
 
 			USAGE:
-			cat -- "$DOROTHY/README.md" | echo-wrap [...options]
+			\`cat -- "$DOROTHY/README.md" | echo-wrap [...options]\`
 
 			OPTIONS:
 			--width=<width>

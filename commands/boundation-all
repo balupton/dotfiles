@@ -13,12 +13,12 @@ function boundation_all() (
 	# Arguments
 
 	function help {
-		cat <<-EOF >&2
+		__print_help "$@" <<-EOF || return $?
 			ABOUT:
 			Upgrade all of a GitHub user's Node.js packages.
 
 			USAGE:
-			boundation-all [...options].
+			\`boundation-all [...options]\`
 
 			OPTIONS:
 			--user=<user>
@@ -27,11 +27,8 @@ function boundation_all() (
 			--skip=<repo>
 			--only=<repo>
 			--start-after=<repo>
-			    Same as --start=<repo> --skip=<repo>
+			    Same as \`--start=<repo> --skip=<repo>\`.
 		EOF
-		if [[ $# -ne 0 ]]; then
-			__print_error "$@"
-		fi
 		return 22 # EINVAL 22 Invalid argument
 	}
 

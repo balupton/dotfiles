@@ -7,23 +7,20 @@ function screentime_work() (
 	# Arguments
 
 	function __help {
-		cat <<-EOF >&2 || return $?
+		__print_help "$@" <<-EOF || return $?
 			ABOUT:
 			Fetches the amount of time I spent working via the Screen Time feature of macOS.
 
 			USAGE:
-			screentime-work [...options]
+			\`screentime-work [...options]\`
 
 			OPTIONS:
 			--quiet
 			    If enabled, do not output any messages.
 
 			--update
-			    Update the data jar 'screentime-work' with the latest seconds.
+			    Update the data jar \`screentime-work\` with the latest seconds.
 		EOF
-		if [[ $# -ne 0 ]]; then
-			__print_error "$@" || return $?
-		fi
 		return 22 # EINVAL 22 Invalid argument
 	}
 

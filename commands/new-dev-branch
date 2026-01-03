@@ -28,7 +28,7 @@ function new_dev_branch() (
 	# action
 	local word branch question
 	while :; do
-		#words="$(shuf -n 1 /usr/share/dict/words | echo-join '-' --stdin | echo-lowercase --stdin | echo-lines --prefix='dev/' --stdin)"
+		#words="$(shuf -n 1 /usr/share/dict/words | echo-join --between='-' --stdin | echo-lowercase --stdin | echo-lines --prefix='dev/' --stdin)"
 		word="$(shuf -n 1 /usr/share/dict/words)" || return $?
 		# check it is a valid word, unlike: Olympiad, haiphong's, chancel's
 		if ! echo-regexp -qf --regexp='^[a-z]+$' -- "$word"; then

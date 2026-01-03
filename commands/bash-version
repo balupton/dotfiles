@@ -1,0 +1,12 @@
+#!/usr/bin/env bash
+
+function bash_version() (
+	source "$DOROTHY/sources/bash.bash"
+
+	__dump {BASH} {BASH_VERSION} {BASH_VERSINFO} {BASH_VERSION_MAJOR} {BASH_VERSION_MINOR} {BASH_VERSION_PATCH} {BASH_VERSION_CURRENT} {BASH_VERSION_LATEST}
+)
+
+# fire if invoked standalone
+if [[ $0 == "${BASH_SOURCE[0]}" ]]; then
+	bash_version "$@"
+fi

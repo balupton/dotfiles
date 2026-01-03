@@ -7,16 +7,13 @@ function remove_duplicates() (
 	# Arguments
 
 	function help {
-		cat <<-EOF >&2
+		__print_help "$@" <<-EOF || return $?
 			ABOUT:
 			Compare files with the same filenames from multiple directories, if they share the same checksum remove them.
 
 			USAGE:
-			remove-duplicates [...options] -- <source-path> ...<duplicate-path>
+			\`remove-duplicates [...options] -- <source-path> ...<duplicate-path>\`
 		EOF
-		if [[ $# -ne 0 ]]; then
-			__print_error "$@"
-		fi
 		return 22 # EINVAL 22 Invalid argument
 	}
 

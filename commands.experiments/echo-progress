@@ -7,19 +7,18 @@ function echo_progress() (
 	# Arguments
 
 	function help {
-		cat <<-EOF >&2
+		__print_help "$@" <<-EOF || return $?
 			ABOUT:
 			Continue reading a number from STDIN, that will be between 0 and 100 and will be newline separated, and update the progress bar in the terminal title bar to the progress percentage that the number represents.
 
 			USAGE:
+			\`\`\`
 			{ for (( i=0; i<=100; i+=20 )); do sleep 20; echo \$i; done; } | echo-progress
+			\`\`\`
 
 			OPTIONS:
 			$(__stdinargs__help_options --)
 		EOF
-		if [[ $# -ne 0 ]]; then
-			__print_error "$@"
-		fi
 		return 22 # EINVAL 22 Invalid argument
 	}
 

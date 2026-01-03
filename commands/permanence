@@ -17,7 +17,7 @@ function permanence() (
 		return 1
 	fi
 	if is-odd -- "${#tuples[@]}"; then
-		__print_lines 'the tuples do not seem to have one destination for one source' >&2
+		__print_error 'Tuples were not pairs of source and destination:' --newline --variable={tuples} >&2
 		return 1
 	fi
 

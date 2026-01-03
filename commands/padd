@@ -5,14 +5,14 @@ function padd() (
 
 	# help
 	function help {
-		cat <<-EOF >&2
+		__print_help "$@" <<-EOF || return $?
 			ABOUT:
 			Forward to the correct package manager for your project.
-			If [yarn.lock] is present, uses [yarn].
-			If [package.json] is present, uses [package.json].
+			If \`yarn.lock\` is present, uses \`yarn\`.
+			If \`package.json\` is present, uses \`npm\`.
 
 			USAGE:
-			padd ...
+			\`padd ...\`
 		EOF
 		return 22 # EINVAL 22 Invalid argument
 	}
