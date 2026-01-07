@@ -58,8 +58,11 @@ alias git-wipe='git reset --hard; git clean -f'
 alias git-hooks='edit .git/hooks/pre-commit'
 alias git-up='git branch --set-upstream-to=origin/$(git rev-parse --abbrev-ref HEAD) $(git rev-parse --abbrev-ref HEAD); git pull --rebase --autostash'
 
-# Remove Elgato Stream Deck logs as they baloon to 100GB within a week
-rm -rf "$HOME/Library/Logs/ElgatoStreamDeck" || true
+# MacOS
+if is-system --macos; then
+	# Remove Elgato Stream Deck logs as they baloon to 100GB within a week
+	rm -rf "$HOME/Library/Logs/ElgatoStreamDeck" || true
 
-# Renive other logs that also baloon
-rm -rf "$HOME/Library/Logs/ESDZoom" || true
+	# Renive other logs that also baloon
+	rm -rf "$HOME/Library/Logs/ESDZoom" || true
+fi
