@@ -45,9 +45,7 @@ GO_INSTALL=()
 # '409203825' 'Numbers'
 # '430798174' 'HazeOver'
 # '441258766' 'Magnet'
-# '441258766' 'Magnet'
 # '497799835' 'Xcode'
-# '497799835' 'XCode'
 # '639968404' 'Parcel'
 # '803453959' 'Slack'
 # '931134707' 'Wire'
@@ -150,6 +148,7 @@ UV_INSTALL=()
 # SERVERS
 # - browser-refresh
 # - live-server
+# - serve
 # DATABASE
 # - fauna-shell
 # ECOSYSTEMS
@@ -167,17 +166,16 @@ UV_INSTALL=()
 # TOOLING
 # - tldr # replaced with tealdeer
 # - typescript@next
+# - json
+# - eslint
+# - typescript
+# - @bevry/github-api
 # CRYPTOCURRENCY
 # - cartera
 # - coinmon
 NPM_INSTALL=(
 	'@bevry/testen'
-	'@bevry/github-api'
 	'boundation'
-	'serve'
-	'eslint'
-	'json'
-	'typescript'
 )
 # https://nodejs.org/en/about/previous-releases
 # As of 2025 November 16, on macOS Tahoe 26.1 (25B78), Node.js 14 fails to install, others are fine.
@@ -211,9 +209,11 @@ SETUP_UTILS=(
 	ripgrep
 	sd
 	strongbox
-	tealdeer
-	teip
 	trash
 	tree
 	vim
+)
+
+DOROTHY_LOGIN_SHELLS=(
+	bash
 )
