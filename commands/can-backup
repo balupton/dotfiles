@@ -3,7 +3,7 @@
 function can_backup() (
 	# @todo figure out a better option for this
 	# Arq (like cron) does not inherit the shell environment.
-	# [say] does not work in this environment: Open speech channel failed: -915
+	# `say` does not work in this environment: Open speech channel failed: -915
 	if [[ -z $DOROTHY ]]; then
 		DOROTHY="$HOME/.local/share/.dorothy"
 	fi

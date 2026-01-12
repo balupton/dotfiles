@@ -13,4 +13,4 @@ $env.DOROTHY_THEME = 'starship'
 def greet [name] {
   ['hello' $name]
 }
-# for some reason [greet] is not available to the actual interactive shell
+# for some reason `greet` is not available to the actual interactive shell

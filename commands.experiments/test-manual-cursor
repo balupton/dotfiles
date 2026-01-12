@@ -26,7 +26,7 @@ details="$(
 )"
 
 # while :; do
-# # ⌅, ⌤ = enter key: [return enter] old macos keyboards, [return] new macos keyboards, [Enter ↵] raspberry keyboards
+# # ⌅, ⌤ = enter key: `return enter` old macos keyboards, `return` new macos keyboards, [Enter ↵] raspberry keyboards
 # 	# echo-style --no-trail --clear-line --bold='Do you want to continue? ' 'CONFIRM [↵]'
 # 	# sleep 0.6
 # 	# echo-style --no-trail --clear-line --bold='Do you want to continue? ' --invert='CONFIRM [↵]'

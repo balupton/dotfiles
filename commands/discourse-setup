@@ -75,7 +75,7 @@ function discourse_setup() (
 
 	# Install docker
 	if __command_missing docker; then
-		__print_style --header2='Docker is missing, install it via [setup-util-docker] by installing Dorothy [dorothy.bevry.me]...' >&2 || :
+		__print_error --help='Docker is missing, install it via `setup-util-docker` by installing Dorothy `dorothy.bevry.me`...' || :
 		return 74 # EPROGUNAVAIL 74 RPC prog. not avail
 	fi
 
