@@ -8,8 +8,39 @@ source "$DOROTHY/config/setup.bash"
 # fetch hostname, without .local suffix
 hostname="${HOSTNAME%.local}"
 
+# Shells
+# Used by `setup-shell`
+# Configure Shells: All the shells you wish to enable Dorothy for.
+DOROTHY_CONFIGURE_SHELLS=(
+	bash
+	fish
+	nu
+)
+# Login Shells: Your preferred login shells, by earliest order of preference.
+DOROTHY_LOGIN_SHELLS=(
+	bash
+)
+# ## officially supported shells
+# bash # bourne again shell
+# dash # debian almquist shell
+# fish # fish shell
+# nu   # nushell
+# zsh  # Z shell
+# ## officially supported shells (alpha/beta quality integrations)
+# elvish # elvish shell
+# ksh    # korn shell
+# xonsh  # python-powered shell
+# ## potentially supported shells
+# ash  # almquist shell
+# hush # hush, an independent implementation of a Bourne shell for BusyBox
+# sh   # the operating-system symlinks this to any POSIX compliant shell
+
+# APK
+# Used by `setup-linux`
 APK_INSTALL=()
 
+# Apt / apt-get
+# Used by `setup-linux`
 # APT_UNINSTALL=(
 # 	aisleriot
 # 	gnome-mahjongg
@@ -212,8 +243,4 @@ SETUP_UTILS=(
 	trash
 	tree
 	vim
-)
-
-DOROTHY_LOGIN_SHELLS=(
-	bash
 )
