@@ -16,4 +16,10 @@ if is-system --macos; then
 		set +b # disable background notifications
 		screentime-work --quiet --update &
 	)
+
+	# Remove Elgato Stream Deck logs as they baloon to 100GB within a week
+	rm -rf "$HOME/Library/Logs/ElgatoStreamDeck" || true
+
+	# Renive other logs that also baloon
+	rm -rf "$HOME/Library/Logs/ESDZoom" || true
 fi

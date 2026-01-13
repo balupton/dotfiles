@@ -4,7 +4,7 @@
 
 # support caching the environment
 # __cache -- /opt/homebrew/bin/xxhsum -H3 || :
-# __cache || :
+__cache || :
 
 # dorothy
 export HOMEBREW_RUBY_VERSION
