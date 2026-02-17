@@ -9,7 +9,7 @@ function test_broken_pipe() (
 		bash -c 'set -Eeuo pipefail; yes | head -n 1'
 		# yes | head -n 1
 		# find . | head -n 1
-		# curl --fail-early --head --write-out '%{http_code}' --location 'https://www.google.com' | "$@" | tail -n 1 
+		# curl --fail-early --head --write-out '%{http_code}' --location 'https://www.google.com' | "$@" | tail -n 1
 	}
 	function right_side {
 		# local status='' stdout='' stderr=''
@@ -19,7 +19,7 @@ function test_broken_pipe() (
 		# printf 'stderr: [%s]\n' "$stderr"
 		:
 	}
-	#broken_pipe | eval-tester --status=0 --stdout='' --stderr='' -- cat
+	#broken_pipe | eval-tester --stdout='' --stderr='' -- cat
 
 	bash -c 'set -Eeuo pipefail; yes | head -n 1' | eval-tester --name='stdin with newline' --stdout='y' -- cat
 
