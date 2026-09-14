@@ -13,3 +13,7 @@ HOMEBREW_RUBY_VERSION='default'
 # https://doc.rust-lang.org/cargo/reference/config.html#netgit-fetch-with-cli
 export CARGO_NET_GIT_FETCH_WITH_CLI
 CARGO_NET_GIT_FETCH_WITH_CLI='true'
+
+# disable mas from indexing things I don't care about
+export MAS_NO_AUTO_INDEX
+MAS_NO_AUTO_INDEX=1
