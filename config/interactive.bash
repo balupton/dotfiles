@@ -22,4 +22,13 @@ if is-system --macos; then
 
 	# Renive other logs that also baloon
 	rm -rf "$HOME/Library/Logs/ESDZoom" || true
+
+	# If my external HDD is mounted, redo the plex symlink
+
+fi
+
+# carapace
+# https://carapace-sh.github.io/carapace-bin/setup.html#zsh
+if command -v carapace >/dev/null 2>&1; then
+	eval "$(carapace _carapace bash)" # if this fails or outputs a warning, you are running in an old bash: https://github.com/carapace-sh/carapace-bin/issues/3685
 fi
