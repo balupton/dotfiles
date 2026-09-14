@@ -1,0 +1,106 @@
+#!/usr/bin/env bash
+
+function remove_duplicates() (
+	source "$DOROTHY/sources/bash.bash"
+
+	# =====================================
+	# Arguments
+
+	function help {
+		cat <<-EOF >&2
+			ABOUT:
+			Remove duplicate ScreenFlow dir-as-files in the current path.
+
+			USAGE:
+			screenflow-duplicates
+		EOF
+		if [[ $# -ne 0 ]]; then
+			__print_error "$@"
+		fi
+		return 22 # EINVAL 22 Invalid argument
+	}
+
+	# process
+	local item option_quiet='yes'
+	while [[ $# -ne 0 ]]; do
+		item="$1"
+		shift
+		case "$item" in
+		'--help' | '-h') help ;;
+		'--no-verbose'* | '--verbose'*) __flag --source={item} --target={option_quiet} --non-affirmative ;;
+		'--no-quiet'* | '--quiet'*) __flag --source={item} --target={option_quiet} --affirmative ;;
+		'--'*) __unrecognised_flag "$item" || return $? ;;
+		*) __unrecognised_argument "$item" || return $? ;;
+		esac
+	done
+
+	# =====================================
+	# Action
+
+	local pwd
+	pwd="$(pwd)"
+	function handle_dirs() (
+		local screenflows=() path parent dirname name screenflow tar relocate_parent_dir="${1-}" temp remove=()
+		__split --target={screenflows} --invoke --no-zero-length -- find . -type d -iname '*.screenflow*'
+		for path in "${screenflows[@]}"; do
+			path="$(fs-path --absolute -- "$path")"
+			removes+=("$path")
+			parent="$(fs-path --parents -- "$path")"
+			dirname="$(fs-path --no-parents -- "$path")"
+			name="$(fs-path --no-extensions -- "$dirname")"
+			screenflow="$name.screenflow"
+			tar="$screenflow.tar"
+			cd "$parent"
+			__print_style --path="$dirname" ' => ' --path="$screenflow" ' => ' --path="$tar"
+			# clean the directory
+			fs-trim --quiet --cache -- "$path"
+			# ensure the directory ends in .screenflow, and ensure we don't overwrite an existing tar
+			if [[ $dirname != *.screenflow || -e $tar ]]; then
+				if [[ -z $relocate_parent_dir ]]; then
+					relocate_parent_dir="$parent"
+				fi
+				parent="$(fs-temp --directory)"
+				removes+=("$parent")
+				cd "$parent"
+				mv -v -- "$path" "$screenflow"
+				path="$parent/$screenflow"
+				dirname="$screenflow"
+			fi
+			# overwrite the tar target
+			# to be deterministic we use `--file=-` to stream to stdout, which we then write ourself, as doing `--file=<file>` results in a non-deterministic result
+			# use relative input, otherwise absolute path heirarchy will be included
+			env LC_ALL=C gtar --create --verbose --file=- --sort=name --mtime='2000-01-01 00:00:00' --owner=0 --group=0 --numeric-owner "$dirname" >"$tar"
+			# relocate the tar target
+			if [[ -n $relocate_parent_dir ]]; then
+				fs-move --rename -- "$tar" "$relocate_parent_dir/$tar"
+			fi
+			cd "$pwd"
+			fs-remove --quiet --no-confirm --trash -- "${removes[@]}"
+		done
+	)
+	function handle_tars() (
+		# redo screenflow zips and tars as deterministic tars
+		local archives=() archive extraction_dir parent_dir
+		__split --target={archives} --invoke --no-zero-length -- find . -type f \( -iname '*.screenflow*.tar*' -or -iname '*.screenflow*.zip*' \)
+		cd "$pwd"
+		for archive in "${archives[@]}"; do
+			extraction_dir="$(fs-temp --directory)"
+			parent_dir="$(fs-path --absolute --parents -- "$archive")"
+			__print_style --path="$archive" ' => ' --path="$extraction_dir"
+			unziptar --archive="$archive" --directory="$extraction_dir"
+			fs-remove --quiet --no-confirm --trash -- "$archive"
+			cd "$extraction_dir"
+			handle_dirs "$parent_dir"
+			cd "$pwd"
+			fs-remove --quiet --no-confirm --trash -- "$extraction_dir"
+		done
+	)
+
+	handle_tars
+	handle_dirs
+)
+
+# fire if invoked standalone
+if [[ $0 == "${BASH_SOURCE[0]}" ]]; then
+	remove_duplicates "$@"
+fi

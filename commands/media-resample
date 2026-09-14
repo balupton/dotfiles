@@ -1,0 +1,60 @@
+#!/usr/bin/env bash
+
+function media_resample() (
+	source "$DOROTHY/sources/stdinargs.bash"
+
+	function help {
+		__print_help "$@" <<-EOF || return $?
+			ABOUT:
+			Resample input as 48khz flac, and move to trash (if  supported) the original.
+
+			USAGE:
+			\`media-resample [...options] [--] <input>\`
+			\`echo-lines ...<input> | media-resample [...options]\`
+
+			OPTIONS:
+			$(__stdinargs__help_options --)
+		EOF
+		return 22 # EINVAL 22 Invalid argument
+	}
+
+	function __on_piece {
+		local input="$1" hertz no_extension output temp
+		local uhoh
+		uhoh="$(fs-path --no-extensions -- "$input")" || return $?
+		rm -fv "$uhoh."{flac,alac} || :
+		if [[ "$(fs-path --no-parents --no-extensions -- "$input")" == 'The White Stripes - Elephant - 09 - The Hardest Button to Button' ]]; then
+			return 210
+		fi
+		# this conversions sound awful... so either 96khz/192khz actually matters and people are crazy, or downsampling is not actually lossless
+		# if [[ ! -e "$input" ]]; then
+		# 	__print_style --path="$input" ' ' --error='missing' || return $?
+		# 	return 0
+		# fi
+		# if hertz="$(ffprobe -i "$input" 2>&1 </dev/null | echo-regexp -f '48000 Hz|44100 Hz')"; then
+		# 	__print_style --path="$input" ' ' --success='already ' --code="$hertz" || return $?
+		# 	return 0
+		# fi
+		# no_extension="$(fs-path --no-extension -- "$input")" || return $?
+		# output="${no_extension}.flac"
+		# if [[ $input == "$output" ]]; then
+		# 	temp="${no_extension}.temp.flac"
+		# else
+		# 	temp="$output"
+		# fi
+		# __print_style --h1="$input" || return $?
+		# ffmpeg -i "$input" -map 0 -af "aresample=resampler=soxr" -ar 48000 -y "$temp" </dev/null || return $?
+		# fs-remove --no-confirm --trash -- "$input" || return $?
+		# if [[ $temp != "$output" ]]; then
+		# 	mv "$temp" "$output" || return $?
+		# fi
+		# __print_style --g1="$input" || return $?
+	}
+
+	stdinargs "$@"
+)
+
+# fire if invoked standalone
+if [[ $0 == "${BASH_SOURCE[0]}" ]]; then
+	media_resample "$@"
+fi
