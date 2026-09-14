@@ -4,6 +4,20 @@
 // trunk-ignore-all(eslint/camelcase)
 // trunk-ignore-all(eslint/max-params)
 
+import {
+	heredoc,
+	HelpError,
+	exitWithError,
+	wantsHelp,
+} from '../../sources/ts.ts'
+
+class UsageError extends HelpError {
+	override help = heredoc`
+		USAGE:
+		\`TOKEN=<token> cloudflare-dynamic-dns.ts ...[<zone_id> <record_id> <record_type> <record_name>]\`
+	`
+}
+
 async function wanip(): Promise<string> {
 	const response = await fetch('https://whatmyip.bevry.workers.dev')
 	const result = await response.text()
@@ -105,4 +119,11 @@ async function run() {
 	}
 }
 
-run()
+try {
+	if (wantsHelp(Deno.args)) {
+		throw new UsageError()
+	}
+	await run()
+} catch (error) {
+	await exitWithError(error)
+}
